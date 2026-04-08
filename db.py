@@ -14,6 +14,7 @@ db_config = {
 
 try:
     connection = psql.connect(**db_config)
+    cursor = connection.cursor()
     print("Uppkopplad till databasen")
     
 except Exception as e:
