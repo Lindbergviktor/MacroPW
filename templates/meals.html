@@ -36,16 +36,16 @@
   <body>
     <nav class="navbar navbar-expand-lg" data-bs-theme="dark">
         <div class="container-fluid">
-            <a class="navbar-brand" href="index.html">MacroPW</a>
+            <a class="navbar-brand" href="{{ url_for('index') }}">MacroPW</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
             <div class="navbar-nav">
-                <a class="nav-link" href="index.html">Start</a>
-                <a class="nav-link active" aria-current="page" href="meals.html">Meal log</a>
-                <a class="nav-link" href="workouts.html">Workouts</a>
-                <a class="nav-link" href="statistics.html">Statistics</a>
+                <a class="nav-link" href="{{ url_for('index') }}">Start</a>
+                <a class="nav-link active" aria-current="page" href="{{ url_for('meals') }}">Meal log</a>
+                <a class="nav-link" href="{{ url_for('workouts') }}">Workouts</a>
+                <a class="nav-link" href="{{ url_for('statistics') }}">Statistics</a>
             </div>
             </div>
         </div>

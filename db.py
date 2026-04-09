@@ -12,11 +12,11 @@ db_config = {
     'database': config['database']['database']
 }
 
-try:
-    connection = psql.connect(**db_config)
-    cursor = connection.cursor()
-    print("Uppkopplad till databasen")
-    
-except Exception as e:
-    print("Fel i anslutning till databasen:", e)
-    exit()
+def get_db_connection():
+    try:
+        connection = psql.connect(**db_config)
+        return connection
+        
+    except Exception as e:
+        print("Fel i anslutning till databasen:", e)
+        return None
