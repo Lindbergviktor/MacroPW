@@ -1,36 +1,61 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, session
 from db import get_db_connection
 
 app = Flask(__name__)
-app.secret_key = "hemlig_nyckel"
+app.secret_key = "secret_key"
 
 @app.route("/")
 def index():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
     return render_template("index.html")
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        username = request.form["username"]
+        password = request.form["password"]
+
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute("SELECT user_id, username FROM users WHERE username = %s AND password = %s", (username, password))
+        user = cur.fetchone()
+        cur.close()
+        conn.close()
+
+        if user:
+            session['user_id'] = user[0]
+            session['username'] = user[1]
+            return redirect(url_for('index'))
+        else:
+            flash("Wrong username or password", "danger")
+
+    return render_template("login.html")
 
 @app.route("/meals")
 def meals():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+
     conn = get_db_connection()
     cur = conn.cursor()
 
-    # Hämta livsmedel
     cur.execute("SELECT * FROM food;")
     foods = cur.fetchall()
 
-    # Hämta sparade recept med ingredienser
     cur.execute("""
         SELECT m.meal_id, m.name, f.name, mi.amount
         FROM meal m
         JOIN meal_ingredient mi ON m.meal_id = mi.meal_id
         JOIN food f ON mi.food_id = f.food_id
+        WHERE m.user_id = %s
         ORDER BY m.meal_id
-    """)
+    """, (session['user_id'],))
     rows = cur.fetchall()
 
     cur.close()
     conn.close()
 
-    # Gruppera ingredienser per recept
     meals_dict = {}
     for meal_id, meal_name, food_name, amount in rows:
         if meal_id not in meals_dict:
@@ -41,6 +66,9 @@ def meals():
 
 @app.route("/foods")
 def foods():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+
     conn = get_db_connection()
     cur = conn.cursor()
     cur.execute("SELECT * FROM food;")
@@ -51,24 +79,26 @@ def foods():
 
 @app.route("/add_food", methods=["POST"])
 def add_food():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+
     name = request.form["name"]
     calories = request.form["calories"]
     protein = request.form["protein"]
     fat = request.form["fat"]
     carbs = request.form["carbs"]
 
-    # Validering
     if not name.strip():
-        flash("Namnet får inte vara tomt.", "danger")
+        flash("Name cannot be empty", "danger")
         return redirect(url_for("foods"))
 
     if int(calories) <= 0:
-        flash("Kalorier måste vara större än 0.", "danger")
+        flash("Calories must be greater than 0", "danger")
         return redirect(url_for("foods"))
 
     for value in [protein, fat, carbs]:
         if float(value) < 0:
-            flash("Näringsvärden kan inte vara negativa.", "danger")
+            flash("Nutritional values cannot be negative", "danger")
             return redirect(url_for("foods"))
 
     conn = get_db_connection()
@@ -85,18 +115,20 @@ def add_food():
 
 @app.route("/add_meal", methods=["POST"])
 def add_meal():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+
     meal_name = request.form["meal_name"]
     food_ids = request.form.getlist("food_id[]")
     amounts = request.form.getlist("amount[]")
 
-    # Validering
     if not meal_name.strip():
-        flash("Namnet får inte vara tomt.", "danger")
+        flash("Name cannot be empty", "danger")
         return redirect(url_for("meals"))
 
     for amount in amounts:
         if float(amount) <= 0:
-            flash("Mängd måste vara större än 0.", "danger")
+            flash("Amount must be greater than 0", "danger")
             return redirect(url_for("meals"))
 
     conn = get_db_connection()
@@ -104,7 +136,7 @@ def add_meal():
 
     cur.execute(
         "INSERT INTO meal (name, user_id) VALUES (%s, %s) RETURNING meal_id",
-        (meal_name, 1)
+        (meal_name, session['user_id'])
     )
     meal_id = cur.fetchone()[0]
 
@@ -122,13 +154,20 @@ def add_meal():
 
 @app.route("/statistics")
 def statistics():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
     return render_template("statistics.html")
 
 @app.route("/workouts")
 def workouts():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
     return render_template("workouts.html")
 
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect(url_for('login'))
 
 if __name__ == "__main__":
     app.run(debug=True)
-

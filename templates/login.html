@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MacroPW – Log In</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='login.css') }}">
+</head>
+<body>
+
+  <!-- Navbar (visas på desktop, dold på mobil) -->
+  <nav class="login-nav">
+    <div class="app-name">MacroPW</div>
+    <div class="nav-btns">
+      <button class="btn-login" data-bs-toggle="modal" data-bs-target="#loginModal">Log In</button>
+      <button class="btn-newuser" disabled>New User</button>
+    </div>
+  </nav>
+
+  <!-- Hero (mitten av sidan) -->
+  <div class="hero">
+    <div class="app-name">MacroPW</div>
+    <div class="hero-illustration">📈</div>
+    <div class="hero-text">Start Today</div>
+  </div>
+
+  <!-- Knappar (visas på mobil, dolda på desktop) -->
+  <div class="btn-section">
+    <button class="btn-login" data-bs-toggle="modal" data-bs-target="#loginModal">Log In</button>
+    <button class="btn-newuser" disabled>New User</button>
+  </div>
+    <div class="modal fade" id="loginModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+            <div class="modal-header" style="background-color: var(--green-dark);">
+                <h5 class="modal-title text-white">Log In</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }} alert-dismissible fade show mb-3" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <form method="POST" action="{{ url_for('login') }}">
+                <div class="mb-3">
+                    <label class="form-label">Username</label>
+                    <input type="text" class="form-control" name="username" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Password</label>
+                    <input type="password" class="form-control" name="password" required>
+                </div>
+                <button type="submit" class="btn btn-green w-100">Log In</button>
+                </form>
+            </div>
+
+            </div>
+        </div>
+    </div>
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div id="has-error" style="display:none;"></div>
+        {% endif %}
+    {% endwith %}
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        if (document.getElementById('has-error')) {
+            var loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
+            loginModal.show();
+        }
+    </script>
+</body>
+</html>
