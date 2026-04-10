@@ -345,6 +345,17 @@ footer {
   gap: 1.2rem;
 }
 
+.btn-green {
+  background-color: var(--green-dark);
+  color: white;
+  border: none;
+}
+
+  .btn-green:hover {
+  background-color: var(--green-mid);
+  color: white;
+}
+
 @media (min-width: 768px) {
   body {
     background: linear-gradient(135deg, #d8ead8, #b8d8b8);

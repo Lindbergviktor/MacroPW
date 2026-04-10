@@ -201,6 +201,17 @@
 
     footer { font-size: .78rem; }
 
+    .btn-green {
+      background-color: var(--green-dark);
+      color: white;
+      border: none;
+    }
+
+      .btn-green:hover {
+      background-color: var(--green-mid);
+      color: white;
+    }
+
     /* â”€â”€ Desktop two-column layout â”€â”€ */
     @media (min-width: 768px) {
       body {
