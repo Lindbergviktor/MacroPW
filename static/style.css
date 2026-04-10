@@ -1,0 +1,238 @@
+
+:root {
+      --green-dark: #2d6a2d;
+      --green-mid: #4a9c4a;
+      --green-light: #7ec87e;
+      --green-pale: #c8e6c8;
+      --green-bg: #f0f7f0;
+      --text-dark: #1a2e1a;
+      --text-muted: #6b8f6b;
+      --card-bg: #ffffff;
+      --section-bg: #ddeedd;
+      --radius: 18px;
+      --radius-sm: 12px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--green-bg);
+      color: var(--text-dark);
+      min-height: 100vh;
+      padding-bottom: 2rem;
+    }
+
+    /* â”€â”€ Navbar â”€â”€ */
+    .navbar { background: var(--green-dark) !important; }
+    .navbar-brand { font-weight: 700; letter-spacing: -.3px; }
+
+    /* â”€â”€ Hero card â”€â”€ */
+    .hero-card {
+      background: linear-gradient(160deg, #5cb85c 0%, #3a8f3a 55%, #2d6a2d 100%);
+      border-radius: var(--radius);
+      padding: 1.4rem 1.4rem 1.8rem;
+      color: #fff;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-card::before {
+      content: '';
+      position: absolute;
+      top: -60px; right: -60px;
+      width: 200px; height: 200px;
+      background: rgba(255,255,255,.07);
+      border-radius: 50%;
+    }
+
+    .hero-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+    .icon-btn {
+      background: rgba(255,255,255,.18);
+      border: none;
+      border-radius: 50%;
+      width: 40px; height: 40px;
+      display: flex; align-items: center; justify-content: center;
+      color: #fff;
+      cursor: pointer;
+      transition: background .15s;
+    }
+    .icon-btn:hover { background: rgba(255,255,255,.3); }
+
+    .date-nav {
+      display: flex; align-items: center; gap: .6rem;
+      font-weight: 600; font-size: 2rem;
+    }
+    .date-nav button {
+      background: none; border: none; color: rgba(255,255,255,.75);
+      font-size: 1rem; cursor: pointer; padding: 0 4px;
+    }
+    .date-nav button:hover { color: #fff; }
+
+    /* â”€â”€ Calorie gauge â”€â”€ */
+    .gauge-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: -1rem 0 1rem;
+    }
+    .gauge-svg { overflow: visible; transform: translateY(-28px); }
+    .gauge-track { fill: none; stroke: rgba(255,255,255,.2); stroke-width: 14; stroke-linecap: round; }
+    .gauge-fill  { fill: none; stroke: #fff; stroke-width: 12; stroke-linecap: round;
+                   stroke-dasharray: 1000;
+                   transition: stroke-dashoffset .6s ease; }
+    .gauge-center {
+      position: absolute;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+    }
+    .gauge-kcal { font-size: 1.5rem; font-weight: 700; line-height: 1; }
+    .gauge-sub  { font-size: .75rem; opacity: .75; margin-top: 2px; }
+    .gauge-icon { font-size: 1.4rem; margin-bottom: .3rem; }
+    .gauge-container {
+      position: relative;
+      width: 220px; height: 135px;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    /* â”€â”€ Macro pills â”€â”€ */
+    .macro-row { display: flex; gap: .6rem; margin-top: .2rem; }
+    .macro-pill {
+      flex: 1;
+      background: rgba(255,255,255,.92);
+      border-radius: var(--radius-sm);
+      padding: .55rem .7rem .5rem;
+      color: var(--text-dark);
+    }
+    .macro-pill .label { font-size: .72rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: .04em; }
+    .macro-pill .value { font-size: 1rem; font-weight: 700; font-family: 'DM Mono', monospace; }
+    .macro-pill .goal  { font-size: .72rem; color: var(--text-muted); font-family: 'DM Mono', monospace; }
+    .macro-bar { height: 4px; border-radius: 2px; background: var(--green-pale); margin-top: .4rem; overflow: hidden; }
+    .macro-bar-fill { height: 100%; border-radius: 2px; }
+    .bar-protein { background: #f4a261; }
+    .bar-fat     { background: #e76f51; }
+    .bar-carbs   { background: #e63946; }
+
+    /* â”€â”€ Section heading â”€â”€ */
+    .section-title {
+      font-size: .78rem; font-weight: 600;
+      text-transform: uppercase; letter-spacing: .08em;
+      color: var(--text-muted);
+      margin: 1.6rem 0 .6rem;
+    }
+
+    /* â”€â”€ Meal rows â”€â”€ */
+    .meal-list { display: flex; flex-direction: column; gap: .5rem; }
+    .meal-row {
+      background: var(--section-bg);
+      border-radius: var(--radius-sm);
+      padding: .9rem 1rem;
+      display: flex; justify-content: space-between; align-items: center;
+      cursor: pointer;
+      transition: background .15s, transform .1s;
+    }
+    .meal-row:hover { background: #cde0cd; transform: translateX(2px); }
+    .meal-row .meal-name { font-weight: 500; font-size: .95rem; }
+    .meal-row .meal-kcal { font-size: .8rem; color: var(--text-muted); font-family: 'DM Mono', monospace; margin-top: 1px; }
+    .add-btn {
+      width: 32px; height: 32px;
+      background: var(--green-mid); border: none;
+      border-radius: 50%;
+      color: #fff; font-size: 1.2rem; line-height: 1;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      transition: background .15s, transform .1s;
+      flex-shrink: 0;
+    }
+    .add-btn:hover { background: var(--green-dark); transform: scale(1.1); }
+
+    /* â”€â”€ Water tracker â”€â”€ */
+    .water-section {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 1rem 1.2rem;
+      margin-top: 1rem;
+    }
+    .water-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: .8rem; }
+    .water-title { font-weight: 600; font-size: .95rem; }
+    .water-count { font-family: 'DM Mono', monospace; font-size: .85rem; color: var(--text-muted); }
+    .water-glasses { display: flex; gap: .5rem; flex-wrap: wrap; }
+    .glass {
+      width: 38px; height: 44px;
+      border: 2px solid var(--green-pale);
+      border-top: none;
+      border-radius: 0 0 8px 8px;
+      position: relative;
+      cursor: pointer;
+      transition: border-color .15s;
+      overflow: hidden;
+      background: transparent;
+    }
+    .glass::before {
+      content: '';
+      position: absolute; bottom: 0; left: 0; right: 0;
+      height: 0%; background: #81c784;
+      transition: height .3s ease;
+      border-radius: 0 0 6px 6px;
+    }
+    .glass.filled::before { height: 80%; }
+    .glass:hover { border-color: var(--green-mid); }
+    .glass-add {
+      width: 38px; height: 44px;
+      border: 2px dashed var(--green-pale);
+      border-radius: 8px;
+      background: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem; color: var(--green-mid);
+      transition: border-color .15s, color .15s;
+    }
+    .glass-add:hover { border-color: var(--green-mid); color: var(--green-dark); }
+
+    /* â”€â”€ Action buttons â”€â”€ */
+    .action-row { display: flex; gap: .75rem; margin-top: 1.2rem; }
+    .action-row .btn { flex: 1; font-weight: 600; border-radius: var(--radius-sm); padding: .7rem; }
+    .btn-primary-green { background: var(--green-dark); border: none; color: #fff; }
+    .btn-primary-green:hover { background: #1e4d1e; color: #fff; }
+    .btn-outline-green { background: transparent; border: 2px solid var(--green-dark); color: var(--green-dark); }
+    .btn-outline-green:hover { background: var(--green-dark); color: #fff; }
+
+    footer { font-size: .78rem; }
+
+    /* â”€â”€ Desktop two-column layout â”€â”€ */
+    @media (min-width: 768px) {
+      body {
+        background: linear-gradient(135deg, #d8ead8, #b8d8b8);
+      }
+
+      .page-wrapper {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 0 2rem;
+      }
+
+      .desktop-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+        align-items: start;
+      }
+
+      .desktop-right {
+        background: var(--card-bg);
+        border-radius: 24px;
+        padding: 1.2rem 1.4rem;
+        box-shadow: 0 2px 16px rgba(0,0,0,.07);
+      }
+
+      .desktop-right .section-title {
+        margin-top: .4rem;
+      }
+
+      .desktop-right .water-section {
+        border: 1px solid var(--green-pale);
+        box-shadow: none;
+      }
+    }
