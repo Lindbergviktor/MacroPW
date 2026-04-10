@@ -38,19 +38,19 @@
             {% endif %}
         {% endwith %}
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <h4 class="mb-0">Alla livsmedel</h4>
+            <h4 class="mb-0">All Foods</h4>
             <button type="button" class="btn btn-green" data-bs-toggle="modal" data-bs-target="#addFoodModal">
-            + Lägg till livsmedel
+            + Add food
             </button>
         </div>
       <table class="table table-striped">
         <thead>
           <tr>
-            <th>Namn</th>
-            <th>Kalorier <small class="text-muted">/100g</small></th>
+            <th>Name</th>
+            <th>Calories <small class="text-muted">/100g</small></th>
             <th>Protein <small class="text-muted">/100g</small></th>
-            <th>Fett <small class="text-muted">/100g</small></th>
-            <th>Kolhydrater <small class="text-muted">/100g</small></th>
+            <th>Fat <small class="text-muted">/100g</small></th>
+            <th>Carbs <small class="text-muted">/100g</small></th>
           </tr>
         </thead>
         <tbody>
@@ -72,18 +72,18 @@
             <div class="modal-content">
 
                 <div class="modal-header" style="background-color: var(--green-dark);">
-                    <h5 class="modal-title text-white" id="addFoodModalLabel">Lägg till livsmedel</h5>
+                    <h5 class="modal-title text-white" id="addFoodModalLabel">Add Food</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
 
                 <div class="modal-body">
                     <form method="POST" action="{{ url_for('add_food') }}">
                         <div class="mb-3">
-                            <label class="form-label">Namn</label>
+                            <label class="form-label">Name</label>
                             <input type="text" class="form-control" name="name" required>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Kalorier <small class="text-muted">/100g</small></label>
+                            <label class="form-label">Calories <small class="text-muted">/100g</small></label>
                             <input type="number" class="form-control" name="calories" required>
                         </div>
                         <div class="mb-3">
@@ -91,14 +91,14 @@
                             <input type="number" step="0.1" class="form-control" name="protein" required>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Fett <small class="text-muted">/100g</small></label>
+                            <label class="form-label">Fat <small class="text-muted">/100g</small></label>
                             <input type="number" step="0.1" class="form-control" name="fat" required>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Kolhydrater <small class="text-muted">/100g</small></label>
+                            <label class="form-label">Carbs <small class="text-muted">/100g</small></label>
                             <input type="number" step="0.1" class="form-control" name="carbs" required>
                         </div>
-                        <button type="submit" class="btn btn-green w-100">Spara</button>
+                        <button type="submit" class="btn btn-green w-100">Save</button>
                     </form>
                 </div>
 

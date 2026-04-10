@@ -39,10 +39,10 @@
       {% endwith %}
 
       <div class="d-flex justify-content-between align-items-center mb-3">
-        <h4 class="mb-0">Mina måltider</h4>
+        <h4 class="mb-0">My Meals</h4>
         <div class="d-flex gap-2">
-          <a href="{{ url_for('foods') }}" class="btn btn-green">Visa livsmedel</a>
-          <button type="button" class="btn btn-green" data-bs-toggle="modal" data-bs-target="#createMealModal">+ Skapa måltid</button>
+          <a href="{{ url_for('foods') }}" class="btn btn-green">Show Foods</a>
+          <button type="button" class="btn btn-green" data-bs-toggle="modal" data-bs-target="#createMealModal">+ Create Meal</button>
         </div>
       </div>
 
@@ -71,7 +71,7 @@
         <div class="modal-content">
 
           <div class="modal-header" style="background-color: var(--green-dark);">
-            <h5 class="modal-title text-white" id="createMealModalLabel">Skapa måltid</h5>
+            <h5 class="modal-title text-white" id="createMealModalLabel">Create Meal</h5>
             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
 
@@ -79,16 +79,16 @@
             <form method="POST" action="{{ url_for('add_meal') }}">
 
               <div class="mb-3">
-                <label class="form-label">Namn på måltid</label>
+                <label class="form-label">Name</label>
                 <input type="text" class="form-control" name="meal_name" required>
               </div>
 
-              <label class="form-label">Ingredienser</label>
+              <label class="form-label">Ingredients</label>
               <div id="ingredients-container">
                 <div class="row g-2 mb-2">
                   <div class="col-7">
                     <select class="form-select" name="food_id[]" required>
-                      <option value="" disabled selected>Välj livsmedel</option>
+                      <option value="" disabled selected>Select Food</option>
                       {% for food in foods %}
                       <option value="{{ food[0] }}">{{ food[1] }}</option>
                       {% endfor %}
@@ -101,10 +101,10 @@
               </div>
 
               <button type="button" class="btn btn-outline-secondary btn-sm mb-3" id="add-ingredient-btn">
-                + Lägg till ingrediens
+                + Add Ingredient
               </button>
 
-              <button type="submit" class="btn btn-green w-100">Spara måltid</button>
+              <button type="submit" class="btn btn-green w-100">Save Meal</button>
             </form>
           </div>
 
