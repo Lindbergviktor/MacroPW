@@ -176,6 +176,10 @@ body {
   margin: .2rem 0 .9rem;
 }
 
+.card-header {
+  background-color: var(--green-pale);
+}
+
 /* Meals */
 .meal-list {
   display: flex;
@@ -351,9 +355,9 @@ footer {
   border: none;
 }
 
-  .btn-green:hover {
-  background-color: var(--green-mid);
-  color: white;
+.btn-green:hover {
+background-color: var(--green-mid);
+color: white;
 }
 
 @media (min-width: 768px) {
