@@ -360,6 +360,23 @@ background-color: var(--green-mid);
 color: white;
 }
 
+.remove-btn {
+  cursor: pointer;
+  color: var(--text-muted);
+}
+
+.modal-header {
+  background-color: var(--green-dark);
+}
+
+.modal-title {
+  color: white;
+}
+
+.modal-header .btn-close {
+  filter: invert(1);
+}
+
 @media (min-width: 768px) {
   body {
     background: linear-gradient(135deg, #d8ead8, #b8d8b8);

@@ -6,7 +6,8 @@
     <title>MacroPW – Livsmedel</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='foods.css') }}">
   </head>
   <body>
     <nav class="navbar navbar-expand-lg" data-bs-theme="dark">
@@ -75,9 +76,9 @@
         <div class="modal-dialog">
             <div class="modal-content">
 
-                <div class="modal-header" style="background-color: var(--green-dark);">
-                    <h5 class="modal-title text-white" id="addFoodModalLabel">Add Food</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addFoodModalLabel">Add Food</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
 
                 <div class="modal-body">

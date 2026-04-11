@@ -12,13 +12,14 @@ def index():
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
+    error_modal = request.args.get("modal", "loginModal")
     if request.method == "POST":
-        username = request.form["username"]
+        email = request.form["email"]
         password = request.form["password"]
 
         conn = get_db_connection()
         cur = conn.cursor()
-        cur.execute("SELECT user_id, username FROM users WHERE username = %s AND password = %s", (username, password))
+        cur.execute("SELECT user_id, name FROM users WHERE email = %s AND password = %s", (email, password))
         user = cur.fetchone()
         cur.close()
         conn.close()
@@ -28,9 +29,58 @@ def login():
             session['username'] = user[1]
             return redirect(url_for('index'))
         else:
-            flash("Wrong username or password", "danger")
+            flash("Wrong email or password.", "danger")
 
-    return render_template("login.html")
+    return render_template("login.html", error_modal=error_modal)
+
+@app.route("/register", methods=["POST"])
+def register():
+    name = request.form["name"]
+    email = request.form["email"]
+    password = request.form["password"]
+    gender = request.form["gender"]
+    height = request.form.get("height") or None
+    weight = request.form.get("weight") or None
+    activity_level = request.form.get("activity_level") or None
+
+    # Validering
+    if not name.strip():
+        flash("Name cannot be empty.", "danger")
+        return redirect(url_for("login", modal="registerModal"))
+
+    if not email.strip():
+        flash("Email cannot be empty.", "danger")
+        return redirect(url_for("login", modal="registerModal"))
+
+    if not password.strip():
+        flash("Password cannot be empty.", "danger")
+        return redirect(url_for("login", modal="registerModal"))
+
+    if len(password) < 6:
+        flash("Password must be at least 6 characters.", "danger")
+        return redirect(url_for("login", modal="registerModal"))
+
+    conn = get_db_connection()
+    cur = conn.cursor()
+
+    # Kolla om emailen redan finns
+    cur.execute("SELECT user_id FROM users WHERE email = %s", (email,))
+    if cur.fetchone():
+        flash("Email already registered.", "danger")
+        cur.close()
+        conn.close()
+        return redirect(url_for("login", modal="registerModal"))
+
+    cur.execute(
+        "INSERT INTO users (name, email, password, gender, height, weight, activity_level) VALUES (%s, %s, %s, %s, %s, %s, %s)",
+        (name, email, password, gender, height, weight, activity_level)
+    )
+    conn.commit()
+    cur.close()
+    conn.close()
+
+    flash("Account created! You can now log in.", "success")
+    return redirect(url_for("login", modal="loginModal"))
 
 @app.route("/meals")
 def meals():

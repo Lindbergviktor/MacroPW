@@ -91,6 +91,18 @@ body {
   margin: 0 1.5rem;
 }
 
+.modal-header {
+  background-color: var(--green-dark);
+}
+
+.modal-title {
+  color: white;
+}
+
+.modal-header .btn-close {
+  filter: invert(1);
+}
+
 /* Desktop */
 @media (min-width: 768px) {
   /* Visa navbar */

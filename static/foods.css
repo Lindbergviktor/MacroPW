@@ -1,0 +1,11 @@
+.modal-header {
+  background-color: var(--green-dark);
+}
+
+.modal-title {
+  color: white;
+}
+
+.modal-header .btn-close {
+  filter: invert(1);
+}
