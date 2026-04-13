@@ -105,6 +105,7 @@ body {
 
 /* Desktop */
 @media (min-width: 768px) {
+
   /* Visa navbar */
   .login-nav {
     display: flex;
@@ -131,15 +132,28 @@ body {
     width: auto;
   }
 
+  /* VISA bild + centrera */
   .hero-illustration {
     display: block;
+    width: 100%;
+    text-align: center;
   }
 
+  .hero-illustration img {
+    display: block;
+    margin: 0 auto;
+    max-width: 300px;
+    width: 100%;
+    height: auto;
+    transform: translateX(-12px);
+  }
+
+  /* Visa text */
   .hero-text {
     display: block;
   }
 
-  /* Dölj hero app-name och mobil-knappar */
+  /* Dölj mobil-delar */
   .hero .app-name {
     display: none;
   }
