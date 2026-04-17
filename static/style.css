@@ -247,3 +247,137 @@
         box-shadow: none;
       }
     }
+    body.panel-open {
+  overflow: hidden;
+}
+
+.slide-panel-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.18);
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.28s ease;
+  z-index: 9999;
+}
+
+.slide-panel-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.slide-panel {
+  width: 100%;
+  max-width: 560px;
+  min-height: 78vh;
+  background: #e7e7e7;
+  border-radius: 34px 34px 0 0;
+  overflow: hidden;
+  transform: translateY(100%);
+  transition: transform 0.32s ease;
+}
+
+.slide-panel-overlay.active .slide-panel {
+  transform: translateY(0);
+}
+
+.slide-panel-handle {
+  width: 54px;
+  height: 5px;
+  background: #cfcfcf;
+  border-radius: 999px;
+  margin: 12px auto 0;
+}
+
+.slide-panel-header {
+  background: linear-gradient(180deg, #84d96d 0%, #d8edd1 100%);
+  padding: 34px 20px 20px;
+}
+
+.slide-panel-header h2 {
+  margin: 18px 0 28px;
+  text-align: center;
+  font-size: 2.1rem;
+  font-weight: 600;
+  color: #000;
+}
+
+.slide-panel-search-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.slide-panel-search {
+  flex: 1;
+  height: 42px;
+  background: rgba(255, 255, 255, 0.88);
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  padding: 0 14px;
+}
+
+.slide-panel-search svg {
+  color: #444;
+  flex-shrink: 0;
+  margin-right: 8px;
+}
+
+.slide-panel-search input {
+  width: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 0.98rem;
+}
+
+.slide-panel-search input::placeholder {
+  color: #9b9b9b;
+}
+
+.slide-panel-menu {
+  width: 42px;
+  height: 42px;
+  border: none;
+  background: transparent;
+  padding: 0;
+  display: grid;
+  align-content: center;
+  gap: 5px;
+  flex-shrink: 0;
+}
+
+.slide-panel-menu span {
+  display: block;
+  width: 34px;
+  height: 2px;
+  margin: 0 auto;
+  background: #4d4d4d;
+  border-radius: 2px;
+}
+
+.slide-panel-actions {
+  display: flex;
+  gap: 20px;
+  padding: 22px 20px 0;
+  flex-wrap: wrap;
+}
+
+.slide-action-btn {
+  flex: 1 1 190px;
+  min-height: 42px;
+  border: 1.5px solid #8f8f8f;
+  border-radius: 999px;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 10px 18px;
+  font-size: 1rem;
+  font-weight: 500;
+}

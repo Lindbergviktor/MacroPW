@@ -99,8 +99,8 @@
                             <button class="add-btn">+</button>
                         </div>
                         <div class="meal-row">
-                            <div><div class="meal-name">Lunch</div><div class="meal-kcal">0 kcal</div></div>
-                            <button class="add-btn">+</button>
+                          <div><div class="meal-name">Lunch</div><div class="meal-kcal">0 kcal</div></div>
+                          <button class="add-btn" type="button" onclick="openLunchPanel()">+</button>
                         </div>
                         <div class="meal-row">
                             <div><div class="meal-name">Dinner</div><div class="meal-kcal">0 kcal</div></div>
@@ -136,35 +136,114 @@
         </div>
     </footer>
 
+    <div class="slide-panel-overlay" id="lunchPanelOverlay" onclick="closeLunchPanel(event)">
+    <div class="slide-panel" onclick="event.stopPropagation()">
+        <div class="slide-panel-handle"></div>
+
+        <div class="slide-panel-header">
+            <h2>Add Lunch</h2>
+        </div>
+
+        <div class="slide-panel-search-row">
+            <div class="slide-panel-search">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="7"></circle>
+                    <path d="M20 20l-3.5-3.5"></path>
+                </svg>
+                <input type="text" placeholder="Search for food">
+            </div>
+
+            <button class="slide-panel-menu" type="button" aria-label="Menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+
+        <div class="slide-panel-actions">
+            <button class="slide-action-btn" type="button">
+                <span>⚡</span>
+                <span>Quick log</span>
+            </button>
+
+            <button class="slide-action-btn" type="button">
+                <span>📄</span>
+                <span>Add food</span>
+            </button>
+        </div>
+    </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        const TOTAL = 8;
-        let filled = 3;
+      const TOTAL = 8;
+      let filled = 3;
 
-        function renderGlasses() {
-            const wrap = document.getElementById('waterGlasses');
-            wrap.innerHTML = '';
-            for (let i = 0; i < TOTAL; i++) {
-                const g = document.createElement('button');
-                g.className = 'glass' + (i < filled ? ' filled' : '');
-                g.title = i < filled ? 'Click to remove' : 'Click to add';
-                g.addEventListener('click', () => {
-                    filled = (i < filled) ? i : i + 1;
-                    renderGlasses();
-                });
-                wrap.appendChild(g);
-            }
-            if (filled < TOTAL) {
-                const plus = document.createElement('button');
-                plus.className = 'glass-add';
-                plus.innerHTML = '+';
-                plus.addEventListener('click', () => { if (filled < TOTAL) { filled++; renderGlasses(); } });
-                wrap.appendChild(plus);
-            }
-            document.getElementById('waterCount').textContent = `${filled} / ${TOTAL} glasses`;
-        }
+      function renderGlasses() {
+          const wrap = document.getElementById('waterGlasses');
+          if (!wrap) return;
 
-        renderGlasses();
+          wrap.innerHTML = '';
+
+          for (let i = 0; i < TOTAL; i++) {
+              const g = document.createElement('button');
+              g.className = 'glass' + (i < filled ? ' filled' : '');
+              g.title = i < filled ? 'Click to remove' : 'Click to add';
+
+              g.addEventListener('click', () => {
+                  filled = (i < filled) ? i : i + 1;
+                  renderGlasses();
+              });
+
+              wrap.appendChild(g);
+          }
+
+          if (filled < TOTAL) {
+              const plus = document.createElement('button');
+              plus.className = 'glass-add';
+              plus.innerHTML = '+';
+
+              plus.addEventListener('click', () => {
+                  if (filled < TOTAL) {
+                      filled++;
+                      renderGlasses();
+                  }
+              });
+
+              wrap.appendChild(plus);
+          }
+
+          const waterCount = document.getElementById('waterCount');
+          if (waterCount) {
+              waterCount.textContent = `${filled} / ${TOTAL} glasses`;
+          }
+      }
+
+      function openLunchPanel() {
+          const overlay = document.getElementById('lunchPanelOverlay');
+          if (!overlay) return;
+
+          overlay.classList.add('active');
+          document.body.classList.add('panel-open');
+      }
+
+      function closeLunchPanel(event) {
+          const overlay = document.getElementById('lunchPanelOverlay');
+          if (!overlay) return;
+
+          if (!event || event.target.id === 'lunchPanelOverlay') {
+              overlay.classList.remove('active');
+              document.body.classList.remove('panel-open');
+          }
+      }
+
+      document.addEventListener('keydown', function(event) {
+          if (event.key === 'Escape') {
+              closeLunchPanel();
+          }
+      });
+
+      renderGlasses();
     </script>
 </body>
 </html>

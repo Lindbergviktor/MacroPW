@@ -163,6 +163,13 @@ def add_food():
 
     return redirect(url_for("foods"))
 
+@app.route("/add-lunch")
+def add_lunch():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    return render_template("add_lunch.html")
+
+
 @app.route("/add_meal", methods=["POST"])
 def add_meal():
     if 'user_id' not in session:
