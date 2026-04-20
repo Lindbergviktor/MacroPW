@@ -30,34 +30,45 @@ def index():
     conn = get_db_connection()
     cur = conn.cursor()
 
-    # Hämta dagens loggade makron och kalorier
+    # Hämta totala makron och kalorier för idag
     cur.execute("""
         SELECT 
-            COALESCE(SUM(f.calories * mli.amount / 100), 0) as total_calories,
-            COALESCE(SUM(f.protein * mli.amount / 100), 0) as total_protein,
-            COALESCE(SUM(f.fat * mli.amount / 100), 0) as total_fat,
-            COALESCE(SUM(f.carbs * mli.amount / 100), 0) as total_carbs
+            COALESCE(SUM(f.calories * mli.amount / 100), 0),
+            COALESCE(SUM(f.protein * mli.amount / 100), 0),
+            COALESCE(SUM(f.fat * mli.amount / 100), 0),
+            COALESCE(SUM(f.carbs * mli.amount / 100), 0)
         FROM meal_log ml
         JOIN meal_log_item mli ON ml.log_id = mli.log_id
         JOIN food f ON mli.food_id = f.food_id
         WHERE ml.user_id = %s
         AND DATE(ml.log_date) = CURRENT_DATE
     """, (session['user_id'],))
-
     totals = cur.fetchone()
+
+    # Hämta kalorier per kategori för idag
+    cur.execute("""
+        SELECT ml.name, COALESCE(SUM(f.calories * mli.amount / 100), 0)
+        FROM meal_log ml
+        JOIN meal_log_item mli ON ml.log_id = mli.log_id
+        JOIN food f ON mli.food_id = f.food_id
+        WHERE ml.user_id = %s
+        AND DATE(ml.log_date) = CURRENT_DATE
+        GROUP BY ml.name
+    """, (session['user_id'],))
+    category_rows = cur.fetchall()
+
     cur.close()
     conn.close()
 
-    calories = round(totals[0])
-    protein = round(totals[1])
-    fat = round(totals[2])
-    carbs = round(totals[3])
+    # Bygg en dict med kalorier per kategori
+    category_calories = {row[0]: round(row[1]) for row in category_rows}
 
     return render_template("index.html",
-        calories=calories,
-        protein=protein,
-        fat=fat,
-        carbs=carbs
+        calories=round(totals[0]),
+        protein=round(totals[1]),
+        fat=round(totals[2]),
+        carbs=round(totals[3]),
+        category_calories=category_calories
     )
 
 @app.route("/start")
@@ -362,9 +373,11 @@ def log_meal(meal_id):
         return redirect(url_for('meals'))
 
     # Skapa en rad i meal_log
+    meal_category = request.form["meal_category"]
+
     cur.execute(
         "INSERT INTO meal_log (name, meal_id, user_id) VALUES (%s, %s, %s) RETURNING log_id",
-        (meal[0], meal_id, session['user_id'])
+        (meal_category, meal_id, session['user_id'])
     )
     log_id = cur.fetchone()[0]
 
