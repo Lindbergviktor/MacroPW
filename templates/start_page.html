@@ -4,23 +4,30 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>MacroPW</title>
+  <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
 
+  <!-- Navbar -->
   <nav class="navbar navbar-expand-lg" data-bs-theme="dark">
     <div class="container-fluid">
       <a class="navbar-brand" href="{{ url_for('start_page') }}">MacroPW</a>
     </div>
   </nav>
 
+  <!-- Startsida med logga och knappar för inloggning/registrering -->
   <div class="auth-wrapper">
     <div class="auth-card text-center">
+      <!-- App-logga -->
       <img src="{{ url_for('static', filename='images/Logga.png') }}" alt="MacroPW" style="height: 64px; margin: 0 auto 1.2rem;">
       <h1 class="auth-title">MacroPW</h1>
       <p class="auth-subtitle">Track your macros and reach your goals.</p>
+
+      <!-- Knappar för att logga in eller skapa konto -->
       <div class="d-flex flex-column gap-3 mt-2">
         <a href="{{ url_for('login') }}" class="btn btn-primary-green w-100" style="padding: 0.75rem;">Log In</a>
         <a href="{{ url_for('register') }}" class="btn btn-outline-green w-100" style="padding: 0.75rem;">New User</a>
@@ -28,6 +35,7 @@
     </div>
   </div>
 
+  <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

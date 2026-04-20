@@ -4,24 +4,29 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>MacroPW – New User</title>
+  <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
 
+  <!-- Navbar -->
   <nav class="navbar navbar-expand-lg" data-bs-theme="dark">
     <div class="container-fluid">
       <a class="navbar-brand" href="{{ url_for('start_page') }}">MacroPW</a>
     </div>
   </nav>
 
+  <!-- Registreringsformulär -->
   <div class="auth-wrapper">
     <div class="auth-card">
       <a href="{{ url_for('start_page') }}" class="text-muted-soft d-inline-block mb-3" style="font-size: 0.9rem;">← Back</a>
       <h2 class="auth-title">Create Account</h2>
       <p class="auth-subtitle">Start tracking your macros today.</p>
 
+      <!-- Felmeddelanden från servern -->
       {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
           {% for category, message in messages %}
@@ -33,6 +38,7 @@
         {% endif %}
       {% endwith %}
 
+      <!-- Formulärfält för ny användare -->
       <form method="POST" action="{{ url_for('register') }}">
         <div class="mb-3">
           <label class="form-label">Name</label>
@@ -54,6 +60,7 @@
             <option value="female">Female</option>
           </select>
         </div>
+        <!-- Valfria fält för beräkning av kaloribudget -->
         <div class="mb-3">
           <label class="form-label">Height (cm)</label>
           <input type="number" class="form-control" name="height">
@@ -74,12 +81,14 @@
         <button type="submit" class="btn btn-primary-green w-100" style="padding: 0.75rem;">Create Account</button>
       </form>
 
+      <!-- Länk tillbaka till inloggning -->
       <p class="text-center mt-3 mb-0" style="font-size: 0.9rem; color: var(--text-muted);">
         Already have an account? <a href="{{ url_for('login') }}" style="color: var(--green-dark); font-weight: 600;">Log in</a>
       </p>
     </div>
   </div>
 
+  <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
