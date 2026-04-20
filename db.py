@@ -1,6 +1,12 @@
 import psycopg2 as psql
 import configparser
 
+"""
+Databasanslutning för applikationen.
+
+Läser konfigurationen från config.ini och skapar uppkoppling till PostgresSQL-databasen
+"""
+
 config = configparser.ConfigParser()
 config.read('./config.ini')
 
@@ -13,6 +19,13 @@ db_config = {
 }
 
 def get_db_connection():
+    """
+    Skapar och returnerar en databasanslutning
+
+    Returnerar:
+        connection (psycopg2 connection) om lyckad anslutning
+        None om anslutningen misslyckas
+    """
     try:
         connection = psql.connect(**db_config)
         return connection
