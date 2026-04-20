@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 from db import get_db_connection
+from psycopg2 import errors
 
 """
 Flask-applikation för kost- och träningshantering.
@@ -222,13 +223,19 @@ def add_food():
 
     conn = get_db_connection()
     cur = conn.cursor()
-    cur.execute(
-        "INSERT INTO food (name, calories, protein, fat, carbs) VALUES (%s, %s, %s, %s, %s)",
-        (name, calories, protein, fat, carbs)
-    )
-    conn.commit()
-    cur.close()
-    conn.close()
+    try:
+        cur.execute(
+            "INSERT INTO food (name, calories, protein, fat, carbs) VALUES (%s, %s, %s, %s, %s)",
+            (name, calories, protein, fat, carbs)
+        )
+        conn.commit()
+    except errors.UniqueViolation:
+        conn.rollback()
+        flash("A food with that name already exists.", "danger")
+        return redirect(url_for("foods"))
+    finally:
+        cur.close()
+        conn.close()
 
     return redirect(url_for("foods"))
 
