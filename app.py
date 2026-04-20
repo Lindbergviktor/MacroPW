@@ -7,12 +7,17 @@ app.secret_key = "secret_key"
 @app.route("/")
 def index():
     if 'user_id' not in session:
-        return redirect(url_for('login'))
+        return redirect(url_for('start_page'))
     return render_template("index.html")
+
+@app.route("/start")
+def start_page():
+    """Visar startsida för icke-inloggade användare"""
+    return render_template("start_page.html")
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
-    error_modal = request.args.get("modal", "loginModal")
+    """Hanterar inloggning. GET visar inloggningsformuläret, POST validerar email och lösenord mot databasen."""
     if request.method == "POST":
         email = request.form["email"]
         password = request.form["password"]
@@ -31,10 +36,14 @@ def login():
         else:
             flash("Wrong email or password.", "danger")
 
-    return render_template("login.html", error_modal=error_modal)
+    return render_template("login.html")
 
-@app.route("/register", methods=["POST"])
+@app.route("/register", methods=["GET", "POST"])
 def register():
+    """Hanterar registrering av användare. GET visar formuläret, POST behandlar det."""
+    if request.method == "GET":
+        return render_template("register.html")
+    
     name = request.form["name"]
     email = request.form["email"]
     password = request.form["password"]
@@ -46,19 +55,27 @@ def register():
     # Validering
     if not name.strip():
         flash("Name cannot be empty.", "danger")
-        return redirect(url_for("login", modal="registerModal"))
+        return redirect(url_for("register"))
 
     if not email.strip():
         flash("Email cannot be empty.", "danger")
-        return redirect(url_for("login", modal="registerModal"))
+        return redirect(url_for("register"))
 
     if not password.strip():
         flash("Password cannot be empty.", "danger")
-        return redirect(url_for("login", modal="registerModal"))
+        return redirect(url_for("register"))
 
-    if len(password) < 6:
-        flash("Password must be at least 6 characters.", "danger")
-        return redirect(url_for("login", modal="registerModal"))
+    if len(password) < 8:
+        flash("Password must be at least 8 characters.", "danger")
+        return redirect(url_for("register"))
+
+    if not any(c.isupper() for c in password):
+        flash("Password must contain at least one uppercase letter.", "danger")
+        return redirect(url_for("register"))
+
+    if not any(c.isdigit() for c in password):
+        flash("Password must contain at least one number.", "danger")
+        return redirect(url_for("register"))
 
     conn = get_db_connection()
     cur = conn.cursor()
@@ -69,7 +86,7 @@ def register():
         flash("Email already registered.", "danger")
         cur.close()
         conn.close()
-        return redirect(url_for("login", modal="registerModal"))
+        return redirect(url_for("register"))
 
     cur.execute(
         "INSERT INTO users (name, email, password, gender, height, weight, activity_level) VALUES (%s, %s, %s, %s, %s, %s, %s)",
@@ -80,7 +97,7 @@ def register():
     conn.close()
 
     flash("Account created! You can now log in.", "success")
-    return redirect(url_for("login", modal="loginModal"))
+    return render_template("login.html")
 
 @app.route("/meals")
 def meals():
