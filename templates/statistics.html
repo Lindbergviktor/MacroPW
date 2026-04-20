@@ -1,46 +1,211 @@
 <!doctype html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>MacroPW – Statistics</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
-    <link rel="stylesheet" href="/static/style.css">
-  </head>
-  <body>
+    <title>Statistics - MacroPW</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
 
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg bg-body-tertiary" data-bs-theme="dark">
-      <div class="container-fluid">
-        <a class="navbar-brand" href="{{ url_for('index') }}">MacroPW</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-          <div class="navbar-nav">
-            <a class="nav-link" href="{{ url_for('index') }}">Start</a>
-            <a class="nav-link" href="{{ url_for('meals') }}">Meal log</a>
-            <a class="nav-link" href="{{ url_for('workouts') }}">Workouts</a>
-            <a class="nav-link active" aria-current="page" href="{{ url_for('statistics') }}">Statistics</a>
-          </div>
-          <div class="navbar-nav ms-auto">
-            <a class="nav-link" href="{{ url_for('logout') }}">Log Out</a>
-          </div>
+    <nav class="navbar navbar-expand-lg" data-bs-theme="dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{{ url_for('index') }}">MacroPW</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <div class="navbar-nav">
+                    <a class="nav-link" href="{{ url_for('index') }}">Start</a>
+                    <a class="nav-link" href="{{ url_for('meals') }}">Meal log</a>
+                    <a class="nav-link" href="{{ url_for('add_workout') }}">Workouts</a>
+                    <a class="nav-link active" href="{{ url_for('statistics') }}">Statistics</a>
+                </div>
+
+                <div class="navbar-nav ms-auto">
+                    <a class="nav-link" href="{{ url_for('logout') }}">Log Out</a>
+                </div>
+            </div>
         </div>
-      </div>
     </nav>
 
-    <!-- Statistikinnehåll -->
-    <div class="col-6 col-md-4 col-lg-3">
-      <div class="card">
-        <div class="card-body">
-          <h5 class="card-title">Visa statistik</h5>
+    <div class="page-wrapper">
+        <div class="container mt-4">
+            <div class="content-card">
+                <div class="section-title">Overview</div>
+                <h1 class="page-title">Statistics</h1>
+                <p class="page-subtitle">Your logged nutrition, workouts and water intake.</p>
+
+                <!-- Top stats -->
+                <div class="row g-3 mt-1">
+                    <div class="col-12 col-md-6 col-lg-3">
+                        <div class="stat-card">
+                            <div class="stat-label">Calories today</div>
+                            <div class="stat-value">{{ calories_today }}</div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-md-6 col-lg-3">
+                        <div class="stat-card">
+                            <div class="stat-label">Protein today</div>
+                            <div class="stat-value">{{ protein_today }} g</div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-md-6 col-lg-3">
+                        <div class="stat-card">
+                            <div class="stat-label">Workouts this week</div>
+                            <div class="stat-value">{{ workouts_this_week }}</div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-md-6 col-lg-3">
+                        <div class="stat-card">
+                            <div class="stat-label">Water today</div>
+                            <div class="stat-value">{{ water_today }} / 8</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Nutrition + workout summary -->
+                <div class="row g-4 mt-3">
+                    <div class="col-12 col-lg-6">
+                        <div class="content-card h-100">
+                            <div class="section-title">Nutrition</div>
+                            <h2 class="page-title" style="font-size: 1.25rem;">Today</h2>
+
+                            <div class="meal-list mt-3">
+                                <div class="meal-row">
+                                    <div>
+                                        <div class="meal-name">Calories</div>
+                                        <div class="meal-kcal">Logged today</div>
+                                    </div>
+                                    <div class="mono">{{ calories_today }} kcal</div>
+                                </div>
+
+                                <div class="meal-row">
+                                    <div>
+                                        <div class="meal-name">Protein</div>
+                                        <div class="meal-kcal">Logged today</div>
+                                    </div>
+                                    <div class="mono">{{ protein_today }} g</div>
+                                </div>
+
+                                <div class="meal-row">
+                                    <div>
+                                        <div class="meal-name">Fat</div>
+                                        <div class="meal-kcal">Logged today</div>
+                                    </div>
+                                    <div class="mono">{{ fat_today }} g</div>
+                                </div>
+
+                                <div class="meal-row">
+                                    <div>
+                                        <div class="meal-name">Carbs</div>
+                                        <div class="meal-kcal">Logged today</div>
+                                    </div>
+                                    <div class="mono">{{ carbs_today }} g</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-lg-6">
+                        <div class="content-card h-100">
+                            <div class="section-title">Training</div>
+                            <h2 class="page-title" style="font-size: 1.25rem;">This week</h2>
+
+                            <div class="meal-list mt-3">
+                                <div class="meal-row">
+                                    <div>
+                                        <div class="meal-name">Workouts</div>
+                                        <div class="meal-kcal">Last 7 days</div>
+                                    </div>
+                                    <div class="mono">{{ workouts_this_week }}</div>
+                                </div>
+
+                                <div class="meal-row">
+                                    <div>
+                                        <div class="meal-name">Duration</div>
+                                        <div class="meal-kcal">Last 7 days</div>
+                                    </div>
+                                    <div class="mono">{{ workout_minutes_this_week }} min</div>
+                                </div>
+
+                                <div class="meal-row">
+                                    <div>
+                                        <div class="meal-name">Workout calories</div>
+                                        <div class="meal-kcal">Last 7 days</div>
+                                    </div>
+                                    <div class="mono">{{ workout_calories_this_week }} kcal</div>
+                                </div>
+
+                                <div class="meal-row">
+                                    <div>
+                                        <div class="meal-name">Water</div>
+                                        <div class="meal-kcal">Today</div>
+                                    </div>
+                                    <div class="mono">{{ water_today }} glasses</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Last 7 days table -->
+                <div class="table-card mt-4">
+                    <div class="p-3 pb-0">
+                        <div class="section-title">History</div>
+                        <h2 class="page-title" style="font-size: 1.25rem;">Last 7 days nutrition</h2>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Calories</th>
+                                    <th>Protein</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if nutrition_last_7 %}
+                                    {% for row in nutrition_last_7 %}
+                                    <tr>
+                                        <td>{{ row[0] }}</td>
+                                        <td>{{ row[1]|round(0) }} kcal</td>
+                                        <td>{{ row[2]|round(1) }} g</td>
+                                    </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr>
+                                        <td colspan="3" class="text-center text-muted py-4">
+                                            No meal data logged yet.
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="action-row mt-4">
+                    <a href="{{ url_for('meals') }}" class="btn btn-outline-green">View Meals</a>
+                    <a href="{{ url_for('add_workout') }}" class="btn btn-primary-green">Add Workout</a>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
-  </body>
+    <footer class="text-center text-muted py-3 mt-5">
+        <div class="container">
+            <p class="mb-0">&copy; 2026 MacroPW INC. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+</body>
 </html>

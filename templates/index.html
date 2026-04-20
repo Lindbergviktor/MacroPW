@@ -11,7 +11,7 @@
   <link
     href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@500&display=swap"
     rel="stylesheet">
-  <link rel="stylesheet" href="/static/style.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 
 <body>
@@ -27,7 +27,7 @@
         <div class="navbar-nav">
           <a class="nav-link active" href="{{ url_for('index') }}">Start</a>
           <a class="nav-link" href="{{ url_for('meals') }}">Meal log</a>
-          <a class="nav-link" href="{{ url_for('workouts') }}">Workouts</a>
+          <a class="nav-link" href="{{ url_for('add_workout') }}">Workouts</a>
           <a class="nav-link" href="{{ url_for('statistics') }}">Statistics</a>
         </div>
         <div class="navbar-nav ms-auto">
@@ -124,6 +124,7 @@
           <div class="meal-list">
             <div class="meal-row">
               <div>
+
                 <div class="meal-name">Frukost</div>
                 <div class="meal-kcal">{{ category_calories.get('Frukost', 0) }} kcal</div>
               </div>
@@ -158,7 +159,7 @@
           <!-- Snabbknappar -->
           <div class="action-row">
             <a href="{{ url_for('meals') }}" class="btn btn-primary-green">Add Meal</a>
-            <a href="{{ url_for('workouts') }}" class="btn btn-outline-green">Log Workout</a>
+            <a href="{{ url_for('add_workout') }}" class="btn btn-primary-green">Add Workout</a>
           </div>
         </div>
 

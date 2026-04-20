@@ -123,7 +123,6 @@ def register():
     weight = request.form.get("weight") or None
     activity_level = request.form.get("activity_level") or None
 
-    # Validering
     if not name.strip():
         flash("Name cannot be empty.", "danger")
         return redirect(url_for("register"))
@@ -151,7 +150,6 @@ def register():
     conn = get_db_connection()
     cur = conn.cursor()
 
-    # Kolla om emailen redan finns
     cur.execute("SELECT user_id FROM users WHERE email = %s", (email,))
     if cur.fetchone():
         flash("Email already registered.", "danger")
@@ -177,10 +175,10 @@ def meals():
     Visar användarens måltider och tillgängliga livsmedel.
 
     Hämtar:
-    -Alla livsmedel från databasen.
-    -Alla måltider med ingredienser för aktuell användare.
+    - Alla livsmedel från databasen.
+    - Alla måltider med ingredienser för aktuell användare.
 
-    Returnerar: meals.html med strukturerad måltidsdata
+    Returnerar: meals.html med strukturerad måltidsdata.
     """
     conn = get_db_connection()
     cur = conn.cursor()
@@ -201,7 +199,6 @@ def meals():
     cur.close()
     conn.close()
 
-    # Grupperar databasrader till måltider med tillhörande ingredienser.
     meals_dict = {}
     for meal_id, meal_name, food_name, amount in rows:
         if meal_id not in meals_dict:
@@ -219,7 +216,6 @@ def foods():
     Kräver att användaren är inloggad.
 
     Returnerar: foods.html med lista över livsmedel.
-
     """
     conn = get_db_connection()
     cur = conn.cursor()
@@ -237,14 +233,10 @@ def add_food():
 
     Kräver att användaren är inloggad.
 
-    Förväntar formulärdata
-    - name
-    - calories
-    - protein
-    - fats
-    - carbs
+    Förväntar formulärdata:
+    - name, calories, protein, fat, carbs
 
-    Validerar input och sparar i databasen
+    Validerar input och sparar i databasen.
     """
     name = request.form["name"].strip().lower()
     calories = request.form["calories"]
@@ -256,17 +248,28 @@ def add_food():
         flash("Name cannot be empty", "danger")
         return redirect(url_for("foods"))
 
-    if int(calories) <= 0:
+    # FIX: wrap in try/except to avoid 500 crash on non-numeric input
+    try:
+        calories_val = int(calories)
+        protein_val = float(protein)
+        fat_val = float(fat)
+        carbs_val = float(carbs)
+    except ValueError:
+        flash("Calories, protein, fat and carbs must be valid numbers.", "danger")
+        return redirect(url_for("foods"))
+
+    if calories_val <= 0:
         flash("Calories must be greater than 0", "danger")
         return redirect(url_for("foods"))
 
-    for value in [protein, fat, carbs]:
-        if float(value) < 0:
+    for value in [protein_val, fat_val, carbs_val]:
+        if value < 0:
             flash("Nutritional values cannot be negative", "danger")
             return redirect(url_for("foods"))
 
     conn = get_db_connection()
     cur = conn.cursor()
+
     try:
         cur.execute(
             "INSERT INTO food (name, calories, protein, fat, carbs) VALUES (%s, %s, %s, %s, %s)",
@@ -289,14 +292,72 @@ def add_food():
 def add_lunch():
     return render_template("add_lunch.html")
 
+@app.route("/add_workout", methods=["GET", "POST"])
+def add_workout():
+    """
+    GET:  Visar formulär med befintliga workouts att välja mellan.
+    POST: Sparar ett träningspass med vald workout och duration.
+    """
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+
+    conn = get_db_connection()
+    cur = conn.cursor()
+
+    if request.method == "POST":
+        workout_id = request.form.get("workout_id")
+        duration = request.form.get("duration")
+
+        if not workout_id:
+            flash("Choose a workout.", "danger")
+            cur.close()
+            conn.close()
+            return redirect(url_for("add_workout"))
+
+        # FIX: wrap in try/except to handle non-numeric duration input
+        try:
+            duration_val = float(duration)
+        except (TypeError, ValueError):
+            flash("Duration must be a valid number.", "danger")
+            cur.close()
+            conn.close()
+            return redirect(url_for("add_workout"))
+
+        if duration_val <= 0:
+            flash("Duration must be greater than 0.", "danger")
+            cur.close()
+            conn.close()
+            return redirect(url_for("add_workout"))
+
+        cur.execute("""
+            INSERT INTO workout_log (duration, user_id, workout_id)
+            VALUES (%s, %s, %s)
+        """, (duration_val, session["user_id"], workout_id))
+
+        conn.commit()
+        cur.close()
+        conn.close()
+
+        flash("Workout saved.", "success")
+        return redirect(url_for("statistics"))
+
+    # GET: fetch available workouts to populate the dropdown
+    cur.execute("SELECT workout_id, name, calories FROM workout ORDER BY name")
+    workouts = cur.fetchall()
+
+    cur.close()
+    conn.close()
+
+    return render_template("add_workout.html", workouts=workouts)
+
 
 @app.route("/add_meal", methods=["POST"])
 @login_required
 def add_meal():
     """
     Skapar en måltid med valda ingredienser.
-    
-    Förväntar sig formulärdata
+
+    Förväntar sig formulärdata:
     - meal_name (sträng)
     - food_id[] (lista av id:n)
     - amount[] (lista av mängder)
@@ -312,8 +373,12 @@ def add_meal():
         return redirect(url_for("meals"))
 
     for amount in amounts:
-        if float(amount) <= 0:
-            flash("Amount must be greater than 0", "danger")
+        try:
+            if float(amount) <= 0:
+                flash("Amount must be greater than 0", "danger")
+                return redirect(url_for("meals"))
+        except ValueError:
+            flash("Amount must be a valid number.", "danger")
             return redirect(url_for("meals"))
 
     conn = get_db_connection()
@@ -340,12 +405,81 @@ def add_meal():
 @app.route("/statistics")
 @login_required
 def statistics():
-    return render_template("statistics.html")
 
-@app.route("/workouts")
-@login_required
-def workouts():
-    return render_template("workouts.html")
+    conn = get_db_connection()
+    cur = conn.cursor()
+
+    user_id = session["user_id"]
+
+    # Today's nutrition totals
+    cur.execute("""
+        SELECT
+            COALESCE(SUM(f.calories * mli.amount / 100.0), 0),
+            COALESCE(SUM(f.protein  * mli.amount / 100.0), 0),
+            COALESCE(SUM(f.fat      * mli.amount / 100.0), 0),
+            COALESCE(SUM(f.carbs    * mli.amount / 100.0), 0)
+        FROM meal_log ml
+        JOIN meal_log_item mli ON ml.log_id = mli.log_id
+        JOIN food f ON mli.food_id = f.food_id
+        WHERE ml.user_id = %s
+          AND DATE(ml.log_date) = CURRENT_DATE
+    """, (user_id,))
+    nutrition_today = cur.fetchone()
+
+    # This week's workout summary
+    cur.execute("""
+        SELECT
+            COUNT(*),
+            COALESCE(SUM(wl.duration), 0),
+            COALESCE(SUM((w.calories / 60.0) * wl.duration), 0)
+        FROM workout_log wl
+        JOIN workout w ON wl.workout_id = w.workout_id
+        WHERE wl.user_id = %s
+          AND wl.log_date >= CURRENT_DATE - INTERVAL '6 days'
+    """, (user_id,))
+    workouts_week = cur.fetchone()
+
+    # Today's water intake
+    cur.execute("""
+        SELECT COALESCE(SUM(nr_of_glasses), 0)
+        FROM water_log
+        WHERE user_id = %s
+          AND DATE(log_date) = CURRENT_DATE
+    """, (user_id,))
+    water_today = cur.fetchone()[0]
+
+    # FIX: was incorrectly querying workouts instead of nutrition per day
+    cur.execute("""
+        SELECT
+            DATE(ml.log_date),
+            COALESCE(SUM(f.calories * mli.amount / 100.0), 0),
+            COALESCE(SUM(f.protein  * mli.amount / 100.0), 0)
+        FROM meal_log ml
+        JOIN meal_log_item mli ON ml.log_id = mli.log_id
+        JOIN food f ON mli.food_id = f.food_id
+        WHERE ml.user_id = %s
+          AND ml.log_date >= CURRENT_DATE - INTERVAL '6 days'
+        GROUP BY DATE(ml.log_date)
+        ORDER BY DATE(ml.log_date) DESC
+    """, (user_id,))
+    nutrition_last_7 = cur.fetchall()
+
+    cur.close()
+    conn.close()
+
+    return render_template(
+        "statistics.html",
+        calories_today=round(nutrition_today[0] or 0),
+        protein_today=round(nutrition_today[1] or 0, 1),
+        fat_today=round(nutrition_today[2] or 0, 1),
+        carbs_today=round(nutrition_today[3] or 0, 1),
+        workouts_this_week=workouts_week[0] or 0,
+        workout_minutes_this_week=round(workouts_week[1] or 0),
+        workout_calories_this_week=round(workouts_week[2] or 0),
+        water_today=water_today or 0,
+        nutrition_last_7=nutrition_last_7
+    )
+
 
 @app.route("/logout")
 def logout():
