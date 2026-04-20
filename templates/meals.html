@@ -62,11 +62,11 @@
         {% for meal in meals %}
         <div class="col">
           <div class="card meal-card">
-            <div class="card-header">{{ meal.name }}</div>
+            <div class="card-header">{{ meal.name.title() }}</div>
             <div class="card-body">
               {% for ingredient in meal.ingredients %}
               <div class="ingredient-row">
-                <span>{{ ingredient.food }}</span>
+                <span>{{ ingredient.food.title() }}</span>
                 <span class="amount-badge">{{ ingredient.amount }}g</span>
               </div>
               {% endfor %}
