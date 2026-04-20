@@ -244,7 +244,7 @@ def add_food():
     if 'user_id' not in session:
         return redirect(url_for('login'))
 
-    name = request.form["name"]
+    name = request.form["name"].strip().lower()
     calories = request.form["calories"]
     protein = request.form["protein"]
     fat = request.form["fat"]
@@ -271,6 +271,7 @@ def add_food():
             (name, calories, protein, fat, carbs)
         )
         conn.commit()
+        flash("Food added!", "success")
     except errors.UniqueViolation:
         conn.rollback()
         flash("A food with that name already exists.", "danger")
@@ -304,7 +305,7 @@ def add_meal():
     if 'user_id' not in session:
         return redirect(url_for('login'))
 
-    meal_name = request.form["meal_name"]
+    meal_name = request.form["meal_name"].strip().lower()
     food_ids = request.form.getlist("food_id[]")
     amounts = request.form.getlist("amount[]")
 
