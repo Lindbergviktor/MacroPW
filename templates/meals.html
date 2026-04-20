@@ -71,6 +71,12 @@
               </div>
               {% endfor %}
             </div>
+            <!-- Knapp för att logga måltiden -->
+            <div class="card-footer">
+              <form method="POST" action="{{ url_for('log_meal', meal_id=meal.meal_id) }}">
+                <button type="submit" class="btn btn-primary-green w-100">Log Meal</button>
+              </form>
+            </div>
           </div>
         </div>
         {% endfor %}
