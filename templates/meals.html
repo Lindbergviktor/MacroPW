@@ -62,14 +62,29 @@
         {% for meal in meals %}
         <div class="col">
           <div class="card meal-card">
-            <div class="card-header">{{ meal.name }}</div>
+            <div class="card-header">{{ meal.name.title() }}</div>
             <div class="card-body">
               {% for ingredient in meal.ingredients %}
               <div class="ingredient-row">
-                <span>{{ ingredient.food }}</span>
+                <span>{{ ingredient.food.title() }}</span>
                 <span class="amount-badge">{{ ingredient.amount }}g</span>
               </div>
               {% endfor %}
+            </div>
+            <!-- Dropdown för kategori och loggknapp -->
+            <div class="card-footer">
+              <form method="POST" action="{{ url_for('log_meal', meal_id=meal.meal_id) }}">
+                <div class="mb-2">
+                  <select class="form-select form-select-sm" name="meal_category" required>
+                    <option value="" disabled selected>Välj kategori</option>
+                    <option value="Frukost">Frukost</option>
+                    <option value="Lunch">Lunch</option>
+                    <option value="Middag">Middag</option>
+                    <option value="Mellanmål">Mellanmål</option>
+                  </select>
+                </div>
+                <button type="submit" class="btn btn-primary-green w-100">Log Meal</button>
+              </form>
             </div>
           </div>
         </div>

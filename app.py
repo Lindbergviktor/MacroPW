@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 from db import get_db_connection
+from psycopg2 import errors
 
 """
 Flask-applikation för kost- och träningshantering.
@@ -21,12 +22,54 @@ app.secret_key = "secret_key"
 def index():
     """
     Startsida för användaren.
-
-    Omdirigerar till startsidan om användaren inte är inloggad.
+    Hämtar dagens loggade kalorier och makron från databasen.
     """
     if 'user_id' not in session:
         return redirect(url_for('start_page'))
-    return render_template("index.html")
+
+    conn = get_db_connection()
+    cur = conn.cursor()
+
+    # Hämta totala makron och kalorier för idag
+    cur.execute("""
+        SELECT 
+            COALESCE(SUM(f.calories * mli.amount / 100), 0),
+            COALESCE(SUM(f.protein * mli.amount / 100), 0),
+            COALESCE(SUM(f.fat * mli.amount / 100), 0),
+            COALESCE(SUM(f.carbs * mli.amount / 100), 0)
+        FROM meal_log ml
+        JOIN meal_log_item mli ON ml.log_id = mli.log_id
+        JOIN food f ON mli.food_id = f.food_id
+        WHERE ml.user_id = %s
+        AND DATE(ml.log_date) = CURRENT_DATE
+    """, (session['user_id'],))
+    totals = cur.fetchone()
+
+    # Hämta kalorier per kategori för idag
+    cur.execute("""
+        SELECT ml.name, COALESCE(SUM(f.calories * mli.amount / 100), 0)
+        FROM meal_log ml
+        JOIN meal_log_item mli ON ml.log_id = mli.log_id
+        JOIN food f ON mli.food_id = f.food_id
+        WHERE ml.user_id = %s
+        AND DATE(ml.log_date) = CURRENT_DATE
+        GROUP BY ml.name
+    """, (session['user_id'],))
+    category_rows = cur.fetchall()
+
+    cur.close()
+    conn.close()
+
+    # Bygg en dict med kalorier per kategori
+    category_calories = {row[0]: round(row[1]) for row in category_rows}
+
+    return render_template("index.html",
+        calories=round(totals[0]),
+        protein=round(totals[1]),
+        fat=round(totals[2]),
+        carbs=round(totals[3]),
+        category_calories=category_calories
+    )
 
 @app.route("/start")
 def start_page():
@@ -151,7 +194,7 @@ def meals():
     meals_dict = {}
     for meal_id, meal_name, food_name, amount in rows:
         if meal_id not in meals_dict:
-            meals_dict[meal_id] = {"name": meal_name, "ingredients": []}
+            meals_dict[meal_id] = {"name": meal_name, "meal_id": meal_id, "ingredients": []}
         meals_dict[meal_id]["ingredients"].append({"food": food_name, "amount": amount})
 
     return render_template("meals.html", foods=foods, meals=meals_dict.values())
@@ -191,7 +234,7 @@ def add_food():
     if 'user_id' not in session:
         return redirect(url_for('login'))
 
-    name = request.form["name"]
+    name = request.form["name"].strip().lower()
     calories = request.form["calories"]
     protein = request.form["protein"]
     fat = request.form["fat"]
@@ -222,13 +265,21 @@ def add_food():
 
     conn = get_db_connection()
     cur = conn.cursor()
-    cur.execute(
-        "INSERT INTO food (name, calories, protein, fat, carbs) VALUES (%s, %s, %s, %s, %s)",
-        (name, calories_val, protein_val, fat_val, carbs_val)
-    )
-    conn.commit()
-    cur.close()
-    conn.close()
+
+    try:
+        cur.execute(
+            "INSERT INTO food (name, calories, protein, fat, carbs) VALUES (%s, %s, %s, %s, %s)",
+            (name, calories, protein, fat, carbs)
+        )
+        conn.commit()
+        flash("Food added!", "success")
+    except errors.UniqueViolation:
+        conn.rollback()
+        flash("A food with that name already exists.", "danger")
+        return redirect(url_for("foods"))
+    finally:
+        cur.close()
+        conn.close()
 
     return redirect(url_for("foods"))
 
@@ -312,7 +363,7 @@ def add_meal():
     if 'user_id' not in session:
         return redirect(url_for('login'))
 
-    meal_name = request.form["meal_name"]
+    meal_name = request.form["meal_name"].strip().lower()
     food_ids = request.form.getlist("food_id[]")
     amounts = request.form.getlist("amount[]")
 
@@ -434,6 +485,52 @@ def statistics():
 def logout():
     session.clear()
     return redirect(url_for('login'))
+
+@app.route("/log_meal/<int:meal_id>", methods=["POST"])
+def log_meal(meal_id):
+    """Loggar en sparad måltid för dagens datum."""
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+
+    conn = get_db_connection()
+    cur = conn.cursor()
+
+    # Hämta måltidsnamnet
+    cur.execute("SELECT name FROM meal WHERE meal_id = %s", (meal_id,))
+    meal = cur.fetchone()
+
+    if not meal:
+        flash("Måltiden hittades inte.", "danger")
+        return redirect(url_for('meals'))
+
+    # Skapa en rad i meal_log
+    meal_category = request.form["meal_category"]
+
+    cur.execute(
+        "INSERT INTO meal_log (name, meal_id, user_id) VALUES (%s, %s, %s) RETURNING log_id",
+        (meal_category, meal_id, session['user_id'])
+    )
+    log_id = cur.fetchone()[0]
+
+    # Kopiera ingredienserna till meal_log_item
+    cur.execute(
+        "SELECT food_id, amount FROM meal_ingredient WHERE meal_id = %s",
+        (meal_id,)
+    )
+    ingredients = cur.fetchall()
+
+    for food_id, amount in ingredients:
+        cur.execute(
+            "INSERT INTO meal_log_item (log_id, food_id, amount) VALUES (%s, %s, %s)",
+            (log_id, food_id, amount)
+        )
+
+    conn.commit()
+    cur.close()
+    conn.close()
+
+    flash("Måltid loggad!", "success")
+    return redirect(url_for('index'))
 
 if __name__ == "__main__":
     app.run(debug=True)

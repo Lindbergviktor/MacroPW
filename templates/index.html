@@ -80,7 +80,7 @@
                 </svg>
                 <div class="gauge-center" style="bottom:10px;">
                   <div class="gauge-icon">🍽️</div>
-                  <div class="gauge-kcal">1970 <span
+                  <div class="gauge-kcal">{{ calories }} <span
                       style="font-size:.95rem;font-weight:500;opacity:.85">Kcal</span></div>
                   <div class="gauge-sub">Of 2200 Kcal</div>
                 </div>
@@ -91,7 +91,7 @@
             <div class="macro-row">
               <div class="macro-pill">
                 <div class="label">Protein</div>
-                <div><span class="value">67</span><span class="goal">/140</span></div>
+                <div><span class="value">{{ protein }}</span><span class="goal">/140</span></div>
                 <div class="macro-bar">
                   <div class="macro-bar-fill bar-protein"></div>
                 </div>
@@ -99,7 +99,7 @@
 
               <div class="macro-pill">
                 <div class="label">Fat</div>
-                <div><span class="value">25</span><span class="goal">/80</span></div>
+                <div><span class="value">{{ fat }}</span><span class="goal">/80</span></div>
                 <div class="macro-bar">
                   <div class="macro-bar-fill bar-fat"></div>
                 </div>
@@ -107,7 +107,7 @@
 
               <div class="macro-pill">
                 <div class="label">Carbs</div>
-                <div><span class="value">190</span><span class="goal">/300</span></div>
+                <div><span class="value">{{ carbs }}</span><span class="goal">/300</span></div>
                 <div class="macro-bar">
                   <div class="macro-bar-fill bar-carbs"></div>
                 </div>
@@ -120,37 +120,39 @@
         <div class="desktop-right">
           <div class="section-title">Meals</div>
 
+          <!-- Måltidsrader med kalorier per kategori -->
           <div class="meal-list">
             <div class="meal-row">
               <div>
-                <div class="meal-name">Breakfast</div>
-                <div class="meal-kcal">0 kcal</div>
-              </div>
-              <a href="#" class="add-btn">+</a>
-            </div>
 
-            <div class="meal-row">
-              <div>
-                <div class="meal-name">Lunch</div>
-                <div class="meal-kcal">0 kcal</div>
+                <div class="meal-name">Frukost</div>
+                <div class="meal-kcal">{{ category_calories.get('Frukost', 0) }} kcal</div>
               </div>
               <a href="{{ url_for('add_lunch') }}" class="add-btn">+</a>
             </div>
 
             <div class="meal-row">
               <div>
-                <div class="meal-name">Dinner</div>
-                <div class="meal-kcal">0 kcal</div>
+                <div class="meal-name">Lunch</div>
+                <div class="meal-kcal">{{ category_calories.get('Lunch', 0) }} kcal</div>
               </div>
-              <a href="#" class="add-btn">+</a>
+              <a href="{{ url_for('add_lunch') }}" class="add-btn">+</a>
             </div>
 
             <div class="meal-row">
               <div>
-                <div class="meal-name">Snack</div>
-                <div class="meal-kcal">0 kcal</div>
+                <div class="meal-name">Middag</div>
+                <div class="meal-kcal">{{ category_calories.get('Middag', 0) }} kcal</div>
               </div>
-              <a href="#" class="add-btn">+</a>
+              <a href="{{ url_for('add_lunch') }}" class="add-btn">+</a>
+            </div>
+
+            <div class="meal-row">
+              <div>
+                <div class="meal-name">Mellanmål</div>
+                <div class="meal-kcal">{{ category_calories.get('Mellanmål', 0) }} kcal</div>
+              </div>
+              <a href="{{ url_for('add_lunch') }}" class="add-btn">+</a>
             </div>
           </div>
 
@@ -165,7 +167,7 @@
         <div class="water-section">
           <div class="water-header">
             <span class="water-title">💧 Water</span>
-            <span class="water-count" id="waterCount">3/8 glasses</span>
+            <span class="water-count" id="waterCount">0/8 glasses</span>
           </div>
           <div class="water-glasses" id="waterGlasses"></div>
         </div>
@@ -187,7 +189,7 @@
   <!-- Vattentracker-logik -->
   <script>
     const TOTAL = 8;
-    let filled = 3;
+    let filled = 0;
 
     function renderGlasses() {
       const wrap = document.getElementById('waterGlasses');
