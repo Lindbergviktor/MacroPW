@@ -1,11 +1,29 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 from db import get_db_connection
 
+"""
+Flask-applikation för kost- och träningshantering.
+
+Funktioner:
+- Registrering och inloggning av användare
+- Hantering av livsmedel
+- Skapande av måltider med ingredienser
+- Visning av statistik och träningssidor
+
+Observera:
+- Applikationen är för utveckling och saknar säker lösenordshantering.
+"""
+
 app = Flask(__name__)
 app.secret_key = "secret_key"
 
 @app.route("/")
 def index():
+    """
+    Startsida för användaren.
+
+    Omdirigerar till startsidan om användaren inte är inloggad.
+    """
     if 'user_id' not in session:
         return redirect(url_for('start_page'))
     return render_template("index.html")
@@ -101,6 +119,15 @@ def register():
 
 @app.route("/meals")
 def meals():
+    """
+    Visar användarens måltider och tillgängliga livsmedel.
+
+    Hämtar:
+    -Alla livsmedel från databasen.
+    -Alla måltider med ingredienser för aktuell användare.
+
+    Returnerar: meals.html med strukturerad måltidsdata
+    """
     if 'user_id' not in session:
         return redirect(url_for('login'))
 
@@ -123,6 +150,7 @@ def meals():
     cur.close()
     conn.close()
 
+    # Grupperar databasrader till måltider med tillhörande ingredienser.
     meals_dict = {}
     for meal_id, meal_name, food_name, amount in rows:
         if meal_id not in meals_dict:
@@ -133,6 +161,15 @@ def meals():
 
 @app.route("/foods")
 def foods():
+    """
+    Visar alla livsmedel i databasen.
+
+    Kräver att användaren är inloggad.
+
+    Returnerar: foods.html med lista över livsmedel.
+
+    """
+    # Kontrollera att användaren är inloggad
     if 'user_id' not in session:
         return redirect(url_for('login'))
 
@@ -146,6 +183,21 @@ def foods():
 
 @app.route("/add_food", methods=["POST"])
 def add_food():
+    """
+    Lägger till ett nytt livsmedel i databasen.
+
+    Kräver att användaren är inloggad.
+
+    Förväntar formulärdata
+    - name
+    - calories
+    - protein
+    - fats
+    - carbs
+
+    Validerar input och sparar i databasen
+    """
+    # Kontrollera att användaren är inloggad
     if 'user_id' not in session:
         return redirect(url_for('login'))
 
@@ -182,6 +234,7 @@ def add_food():
 
 @app.route("/add-lunch")
 def add_lunch():
+    # Kontrollera att användaren är inloggad
     if 'user_id' not in session:
         return redirect(url_for('login'))
     return render_template("add_lunch.html")
@@ -189,6 +242,16 @@ def add_lunch():
 
 @app.route("/add_meal", methods=["POST"])
 def add_meal():
+    """
+    Skapar en måltid med valda ingredienser.
+    
+    Förväntar sig formulärdata
+    - meal_name (sträng)
+    - food_id[] (lista av id:n)
+    - amount[] (lista av mängder)
+
+    Validerar input och sparar i databasen.
+    """
     if 'user_id' not in session:
         return redirect(url_for('login'))
 
