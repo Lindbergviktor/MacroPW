@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 from db import get_db_connection
 from psycopg2 import errors
+from functools import wraps
 
 """
 Flask-applikation för kost- och träningshantering.
@@ -18,15 +19,24 @@ Observera:
 app = Flask(__name__)
 app.secret_key = "secret_key"
 
+def login_required(f):
+    """
+    Decorator som skyddar routes som kräver inloggning. Redirectar till startsidan om användaren inte är inloggad.
+    """
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'user_id' not in session:
+            return redirect(url_for('start_page'))
+        return f(*args, **kwargs)
+    return decorated_function
+
 @app.route("/")
+@login_required
 def index():
     """
     Startsida för användaren.
     Hämtar dagens loggade kalorier och makron från databasen.
     """
-    if 'user_id' not in session:
-        return redirect(url_for('start_page'))
-
     conn = get_db_connection()
     cur = conn.cursor()
 
@@ -161,6 +171,7 @@ def register():
     return render_template("login.html")
 
 @app.route("/meals")
+@login_required
 def meals():
     """
     Visar användarens måltider och tillgängliga livsmedel.
@@ -171,9 +182,6 @@ def meals():
 
     Returnerar: meals.html med strukturerad måltidsdata
     """
-    if 'user_id' not in session:
-        return redirect(url_for('login'))
-
     conn = get_db_connection()
     cur = conn.cursor()
 
@@ -203,6 +211,7 @@ def meals():
     return render_template("meals.html", foods=foods, meals=meals_dict.values())
 
 @app.route("/foods")
+@login_required
 def foods():
     """
     Visar alla livsmedel i databasen.
@@ -212,10 +221,6 @@ def foods():
     Returnerar: foods.html med lista över livsmedel.
 
     """
-    # Kontrollera att användaren är inloggad
-    if 'user_id' not in session:
-        return redirect(url_for('login'))
-
     conn = get_db_connection()
     cur = conn.cursor()
     cur.execute("SELECT * FROM food;")
@@ -225,6 +230,7 @@ def foods():
     return render_template("foods.html", foods=foods)
 
 @app.route("/add_food", methods=["POST"])
+@login_required
 def add_food():
     """
     Lägger till ett nytt livsmedel i databasen.
@@ -240,10 +246,6 @@ def add_food():
 
     Validerar input och sparar i databasen
     """
-    # Kontrollera att användaren är inloggad
-    if 'user_id' not in session:
-        return redirect(url_for('login'))
-
     name = request.form["name"].strip().lower()
     calories = request.form["calories"]
     protein = request.form["protein"]
@@ -283,14 +285,13 @@ def add_food():
     return redirect(url_for("foods"))
 
 @app.route("/add-lunch")
+@login_required
 def add_lunch():
-    # Kontrollera att användaren är inloggad
-    if 'user_id' not in session:
-        return redirect(url_for('login'))
     return render_template("add_lunch.html")
 
 
 @app.route("/add_meal", methods=["POST"])
+@login_required
 def add_meal():
     """
     Skapar en måltid med valda ingredienser.
@@ -302,9 +303,6 @@ def add_meal():
 
     Validerar input och sparar i databasen.
     """
-    if 'user_id' not in session:
-        return redirect(url_for('login'))
-
     meal_name = request.form["meal_name"].strip().lower()
     food_ids = request.form.getlist("food_id[]")
     amounts = request.form.getlist("amount[]")
@@ -340,15 +338,13 @@ def add_meal():
     return redirect(url_for("meals"))
 
 @app.route("/statistics")
+@login_required
 def statistics():
-    if 'user_id' not in session:
-        return redirect(url_for('login'))
     return render_template("statistics.html")
 
 @app.route("/workouts")
+@login_required
 def workouts():
-    if 'user_id' not in session:
-        return redirect(url_for('login'))
     return render_template("workouts.html")
 
 @app.route("/logout")
@@ -357,10 +353,9 @@ def logout():
     return redirect(url_for('login'))
 
 @app.route("/log_meal/<int:meal_id>", methods=["POST"])
+@login_required
 def log_meal(meal_id):
     """Loggar en sparad måltid för dagens datum."""
-    if 'user_id' not in session:
-        return redirect(url_for('login'))
 
     conn = get_db_connection()
     cur = conn.cursor()
