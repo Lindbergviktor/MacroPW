@@ -19,6 +19,23 @@ Observera:
 app = Flask(__name__)
 app.secret_key = "secret_key"
 
+from contextlib import contextmanager
+
+@contextmanager
+def get_db():
+           conn = get_db_connection()
+           cur = conn.cursor()
+           try:
+                yield cur
+                conn.commit()
+           except Exception:
+               conn.rollback()
+               raise
+           finally:
+               cur.close()
+               conn.close()
+
+
 def login_required(f):
     """
     Decorator som skyddar routes som kräver inloggning. Redirectar till startsidan om användaren inte är inloggad.
@@ -37,38 +54,35 @@ def index():
     Startsida för användaren.
     Hämtar dagens loggade kalorier och makron från databasen.
     """
-    conn = get_db_connection()
-    cur = conn.cursor()
+    try:
+        with get_db() as cur:
+            cur.execute("""
+            SELECT 
+                COALESCE(SUM(f.calories * mli.amount / 100), 0),
+                COALESCE(SUM(f.protein * mli.amount / 100), 0),
+                COALESCE(SUM(f.fat * mli.amount / 100), 0),
+                COALESCE(SUM(f.carbs * mli.amount / 100), 0)
+            FROM meal_log ml
+            JOIN meal_log_item mli ON ml.log_id = mli.log_id
+            JOIN food f ON mli.food_id = f.food_id
+            WHERE ml.user_id = %s
+            AND DATE(ml.log_date) = CURRENT_DATE
+        """, (session['user_id'],))
+            totals = cur.fetchone()
 
-    # Hämta totala makron och kalorier för idag
-    cur.execute("""
-        SELECT 
-            COALESCE(SUM(f.calories * mli.amount / 100), 0),
-            COALESCE(SUM(f.protein * mli.amount / 100), 0),
-            COALESCE(SUM(f.fat * mli.amount / 100), 0),
-            COALESCE(SUM(f.carbs * mli.amount / 100), 0)
-        FROM meal_log ml
-        JOIN meal_log_item mli ON ml.log_id = mli.log_id
-        JOIN food f ON mli.food_id = f.food_id
-        WHERE ml.user_id = %s
-        AND DATE(ml.log_date) = CURRENT_DATE
-    """, (session['user_id'],))
-    totals = cur.fetchone()
-
-    # Hämta kalorier per kategori för idag
-    cur.execute("""
-        SELECT ml.name, COALESCE(SUM(f.calories * mli.amount / 100), 0)
-        FROM meal_log ml
-        JOIN meal_log_item mli ON ml.log_id = mli.log_id
-        JOIN food f ON mli.food_id = f.food_id
-        WHERE ml.user_id = %s
-        AND DATE(ml.log_date) = CURRENT_DATE
-        GROUP BY ml.name
-    """, (session['user_id'],))
-    category_rows = cur.fetchall()
-
-    cur.close()
-    conn.close()
+            cur.execute("""
+            SELECT ml.name, COALESCE(SUM(f.calories * mli.amount / 100), 0)
+            FROM meal_log ml
+            JOIN meal_log_item mli ON ml.log_id = mli.log_id
+            JOIN food f ON mli.food_id = f.food_id
+            WHERE ml.user_id = %s
+            AND DATE(ml.log_date) = CURRENT_DATE
+            GROUP BY ml.name
+        """, (session['user_id'],))
+            category_rows = cur.fetchall()
+    except Exception:
+        flash("Kunde inte hämta data.", "danger")  
+        return redirect(url_for("start_page"))      
 
     # Bygg en dict med kalorier per kategori
     category_calories = {row[0]: round(row[1]) for row in category_rows}
@@ -88,17 +102,20 @@ def start_page():
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
-    """Hanterar inloggning. GET visar inloggningsformuläret, POST validerar email och lösenord mot databasen."""
     if request.method == "POST":
         email = request.form["email"]
         password = request.form["password"]
 
-        conn = get_db_connection()
-        cur = conn.cursor()
-        cur.execute("SELECT user_id, name FROM users WHERE email = %s AND password = %s", (email, password))
-        user = cur.fetchone()
-        cur.close()
-        conn.close()
+        try:
+            with get_db() as cur:
+                cur.execute(
+                    "SELECT user_id, name FROM users WHERE email = %s AND password = %s",
+                    (email, password)
+                )
+                user = cur.fetchone()
+        except Exception:
+            flash("Databasfel vid inloggning.", "danger")
+            return render_template("login.html")
 
         if user:
             session['user_id'] = user[0]
@@ -147,23 +164,24 @@ def register():
         flash("Password must contain at least one number.", "danger")
         return redirect(url_for("register"))
 
-    conn = get_db_connection()
-    cur = conn.cursor()
+    try:
+        with get_db() as cur:
+            cur.execute("SELECT user_id FROM users WHERE email = %s", (email,))
+            existing = cur.fetchone()
 
-    cur.execute("SELECT user_id FROM users WHERE email = %s", (email,))
-    if cur.fetchone():
-        flash("Email already registered.", "danger")
-        cur.close()
-        conn.close()
-        return redirect(url_for("register"))
+            if not existing:
+                cur.execute(
+                    "INSERT INTO users (name, email, password, gender, height, weight, activity_level) VALUES (%s,%s,%s,%s,%s,%s,%s)",
+                    (name, email, password, gender, height, weight, activity_level)
+                )
 
-    cur.execute(
-        "INSERT INTO users (name, email, password, gender, height, weight, activity_level) VALUES (%s, %s, %s, %s, %s, %s, %s)",
-        (name, email, password, gender, height, weight, activity_level)
-    )
-    conn.commit()
-    cur.close()
-    conn.close()
+    except Exception:
+        flash("Databasfel vid registrering.", "danger") 
+        return redirect(url_for("register"))  
+
+    if existing:
+        flash("Email already registered.", "danger") 
+        return redirect(url_for("register"))    
 
     flash("Account created! You can now log in.", "success")
     return render_template("login.html")
@@ -180,24 +198,23 @@ def meals():
 
     Returnerar: meals.html med strukturerad måltidsdata.
     """
-    conn = get_db_connection()
-    cur = conn.cursor()
+    try:
+        with get_db() as cur:
+            cur.execute("SELECT * FROM food;")
+            foods = cur.fetchall()
 
-    cur.execute("SELECT * FROM food;")
-    foods = cur.fetchall()
-
-    cur.execute("""
+            cur.execute("""
         SELECT m.meal_id, m.name, f.name, mi.amount
         FROM meal m
         JOIN meal_ingredient mi ON m.meal_id = mi.meal_id
         JOIN food f ON mi.food_id = f.food_id
         WHERE m.user_id = %s
         ORDER BY m.meal_id
-    """, (session['user_id'],))
-    rows = cur.fetchall()
-
-    cur.close()
-    conn.close()
+         """,(session['user_id'],) )
+            rows = cur.fetchall()
+    except Exception:
+        flash("Kunde inte hämta måltider.", "danger")
+        return redirect(url_for("index"))
 
     meals_dict = {}
     for meal_id, meal_name, food_name, amount in rows:
@@ -217,12 +234,14 @@ def foods():
 
     Returnerar: foods.html med lista över livsmedel.
     """
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute("SELECT * FROM food;")
-    foods = cur.fetchall()
-    cur.close()
-    conn.close()
+    try:
+        with get_db() as cur:
+            cur.execute("SELECT * FROM food;")
+            foods = cur.fetchall()
+    except Exception:
+     flash("Kunde inte hämta livsmedel.", "danger")
+     return redirect(url_for("index"))   
+     
     return render_template("foods.html", foods=foods)
 
 @app.route("/add_food", methods=["POST"])
@@ -267,23 +286,17 @@ def add_food():
             flash("Nutritional values cannot be negative", "danger")
             return redirect(url_for("foods"))
 
-    conn = get_db_connection()
-    cur = conn.cursor()
-
     try:
-        cur.execute(
-            "INSERT INTO food (name, calories, protein, fat, carbs) VALUES (%s, %s, %s, %s, %s)",
+        with get_db() as cur:
+            cur.execute(
+                    "INSERT INTO food (name, calories, protein, fat, carbs) VALUES (%s, %s, %s, %s, %s)",
             (name, calories, protein, fat, carbs)
-        )
-        conn.commit()
+            )
         flash("Food added!", "success")
     except errors.UniqueViolation:
-        conn.rollback()
-        flash("A food with that name already exists.", "danger")
-        return redirect(url_for("foods"))
-    finally:
-        cur.close()
-        conn.close()
+        flash("A food with that name already exists.", "danger")        
+    except Exception:
+        flash("Databasfel vid tillägg av livsmedel.", "danger")
 
     return redirect(url_for("foods"))
 
@@ -294,15 +307,8 @@ def add_lunch():
 
 @app.route("/add_workout", methods=["GET", "POST"])
 def add_workout():
-    """
-    GET:  Visar formulär med befintliga workouts att välja mellan.
-    POST: Sparar ett träningspass med vald workout och duration.
-    """
     if 'user_id' not in session:
         return redirect(url_for('login'))
-
-    conn = get_db_connection()
-    cur = conn.cursor()
 
     if request.method == "POST":
         workout_id = request.form.get("workout_id")
@@ -310,43 +316,38 @@ def add_workout():
 
         if not workout_id:
             flash("Choose a workout.", "danger")
-            cur.close()
-            conn.close()
             return redirect(url_for("add_workout"))
 
-        # FIX: wrap in try/except to handle non-numeric duration input
         try:
             duration_val = float(duration)
         except (TypeError, ValueError):
             flash("Duration must be a valid number.", "danger")
-            cur.close()
-            conn.close()
             return redirect(url_for("add_workout"))
 
         if duration_val <= 0:
             flash("Duration must be greater than 0.", "danger")
-            cur.close()
-            conn.close()
             return redirect(url_for("add_workout"))
 
-        cur.execute("""
-            INSERT INTO workout_log (duration, user_id, workout_id)
-            VALUES (%s, %s, %s)
-        """, (duration_val, session["user_id"], workout_id))
-
-        conn.commit()
-        cur.close()
-        conn.close()
+        try:
+            with get_db() as cur:
+                cur.execute("""
+                    INSERT INTO workout_log (duration, user_id, workout_id)
+                    VALUES (%s, %s, %s)
+                """, (duration_val, session["user_id"], workout_id))
+        except Exception:
+            flash("Databasfel vid sparande av träningspass.", "danger")
+            return redirect(url_for("add_workout"))
 
         flash("Workout saved.", "success")
         return redirect(url_for("statistics"))
 
-    # GET: fetch available workouts to populate the dropdown
-    cur.execute("SELECT workout_id, name, calories FROM workout ORDER BY name")
-    workouts = cur.fetchall()
-
-    cur.close()
-    conn.close()
+    try:
+        with get_db() as cur:
+            cur.execute("SELECT workout_id, name, calories FROM workout ORDER BY name")
+            workouts = cur.fetchall()
+    except Exception:
+        flash("Kunde inte hämta träningspass.", "danger")
+        return redirect(url_for("index"))
 
     return render_template("add_workout.html", workouts=workouts)
 
@@ -381,91 +382,85 @@ def add_meal():
             flash("Amount must be a valid number.", "danger")
             return redirect(url_for("meals"))
 
-    conn = get_db_connection()
-    cur = conn.cursor()
-
-    cur.execute(
-        "INSERT INTO meal (name, user_id) VALUES (%s, %s) RETURNING meal_id",
-        (meal_name, session['user_id'])
-    )
-    meal_id = cur.fetchone()[0]
-
-    for food_id, amount in zip(food_ids, amounts):
+    try:
+     with get_db() as cur:
         cur.execute(
-            "INSERT INTO meal_ingredient (meal_id, food_id, amount) VALUES (%s, %s, %s)",
-            (meal_id, food_id, amount)
+            "INSERT INTO meal (name, user_id) VALUES (%s, %s) RETURNING meal_id",
+            (meal_name, session['user_id'])
         )
+        meal_id = cur.fetchone()[0]
 
-    conn.commit()
-    cur.close()
-    conn.close()
+        for food_id, amount in zip(food_ids, amounts):
+            cur.execute(
+                "INSERT INTO meal_ingredient (meal_id, food_id, amount) VALUES (%s, %s, %s)",
+                (meal_id, food_id, amount)
+            )
+    except Exception:
+        flash("Databasfel vid skapande av måltid.", "danger")
+        return redirect(url_for("meals"))
+
+        
+
 
     return redirect(url_for("meals"))
 
 @app.route("/statistics")
 @login_required
 def statistics():
-
-    conn = get_db_connection()
-    cur = conn.cursor()
-
     user_id = session["user_id"]
 
-    # Today's nutrition totals
-    cur.execute("""
-        SELECT
-            COALESCE(SUM(f.calories * mli.amount / 100.0), 0),
-            COALESCE(SUM(f.protein  * mli.amount / 100.0), 0),
-            COALESCE(SUM(f.fat      * mli.amount / 100.0), 0),
-            COALESCE(SUM(f.carbs    * mli.amount / 100.0), 0)
-        FROM meal_log ml
-        JOIN meal_log_item mli ON ml.log_id = mli.log_id
-        JOIN food f ON mli.food_id = f.food_id
-        WHERE ml.user_id = %s
-          AND DATE(ml.log_date) = CURRENT_DATE
-    """, (user_id,))
-    nutrition_today = cur.fetchone()
+    try:
+        with get_db() as cur:
+            cur.execute("""
+                SELECT
+                    COALESCE(SUM(f.calories * mli.amount / 100.0), 0),
+                    COALESCE(SUM(f.protein  * mli.amount / 100.0), 0),
+                    COALESCE(SUM(f.fat      * mli.amount / 100.0), 0),
+                    COALESCE(SUM(f.carbs    * mli.amount / 100.0), 0)
+                FROM meal_log ml
+                JOIN meal_log_item mli ON ml.log_id = mli.log_id
+                JOIN food f ON mli.food_id = f.food_id
+                WHERE ml.user_id = %s AND DATE(ml.log_date) = CURRENT_DATE
+            """, (user_id,))
+            nutrition_today = cur.fetchone()
 
-    # This week's workout summary
-    cur.execute("""
-        SELECT
-            COUNT(*),
-            COALESCE(SUM(wl.duration), 0),
-            COALESCE(SUM((w.calories / 60.0) * wl.duration), 0)
-        FROM workout_log wl
-        JOIN workout w ON wl.workout_id = w.workout_id
-        WHERE wl.user_id = %s
-          AND wl.log_date >= CURRENT_DATE - INTERVAL '6 days'
-    """, (user_id,))
-    workouts_week = cur.fetchone()
+            cur.execute("""
+                SELECT
+                    COUNT(*),
+                    COALESCE(SUM(wl.duration), 0),
+                    COALESCE(SUM((w.calories / 60.0) * wl.duration), 0)
+                FROM workout_log wl
+                JOIN workout w ON wl.workout_id = w.workout_id
+                WHERE wl.user_id = %s
+                  AND wl.log_date >= CURRENT_DATE - INTERVAL '6 days'
+            """, (user_id,))
+            workouts_week = cur.fetchone()
 
-    # Today's water intake
-    cur.execute("""
-        SELECT COALESCE(SUM(nr_of_glasses), 0)
-        FROM water_log
-        WHERE user_id = %s
-          AND DATE(log_date) = CURRENT_DATE
-    """, (user_id,))
-    water_today = cur.fetchone()[0]
+            cur.execute("""
+                SELECT COALESCE(SUM(nr_of_glasses), 0)
+                FROM water_log
+                WHERE user_id = %s AND DATE(log_date) = CURRENT_DATE
+            """, (user_id,))
+            water_today = cur.fetchone()[0]
 
-    # FIX: was incorrectly querying workouts instead of nutrition per day
-    cur.execute("""
-        SELECT
-            DATE(ml.log_date),
-            COALESCE(SUM(f.calories * mli.amount / 100.0), 0),
-            COALESCE(SUM(f.protein  * mli.amount / 100.0), 0)
-        FROM meal_log ml
-        JOIN meal_log_item mli ON ml.log_id = mli.log_id
-        JOIN food f ON mli.food_id = f.food_id
-        WHERE ml.user_id = %s
-          AND ml.log_date >= CURRENT_DATE - INTERVAL '6 days'
-        GROUP BY DATE(ml.log_date)
-        ORDER BY DATE(ml.log_date) DESC
-    """, (user_id,))
-    nutrition_last_7 = cur.fetchall()
+            cur.execute("""
+                SELECT
+                    DATE(ml.log_date),
+                    COALESCE(SUM(f.calories * mli.amount / 100.0), 0),
+                    COALESCE(SUM(f.protein  * mli.amount / 100.0), 0)
+                FROM meal_log ml
+                JOIN meal_log_item mli ON ml.log_id = mli.log_id
+                JOIN food f ON mli.food_id = f.food_id
+                WHERE ml.user_id = %s
+                  AND ml.log_date >= CURRENT_DATE - INTERVAL '6 days'
+                GROUP BY DATE(ml.log_date)
+                ORDER BY DATE(ml.log_date) DESC
+            """, (user_id,))
+            nutrition_last_7 = cur.fetchall()
 
-    cur.close()
-    conn.close()
+    except Exception:
+        flash("Kunde inte hämta statistik.", "danger")
+        return redirect(url_for("index"))
 
     return render_template(
         "statistics.html",
@@ -479,6 +474,7 @@ def statistics():
         water_today=water_today or 0,
         nutrition_last_7=nutrition_last_7
     )
+    
 
 
 @app.route("/logout")
@@ -491,42 +487,36 @@ def logout():
 def log_meal(meal_id):
     """Loggar en sparad måltid för dagens datum."""
 
-    conn = get_db_connection()
-    cur = conn.cursor()
+    try:
+        with get_db() as cur:
+            cur.execute("SELECT name FROM meal WHERE meal_id = %s", (meal_id,))
+            meal = cur.fetchone()
 
-    # Hämta måltidsnamnet
-    cur.execute("SELECT name FROM meal WHERE meal_id = %s", (meal_id,))
-    meal = cur.fetchone()
+            if not meal:
+                flash("Måltiden hittades inte.", "danger")
+                return redirect(url_for('meals'))
 
-    if not meal:
-        flash("Måltiden hittades inte.", "danger")
+            meal_category = request.form["meal_category"]
+
+            cur.execute(
+                "INSERT INTO meal_log (name, meal_id, user_id) VALUES (%s, %s, %s) RETURNING log_id",
+                (meal_category, meal_id, session['user_id'])
+            )
+            log_id = cur.fetchone()[0]
+
+            cur.execute(
+                "SELECT food_id, amount FROM meal_ingredient WHERE meal_id = %s", (meal_id,)
+            )
+            ingredients = cur.fetchall()
+
+            for food_id, amount in ingredients:
+                cur.execute(
+                     "INSERT INTO meal_log_item (log_id, food_id, amount) VALUES (%s, %s, %s)",
+                     (log_id, food_id, amount)
+                )
+    except Exception:
+        flash("Databasfel vid loggning av måltid.", "danger")
         return redirect(url_for('meals'))
-
-    # Skapa en rad i meal_log
-    meal_category = request.form["meal_category"]
-
-    cur.execute(
-        "INSERT INTO meal_log (name, meal_id, user_id) VALUES (%s, %s, %s) RETURNING log_id",
-        (meal_category, meal_id, session['user_id'])
-    )
-    log_id = cur.fetchone()[0]
-
-    # Kopiera ingredienserna till meal_log_item
-    cur.execute(
-        "SELECT food_id, amount FROM meal_ingredient WHERE meal_id = %s",
-        (meal_id,)
-    )
-    ingredients = cur.fetchall()
-
-    for food_id, amount in ingredients:
-        cur.execute(
-            "INSERT INTO meal_log_item (log_id, food_id, amount) VALUES (%s, %s, %s)",
-            (log_id, food_id, amount)
-        )
-
-    conn.commit()
-    cur.close()
-    conn.close()
 
     flash("Måltid loggad!", "success")
     return redirect(url_for('index'))
