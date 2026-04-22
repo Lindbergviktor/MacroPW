@@ -289,20 +289,32 @@ def add_food():
         if value < 0:
             flash("Nutritional values cannot be negative", "danger")
             return redirect(url_for("foods"))
+    if protein_val + fat_val + carbs_val > 100:
+        flash("Protein, fat and carbs cannot exceed 100g combined.", "danger")
+        return redirect(url_for("foods"))
 
     try:
         with get_db() as cur:
             cur.execute(
-                    "INSERT INTO food (name, calories, protein, fat, carbs) VALUES (%s, %s, %s, %s, %s)",
-            (name, calories_val, protein_val, fat_val, carbs_val)
+                "INSERT INTO food (name, calories, protein, fat, carbs) VALUES (%s, %s, %s, %s, %s)",
+                (name, calories_val, protein_val, fat_val, carbs_val)
             )
         flash("Food added!", "success")
+
     except errors.UniqueViolation:
-        flash("A food with that name already exists.", "danger")        
+        flash("A food with that name already exists.", "danger")
+        return redirect(url_for("foods"))
+
+    except errors.NumericValueOutOfRange:
+        flash("One or more values are too large.", "danger")
+        return redirect(url_for("foods"))
+
     except Exception:
-        flash("Databasfel vid tillägg av livsmedel.", "danger")
+        flash("Database error when adding food.", "danger")
+        return redirect(url_for("foods"))
 
     return redirect(url_for("foods"))
+
 
 @app.route("/add-lunch")
 @login_required
