@@ -34,6 +34,13 @@ def get_db():
            finally:
                cur.close()
                conn.close()
+               
+def get_all_foods():
+    """Hämtar alla livsmedel från databasen."""
+    with get_db() as cur:
+        cur.execute("SELECT * FROM food;")
+        return cur.fetchall()
+
 
 
 def login_required(f):
@@ -199,9 +206,8 @@ def meals():
     Returnerar: meals.html med strukturerad måltidsdata.
     """
     try:
-        with get_db() as cur:
-            cur.execute("SELECT * FROM food;")
-            foods = cur.fetchall()
+        foods = get_all_foods()
+        with get_db() as cur:    
 
             cur.execute("""
         SELECT m.meal_id, m.name, f.name, mi.amount
@@ -235,12 +241,10 @@ def foods():
     Returnerar: foods.html med lista över livsmedel.
     """
     try:
-        with get_db() as cur:
-            cur.execute("SELECT * FROM food;")
-            foods = cur.fetchall()
+        foods = get_all_foods()
     except Exception:
-     flash("Kunde inte hämta livsmedel.", "danger")
-     return redirect(url_for("index"))   
+        flash("Kunde inte hämta livsmedel.", "danger")
+        return redirect(url_for("index"))   
      
     return render_template("foods.html", foods=foods)
 
@@ -383,24 +387,21 @@ def add_meal():
             return redirect(url_for("meals"))
 
     try:
-     with get_db() as cur:
-        cur.execute(
-            "INSERT INTO meal (name, user_id) VALUES (%s, %s) RETURNING meal_id",
-            (meal_name, session['user_id'])
-        )
-        meal_id = cur.fetchone()[0]
-
-        for food_id, amount in zip(food_ids, amounts):
+        with get_db() as cur:
             cur.execute(
-                "INSERT INTO meal_ingredient (meal_id, food_id, amount) VALUES (%s, %s, %s)",
-                (meal_id, food_id, amount)
+                "INSERT INTO meal (name, user_id) VALUES (%s, %s) RETURNING meal_id",
+                (meal_name, session['user_id'])
             )
+            meal_id = cur.fetchone()[0]
+
+            for food_id, amount in zip(food_ids, amounts):
+                cur.execute(
+                    "INSERT INTO meal_ingredient (meal_id, food_id, amount) VALUES (%s, %s, %s)",
+                    (meal_id, food_id, amount)
+                )
     except Exception:
         flash("Databasfel vid skapande av måltid.", "danger")
         return redirect(url_for("meals"))
-
-        
-
 
     return redirect(url_for("meals"))
 
