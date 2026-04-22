@@ -290,7 +290,7 @@ def add_food():
         with get_db() as cur:
             cur.execute(
                     "INSERT INTO food (name, calories, protein, fat, carbs) VALUES (%s, %s, %s, %s, %s)",
-            (name, calories, protein, fat, carbs)
+            (name, calories_val, protein_val, fat_val, carbs_val)
             )
         flash("Food added!", "success")
     except errors.UniqueViolation:
