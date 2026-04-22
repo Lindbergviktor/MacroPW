@@ -1,28 +1,28 @@
 :root {
-  --green-dark: #2d6a2d;
-  --green-mid: #4a9c4a;
-  --green-light: #7ec87e;
-  --green-pale: #c8e6c8;
-  --green-bg: #f0f7f0;
+  --blue-dark: #00A4D1;
+  --blue-mid: #00C8FF;
+  --blue-light: #DAF7FF;
+  --blue-pale: #E1EEF1;
+  --blue-bg: #F7FCFD;
 
-  --text-dark: #1a2e1a;
-  --text-muted: #6b8f6b;
+  --text-dark: #22383e;
+  --text-muted: #6f8790;
 
   --card-bg: #ffffff;
-  --section-bg: #ddeedd;
-  --border-soft: #d7e6d7;
+  --section-bg: #dbecef;
+  --border-soft: #b9dde6;
 
-  --danger: #e63946;
-  --warning: #f4a261;
-  --accent: #e76f51;
-  --water: #81c784;
+  --danger: #e85d5d;
+  --warning: #f2b544;
+  --accent: #f08a24;
+  --water: #8fdcf2;
 
   --radius: 18px;
   --radius-lg: 24px;
   --radius-sm: 12px;
 
   --shadow-soft: 0 2px 16px rgba(0, 0, 0, 0.07);
-  --shadow-card: 0 8px 24px rgba(45, 106, 45, 0.08);
+  --shadow-card: 0 10px 28px rgba(0, 164, 209, 0.14);
 }
 
 * {
@@ -37,7 +37,7 @@ body {
 
 body {
   font-family: "DM Sans", sans-serif;
-  background: var(--green-bg);
+  background: var(--blue-bg);
   color: var(--text-dark);
   min-height: 100vh;
   padding-bottom: 2rem;
@@ -71,10 +71,20 @@ textarea {
 
 .content-card,
 .panel-card,
-.page-card {
+.page-card,
+.form-card,
+.table-card,
+.stat-card,
+.card-soft {
   background: var(--card-bg);
   border-radius: var(--radius);
   box-shadow: var(--shadow-soft);
+}
+
+.content-card,
+.panel-card,
+.page-card,
+.form-card {
   padding: 1.2rem;
 }
 
@@ -111,10 +121,14 @@ textarea {
   color: var(--text-muted);
 }
 
+.mono {
+  font-family: "DM Mono", monospace;
+}
+
 /* ===== Navbar ===== */
 
 .navbar {
-  background: var(--green-dark) !important;
+  background: var(--blue-dark) !important;
 }
 
 .navbar-brand {
@@ -123,7 +137,7 @@ textarea {
 }
 
 .navbar .nav-link {
-  color: rgba(255, 255, 255, 0.82) !important;
+  color: rgba(255, 255, 255, 0.84) !important;
   font-weight: 500;
 }
 
@@ -139,30 +153,32 @@ textarea {
   font-weight: 600;
 }
 
+.btn-primary,
 .btn-primary-green {
-  background: var(--green-dark);
+  background: var(--blue-dark);
   border: none;
   color: #fff;
 }
 
+.btn-primary:hover,
 .btn-primary-green:hover {
-  background: #1e4d1e;
+  background: #008bb0;
   color: #fff;
 }
 
 .btn-outline-green {
   background: transparent;
-  border: 2px solid var(--green-dark);
-  color: var(--green-dark);
+  border: 2px solid var(--blue-dark);
+  color: var(--blue-dark);
 }
 
 .btn-outline-green:hover {
-  background: var(--green-dark);
+  background: var(--blue-dark);
   color: #fff;
 }
 
 .icon-btn {
-  background: rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.92);
   border: none;
   border-radius: 50%;
   width: 40px;
@@ -170,23 +186,24 @@ textarea {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #fff;
+  color: var(--text-dark);
   cursor: pointer;
-  transition: background 0.15s ease;
+  transition: background 0.15s ease, transform 0.15s ease;
 }
 
 .icon-btn:hover {
-  background: rgba(255, 255, 255, 0.3);
+  background: #ffffff;
+  transform: translateY(-1px);
 }
 
 .add-btn {
   width: 32px;
   height: 32px;
-  background: var(--green-mid);
+  background: #ffffff;
   border: none;
   border-radius: 50%;
-  color: #fff;
-  font-size: 1.2rem;
+  color: var(--text-dark);
+  font-size: 1.5rem;
   line-height: 1;
   display: flex;
   align-items: center;
@@ -194,10 +211,11 @@ textarea {
   cursor: pointer;
   transition: background 0.15s ease, transform 0.1s ease;
   flex-shrink: 0;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
 }
 
 .add-btn:hover {
-  background: var(--green-dark);
+  background: var(--blue-light);
   transform: scale(1.08);
 }
 
@@ -215,10 +233,10 @@ textarea {
 /* ===== Hero / Dashboard card ===== */
 
 .hero-card {
-  background: linear-gradient(160deg, #5cb85c 0%, #3a8f3a 55%, #2d6a2d 100%);
+  background: linear-gradient(180deg, #6fc8e6 0%, #9fd4e3 100%);
   border-radius: var(--radius);
   padding: 1.4rem 1.4rem 1.8rem;
-  color: #fff;
+  color: var(--text-dark);
   position: relative;
   overflow: hidden;
   box-shadow: var(--shadow-card);
@@ -227,11 +245,11 @@ textarea {
 .hero-card::before {
   content: "";
   position: absolute;
-  top: -60px;
-  right: -60px;
-  width: 200px;
-  height: 200px;
-  background: rgba(255, 255, 255, 0.07);
+  top: -70px;
+  right: -70px;
+  width: 220px;
+  height: 220px;
+  background: rgba(255, 255, 255, 0.18);
   border-radius: 50%;
 }
 
@@ -250,19 +268,20 @@ textarea {
   gap: 0.6rem;
   font-weight: 600;
   font-size: 2rem;
+  color: #5a5a5a;
 }
 
 .date-nav button {
   background: none;
   border: none;
-  color: rgba(255, 255, 255, 0.75);
+  color: #5a5a5a;
   font-size: 1rem;
   cursor: pointer;
   padding: 0 4px;
 }
 
 .date-nav button:hover {
-  color: #fff;
+  color: var(--text-dark);
 }
 
 /* ===== Gauge ===== */
@@ -290,14 +309,14 @@ textarea {
 
 .gauge-track {
   fill: none;
-  stroke: rgba(255, 255, 255, 0.2);
+  stroke: rgba(255, 255, 255, 0.9);
   stroke-width: 14;
   stroke-linecap: round;
 }
 
 .gauge-fill {
   fill: none;
-  stroke: #fff;
+  stroke: var(--blue-mid);
   stroke-width: 12;
   stroke-linecap: round;
   stroke-dasharray: 1000;
@@ -310,6 +329,7 @@ textarea {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  color: #111;
 }
 
 .gauge-icon {
@@ -326,31 +346,33 @@ textarea {
 .gauge-sub {
   font-size: 0.75rem;
   opacity: 0.75;
-  margin-top: 2px;
+  margin-top: 6px;
 }
 
 /* ===== Macro cards ===== */
 
 .macro-row {
   display: flex;
-  gap: 0.6rem;
-  margin-top: 0.2rem;
+  gap: 0.9rem;
+  margin-top: 0.3rem;
+  justify-content: center;
 }
 
 .macro-pill {
   flex: 1;
-  background: rgba(255, 255, 255, 0.92);
+  background: #d7e2e7;
   border-radius: var(--radius-sm);
   padding: 0.55rem 0.7rem 0.5rem;
   color: var(--text-dark);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 .macro-pill .label {
   font-size: 0.72rem;
   font-weight: 600;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
+  color: var(--text-dark);
+  text-transform: none;
+  letter-spacing: 0;
 }
 
 .macro-pill .value {
@@ -366,28 +388,28 @@ textarea {
 }
 
 .macro-bar {
-  height: 4px;
-  border-radius: 2px;
-  background: var(--green-pale);
-  margin-top: 0.4rem;
+  height: 5px;
+  border-radius: 999px;
+  background: #edf4f6;
+  margin-top: 0.45rem;
   overflow: hidden;
 }
 
 .macro-bar-fill {
   height: 100%;
-  border-radius: 2px;
+  border-radius: 999px;
 }
 
 .bar-protein {
-  background: var(--warning);
-}
-
-.bar-fat {
   background: var(--accent);
 }
 
+.bar-fat {
+  background: #d1bc00;
+}
+
 .bar-carbs {
-  background: var(--danger);
+  background: #e85f0f;
 }
 
 /* ===== Lists / Rows ===== */
@@ -396,30 +418,32 @@ textarea {
 .item-list {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 1rem;
 }
 
 .meal-row,
 .list-row {
   background: var(--section-bg);
   border-radius: var(--radius-sm);
-  padding: 0.9rem 1rem;
+  padding: 1.1rem 1rem;
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   transition: background 0.15s ease, transform 0.1s ease;
+  box-shadow: none;
 }
 
 .meal-row:hover,
 .list-row:hover {
-  background: #cde0cd;
-  transform: translateX(2px);
+  background: #d3e9ee;
+  transform: translateY(-1px);
 }
 
 .meal-name,
 .list-title {
   font-weight: 500;
   font-size: 0.95rem;
+  margin-bottom: 0.25rem;
 }
 
 .meal-kcal,
@@ -433,11 +457,11 @@ textarea {
 /* ===== Water tracker ===== */
 
 .water-section {
-  background: var(--card-bg);
+  background: transparent;
   border-radius: var(--radius);
-  padding: 1rem 1.2rem;
+  padding: 1rem 0 0;
   margin-top: 1rem;
-  box-shadow: var(--shadow-soft);
+  box-shadow: none;
 }
 
 .water-header {
@@ -467,7 +491,7 @@ textarea {
 .glass {
   width: 38px;
   height: 44px;
-  border: 2px solid var(--green-pale);
+  border: 2px solid #8f8f8f;
   border-top: none;
   border-radius: 0 0 8px 8px;
   position: relative;
@@ -484,7 +508,7 @@ textarea {
   left: 0;
   right: 0;
   height: 0%;
-  background: var(--water);
+  background: #d9d9d9;
   transition: height 0.3s ease;
   border-radius: 0 0 6px 6px;
 }
@@ -494,13 +518,13 @@ textarea {
 }
 
 .glass:hover {
-  border-color: var(--green-mid);
+  border-color: var(--blue-mid);
 }
 
 .glass-add {
   width: 38px;
   height: 44px;
-  border: 2px dashed var(--green-pale);
+  border: 2px dashed var(--blue-pale);
   border-radius: 8px;
   background: none;
   cursor: pointer;
@@ -508,23 +532,16 @@ textarea {
   align-items: center;
   justify-content: center;
   font-size: 1.2rem;
-  color: var(--green-mid);
+  color: var(--blue-mid);
   transition: border-color 0.15s ease, color 0.15s ease;
 }
 
 .glass-add:hover {
-  border-color: var(--green-mid);
-  color: var(--green-dark);
+  border-color: var(--blue-mid);
+  color: var(--blue-dark);
 }
 
 /* ===== Forms ===== */
-
-.form-card {
-  background: var(--card-bg);
-  border-radius: var(--radius);
-  padding: 1.2rem;
-  box-shadow: var(--shadow-soft);
-}
 
 .form-label {
   font-weight: 600;
@@ -538,12 +555,13 @@ textarea {
   border: 1px solid var(--border-soft);
   padding: 0.75rem 0.9rem;
   box-shadow: none;
+  background: #fff;
 }
 
 .form-control:focus,
 .form-select:focus {
-  border-color: var(--green-mid);
-  box-shadow: 0 0 0 0.2rem rgba(74, 156, 74, 0.18);
+  border-color: var(--blue-mid);
+  box-shadow: 0 0 0 0.2rem rgba(0, 200, 255, 0.16);
 }
 
 textarea.form-control {
@@ -554,9 +572,6 @@ textarea.form-control {
 /* ===== Tables / stats ===== */
 
 .table-card {
-  background: var(--card-bg);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-soft);
   overflow: hidden;
 }
 
@@ -572,9 +587,6 @@ textarea.form-control {
 }
 
 .stat-card {
-  background: var(--card-bg);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-soft);
   padding: 1rem 1.1rem;
 }
 
@@ -623,22 +635,12 @@ textarea.form-control {
 
 /* ===== Helpers ===== */
 
-.card-soft {
-  background: var(--card-bg);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-soft);
-}
-
 .rounded-soft {
   border-radius: var(--radius);
 }
 
 .rounded-soft-sm {
   border-radius: var(--radius-sm);
-}
-
-.mono {
-  font-family: "DM Mono", monospace;
 }
 
 /* ===== Footer ===== */
@@ -663,11 +665,15 @@ footer {
     align-items: flex-start;
     gap: 0.75rem;
   }
+
+  .macro-row {
+    gap: 0.6rem;
+  }
 }
 
 @media (min-width: 768px) {
   body {
-    background: linear-gradient(135deg, #d8ead8, #b8d8b8);
+    background: linear-gradient(135deg, #eef8fb, #dff2f7);
   }
 
   .page-wrapper {
@@ -695,8 +701,10 @@ footer {
   }
 
   .desktop-right .water-section {
-    border: 1px solid var(--green-pale);
+    border: 1px solid var(--blue-pale);
     box-shadow: none;
+    background: var(--card-bg);
+    padding: 1rem 1.2rem;
   }
 }
 
