@@ -1,35 +1,31 @@
-import psycopg2 as psql
+import psycopg2
 import configparser
 
-"""
-Databasanslutning för applikationen.
-
-Läser konfigurationen från config.ini och skapar uppkoppling till PostgresSQL-databasen
-"""
-
+# Read configuration from config.ini
 config = configparser.ConfigParser()
-config.read('./config.ini')
+config.read('config.ini')
 
-db_config = {
-    'host': config['database']['host'],
-    'user': config['database']['user'],
-    'port': config['database']['port'],
-    'password': config['database']['password'],
-    'database': config['database']['database']
+DB_CONFIG = {
+    "host": config.get('database', 'host'),
+    "database": config.get('database', 'database'),
+    "user": config.get('database', 'user'),
+    "password": config.get('database', 'password'),
+    "port": config.getint('database', 'port')
 }
 
 def get_db_connection():
     """
-    Skapar och returnerar en databasanslutning
-
-    Returnerar:
-        connection (psycopg2 connection) om lyckad anslutning
-        None om anslutningen misslyckas
+    Establishes and returns a PostgreSQL database connection.
+    
+    Returns:
+        psycopg2.connection: Database connection object
+        
+    Raises:
+        psycopg2.Error: If connection fails
     """
     try:
-        connection = psql.connect(**db_config)
-        return connection
-        
-    except Exception as e:
-        print("Fel i anslutning till databasen:", e)
-        return None
+        conn = psycopg2.connect(**DB_CONFIG)
+        return conn
+    except psycopg2.Error as e:
+        print(f"Database connection failed: {e}")
+        raise
