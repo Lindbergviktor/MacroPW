@@ -146,6 +146,8 @@ def register():
     height = request.form.get("height") or None
     weight = request.form.get("weight") or None
     activity_level = request.form.get("activity_level") or None
+    birthdate = request.form.get("birthdate") or None
+    weight_goal = request.form.get("weight_goal") or None
 
     if not name.strip():
         flash("Name cannot be empty.", "danger")
@@ -171,6 +173,18 @@ def register():
         flash("Password must contain at least one number.", "danger")
         return redirect(url_for("register"))
 
+    if not height or not weight or not activity_level:
+        flash("Height, weight and activity level are required.", "danger")
+        return redirect(url_for("register"))
+
+    if not birthdate:
+        flash("Date of birth is required.", "danger")
+        return redirect(url_for("register"))
+
+    if not weight_goal:
+        flash("Goal is required.", "danger")
+        return redirect(url_for("register"))
+    
     try:
         with get_db() as cur:
             cur.execute("SELECT user_id FROM users WHERE email = %s", (email,))
@@ -178,8 +192,10 @@ def register():
 
             if not existing:
                 cur.execute(
-                    "INSERT INTO users (name, email, password, gender, height, weight, activity_level) VALUES (%s,%s,%s,%s,%s,%s,%s)",
-                    (name, email, password, gender, height, weight, activity_level)
+                    """INSERT INTO users
+                    (name, email, password, gender, height, weight, activity_level, birthdate, weight_goal)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)""",
+                    (name, email, password, gender, height, weight, activity_level, birthdate, weight_goal)
                 )
 
     except Exception:
@@ -322,9 +338,8 @@ def add_lunch():
     return render_template("add_lunch.html")
 
 @app.route("/add_workout", methods=["GET", "POST"])
+@login_required
 def add_workout():
-    if 'user_id' not in session:
-        return redirect(url_for('login'))
 
     if request.method == "POST":
         workout_id = request.form.get("workout_id")
@@ -347,9 +362,9 @@ def add_workout():
         try:
             with get_db() as cur:
                 cur.execute("""
-                    INSERT INTO workout_log (duration, user_id, workout_id)
-                    VALUES (%s, %s, %s)
-                """, (duration_val, session["user_id"], workout_id))
+                    INSERT INTO workout_log (duration, user_id, workout_id, weight)
+                    VALUES (%s, %s, %s, (SELECT weight FROM users WHERE user_id = %s))
+                """, (duration_val, session["user_id"], workout_id, session["user_id"]))
         except Exception:
             flash("Databasfel vid sparande av träningspass.", "danger")
             return redirect(url_for("add_workout"))
@@ -359,7 +374,12 @@ def add_workout():
 
     try:
         with get_db() as cur:
-            cur.execute("SELECT workout_id, name, calories FROM workout ORDER BY name")
+            cur.execute("""
+                SELECT w.workout_id, w.name, w.met, u.weight
+                FROM workout w, users u
+                WHERE u.user_id = %s
+                ORDER BY w.name
+            """, (session["user_id"],))
             workouts = cur.fetchall()
     except Exception:
         flash("Kunde inte hämta träningspass.", "danger")
@@ -441,11 +461,11 @@ def statistics():
                 SELECT
                     COUNT(*),
                     COALESCE(SUM(wl.duration), 0),
-                    COALESCE(SUM((w.calories / 60.0) * wl.duration), 0)
+                    COALESCE(SUM(w.met * wl.weight * wl.duration / 60.0), 0)
                 FROM workout_log wl
                 JOIN workout w ON wl.workout_id = w.workout_id
                 WHERE wl.user_id = %s
-                  AND wl.log_date >= CURRENT_DATE - INTERVAL '6 days'
+                AND wl.log_date >= CURRENT_DATE - INTERVAL '6 days'
             """, (user_id,))
             workouts_week = cur.fetchone()
 

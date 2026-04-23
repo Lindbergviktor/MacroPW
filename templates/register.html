@@ -9,6 +9,7 @@
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 </head>
 <body>
 
@@ -60,22 +61,37 @@
             <option value="female">Female</option>
           </select>
         </div>
-        <!-- Valfria fält för beräkning av kaloribudget -->
+        <!-- Obligatoriska fält för beräkning av kaloribudget -->
         <div class="mb-3">
           <label class="form-label">Height (cm)</label>
-          <input type="number" class="form-control" name="height">
+          <input type="number" class="form-control" name="height" required>
         </div>
         <div class="mb-3">
           <label class="form-label">Weight (kg)</label>
-          <input type="number" step="0.1" class="form-control" name="weight">
+          <input type="number" step="0.1" class="form-control" name="weight" required>
         </div>
         <div class="mb-3">
           <label class="form-label">Activity level</label>
-          <select class="form-select" name="activity_level">
+          <select class="form-select" name="activity_level" required>
             <option value="" disabled selected>Select activity level</option>
-            <option value="low">Low</option>
-            <option value="medium">Medium</option>
-            <option value="high">High</option>
+            <option value="sedentary">Sedentary — desk job, little movement</option>
+            <option value="lightly_active">Lightly active — exercise 1–3 days/week</option>
+            <option value="moderately_active">Moderately active — exercise 3–5 days/week</option>
+            <option value="very_active">Very active — hard exercise 6–7 days/week</option>
+            <option value="extra_active">Extra active — physical job + daily exercise</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Date of birth</label>
+          <input type="date" class="form-control" name="birthdate" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Goal</label>
+          <select class="form-select" name="weight_goal" required>
+            <option value="" disabled selected>Select goal</option>
+            <option value="loss">Lose weight</option>
+            <option value="maintain">Maintain weight</option>
+            <option value="gain">Gain weight</option>
           </select>
         </div>
         <button type="submit" class="btn btn-primary-green w-100" style="padding: 0.75rem;">Create Account</button>
@@ -90,5 +106,15 @@
 
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <!-- JS för kalender i formuläret-->
+  <script>
+    flatpickr("input[name='birthdate']", {
+      dateFormat: "Y-m-d",
+      maxDate: "today",
+      defaultDate: "2000-01-01",
+      disableMobile: true
+    });
+</script>
 </body>
 </html>
