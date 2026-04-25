@@ -554,5 +554,99 @@ def log_meal(meal_id):
     flash("Måltid loggad!", "success")
     return redirect(url_for('index'))
 
+@app.route("/delete_meal/<int:meal_id>", methods=["POST"])
+@login_required
+def delete_meal(meal_id):
+    """Tar bort en sparad måltid och dess ingredienser."""
+    try:
+        with get_db() as cur:
+            cur.execute("SELECT user_id FROM meal WHERE meal_id = %s", (meal_id,))
+            meal = cur.fetchone()
+            if not meal or meal[0] != session['user_id']:
+                flash("Måltiden hittades inte.", "danger")
+                return redirect(url_for('meals'))
+            cur.execute("DELETE FROM meal_ingredient WHERE meal_id = %s", (meal_id,))
+            cur.execute("DELETE FROM meal WHERE meal_id = %s", (meal_id,))
+    except Exception:
+        flash("Databasfel vid borttagning av måltid.", "danger")
+        return redirect(url_for('meals'))
+
+    flash("Meal deleted.", "success")
+    return redirect(url_for('meals'))
+
+
+@app.route("/edit_meal/<int:meal_id>", methods=["GET", "POST"])
+@login_required
+def edit_meal(meal_id):
+    """GET: visar redigeringsformulär. POST: sparar ändringar."""
+    if request.method == "POST":
+        meal_name = request.form["meal_name"].strip().lower()
+        food_ids = request.form.getlist("food_id[]")
+        amounts = request.form.getlist("amount[]")
+
+        if not meal_name:
+            flash("Name cannot be empty.", "danger")
+            return redirect(url_for('edit_meal', meal_id=meal_id))
+
+        for amount in amounts:
+            try:
+                if float(amount) <= 0:
+                    flash("Amount must be greater than 0.", "danger")
+                    return redirect(url_for('edit_meal', meal_id=meal_id))
+            except ValueError:
+                flash("Amount must be a valid number.", "danger")
+                return redirect(url_for('edit_meal', meal_id=meal_id))
+
+        try:
+            with get_db() as cur:
+                cur.execute("SELECT user_id FROM meal WHERE meal_id = %s", (meal_id,))
+                meal = cur.fetchone()
+                if not meal or meal[0] != session['user_id']:
+                    flash("Måltiden hittades inte.", "danger")
+                    return redirect(url_for('meals'))
+
+                cur.execute("UPDATE meal SET name = %s WHERE meal_id = %s", (meal_name, meal_id))
+                cur.execute("DELETE FROM meal_ingredient WHERE meal_id = %s", (meal_id,))
+                for food_id, amount in zip(food_ids, amounts):
+                    cur.execute(
+                        "INSERT INTO meal_ingredient (meal_id, food_id, amount) VALUES (%s, %s, %s)",
+                        (meal_id, food_id, amount)
+                    )
+        except Exception:
+            flash("Databasfel vid uppdatering av måltid.", "danger")
+            return redirect(url_for('edit_meal', meal_id=meal_id))
+
+        flash("Meal updated!", "success")
+        return redirect(url_for('meals'))
+
+    # GET hämta befintlig data
+    try:
+        foods = get_all_foods()
+        with get_db() as cur:
+            cur.execute("SELECT name FROM meal WHERE meal_id = %s AND user_id = %s",
+                        (meal_id, session['user_id']))
+            meal = cur.fetchone()
+            if not meal:
+                flash("Måltiden hittades inte.", "danger")
+                return redirect(url_for('meals'))
+
+            cur.execute("""
+                SELECT mi.food_id, f.name, mi.amount
+                FROM meal_ingredient mi
+                JOIN food f ON mi.food_id = f.food_id
+                WHERE mi.meal_id = %s
+            """, (meal_id,))
+            ingredients = cur.fetchall()
+    except Exception:
+        flash("Kunde inte hämta måltid.", "danger")
+        return redirect(url_for('meals'))
+
+    return render_template("edit_meal.html",
+        meal_id=meal_id,
+        meal_name=meal[0],
+        ingredients=ingredients,
+        foods=foods
+    )
+
 if __name__ == "__main__":
     app.run(debug=True)

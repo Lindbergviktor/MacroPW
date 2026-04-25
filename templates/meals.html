@@ -71,8 +71,9 @@
               </div>
               {% endfor %}
             </div>
-            <!-- Dropdown för kategori och loggknapp -->
-            <div class="card-footer">
+
+            <!-- Log, Edit och Delete -->
+            <div class="card-footer d-flex flex-column gap-2">
               <form method="POST" action="{{ url_for('log_meal', meal_id=meal.meal_id) }}">
                 <div class="mb-2">
                   <select class="form-select form-select-sm" name="meal_category" required>
@@ -85,7 +86,21 @@
                 </div>
                 <button type="submit" class="btn btn-primary-green w-100">Log Meal</button>
               </form>
+
+              <div class="d-flex gap-2">
+                <a href="{{ url_for('edit_meal', meal_id=meal.meal_id) }}"
+                   class="btn btn-outline-green btn-sm w-50">Edit</a>
+                <form method="POST" action="{{ url_for('delete_meal', meal_id=meal.meal_id) }}"
+                      class="w-50"
+                      onsubmit="return confirm('Delete this meal?')">
+                  <button type="submit" class="btn btn-sm w-100"
+                          style="border: 2px solid var(--danger); color: var(--danger); border-radius: var(--radius-sm); font-weight: 600;">
+                    Delete
+                  </button>
+                </form>
+              </div>
             </div>
+
           </div>
         </div>
         {% endfor %}
