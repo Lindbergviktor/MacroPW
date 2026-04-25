@@ -23,17 +23,17 @@ from contextlib import contextmanager
 
 @contextmanager
 def get_db():
-           conn = get_db_connection()
-           cur = conn.cursor()
-           try:
-                yield cur
-                conn.commit()
-           except Exception:
-               conn.rollback()
-               raise
-           finally:
-               cur.close()
-               conn.close()
+    conn = get_db_connection()
+    cur = conn.cursor()
+    try:
+        yield cur
+        conn.commit()
+    except Exception:
+        conn.rollback()
+        raise
+    finally:
+        cur.close()
+        conn.close()
                
 def get_all_foods():
     """Hämtar alla livsmedel från databasen."""
@@ -223,16 +223,15 @@ def meals():
     """
     try:
         foods = get_all_foods()
-        with get_db() as cur:    
-
+        with get_db() as cur:
             cur.execute("""
-        SELECT m.meal_id, m.name, f.name, mi.amount
-        FROM meal m
-        JOIN meal_ingredient mi ON m.meal_id = mi.meal_id
-        JOIN food f ON mi.food_id = f.food_id
-        WHERE m.user_id = %s
-        ORDER BY m.meal_id
-         """,(session['user_id'],) )
+                SELECT m.meal_id, m.name, f.name, mi.amount
+                FROM meal m
+                JOIN meal_ingredient mi ON m.meal_id = mi.meal_id
+                JOIN food f ON mi.food_id = f.food_id
+                WHERE m.user_id = %s
+                ORDER BY m.meal_id
+            """, (session['user_id'],))
             rows = cur.fetchall()
     except Exception:
         flash("Kunde inte hämta måltider.", "danger")
@@ -557,7 +556,6 @@ def log_meal(meal_id):
 @app.route("/delete_meal/<int:meal_id>", methods=["POST"])
 @login_required
 def delete_meal(meal_id):
-    """Tar bort en sparad måltid och dess ingredienser."""
     try:
         with get_db() as cur:
             cur.execute("SELECT user_id FROM meal WHERE meal_id = %s", (meal_id,))
@@ -565,6 +563,9 @@ def delete_meal(meal_id):
             if not meal or meal[0] != session['user_id']:
                 flash("Måltiden hittades inte.", "danger")
                 return redirect(url_for('meals'))
+
+            # Bryt kopplingen till logg-historiken innan radering
+            cur.execute("UPDATE meal_log SET meal_id = NULL WHERE meal_id = %s", (meal_id,))
             cur.execute("DELETE FROM meal_ingredient WHERE meal_id = %s", (meal_id,))
             cur.execute("DELETE FROM meal WHERE meal_id = %s", (meal_id,))
     except Exception:
