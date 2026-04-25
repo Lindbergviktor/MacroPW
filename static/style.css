@@ -656,6 +656,15 @@ footer {
     flex-direction: column;
   }
 
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .desktop-grid {
+    padding: 0 1rem;
+  }
+
   .hero-card .date-nav {
     font-size: 1.35rem;
   }
