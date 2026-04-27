@@ -91,7 +91,7 @@ def index():
         flash("Kunde inte hämta data.", "danger")  
         return redirect(url_for("start_page"))      
 
-    # Bygg en dict med kalorier per kategori
+    # Bygger en dict med kalorier per kategori
     category_calories = {row[0]: round(row[1]) for row in category_rows}
 
     return render_template("index.html",
@@ -286,7 +286,7 @@ def add_food():
         flash("Name cannot be empty", "danger")
         return redirect(url_for("foods"))
 
-    # FIX: wrap in try/except to avoid 500 crash on non-numeric input
+    # Ser till så att programmet inte kraschar om användaren skriver text i fälten
     try:
         calories_val = int(calories)
         protein_val = float(protein)
@@ -506,8 +506,6 @@ def statistics():
         water_today=water_today or 0,
         nutrition_last_7=nutrition_last_7
     )
-    
-
 
 @app.route("/logout")
 def logout():

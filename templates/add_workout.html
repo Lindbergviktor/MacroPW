@@ -56,8 +56,6 @@
                     {% endif %}
                 {% endwith %}
  
-                <!-- FIX: form now uses workout_id (select from DB) and duration only,
-                          matching what the Flask add_workout route actually expects -->
                 <form class="form-card mt-4" method="POST" action="{{ url_for('add_workout') }}">
  
                     <div class="mb-3">
