@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session
+from werkzeug.security import check_password_hash, generate_password_hash
 from db import get_db_connection
 from psycopg2 import errors
 from functools import wraps
@@ -102,6 +103,8 @@ def index():
         category_calories=category_calories
     )
 
+
+
 @app.route("/start")
 def start_page():
     """Visar startsida för icke-inloggade användare"""
@@ -133,7 +136,54 @@ def login():
 
     return render_template("login.html")
 
+@app.route('/profile', methods=['GET', 'POST'])
+def profile():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+
+    user_id = session['user_id']
+
+    if request.method == 'POST':
+        name          = request.form['name']
+        email         = request.form['email']
+        gender        = request.form['gender']
+        height        = request.form['height']
+        weight        = request.form['weight']
+        weight_goal   = request.form['weight_goal']
+        activity_level = request.form['activity_level']
+        birthdate     = request.form['birthdate']
+
+        with get_db() as cur:
+            cur.execute("""
+                UPDATE users
+                SET name=%s, email=%s, gender=%s, height=%s, weight=%s,
+                    weight_goal=%s, activity_level=%s, birthdate=%s
+                WHERE user_id=%s
+            """, (name, email, gender, height, weight, weight_goal, activity_level, birthdate, user_id))
+
+        flash('Profile updated!', 'success')
+        return redirect(url_for('profile'))
+
+    with get_db() as cur:
+        cur.execute("SELECT * FROM users WHERE user_id=%s", (user_id,))
+        row = cur.fetchone()
+        cur.execute("SELECT column_name FROM information_schema.columns WHERE table_name='users' ORDER BY ordinal_position")
+        cols = [c[0] for c in cur.fetchall()]
+
+    user = dict(zip(cols, row))
+    return render_template('profile.html', user=user)
+
+
+@app.route('/delete_account', methods=['POST'])
+def delete_account():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    with get_db() as cur:
+        cur.execute("DELETE FROM users WHERE user_id=%s", (session['user_id'],))
+    session.clear()
+    return redirect(url_for('start_page'))
 @app.route("/register", methods=["GET", "POST"])
+
 def register():
     """Hanterar registrering av användare. GET visar formuläret, POST behandlar det."""
     if request.method == "GET":

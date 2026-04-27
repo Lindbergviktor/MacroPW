@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Profile - MacroPW</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg" data-bs-theme="dark">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="{{ url_for('index') }}">MacroPW</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <div class="navbar-nav">
+          <a class="nav-link" href="{{ url_for('index') }}">Start</a>
+          <a class="nav-link" href="{{ url_for('meals') }}">Meal log</a>
+          <a class="nav-link" href="{{ url_for('add_workout') }}">Workouts</a>
+          <a class="nav-link" href="{{ url_for('statistics') }}">Statistics</a>
+        </div>
+        <div class="navbar-nav ms-auto">
+          <a class="nav-link active" href="{{ url_for('profile') }}">Profile</a>
+          <a class="nav-link" href="{{ url_for('logout') }}">Log Out</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="page-wrapper">
+    <div class="container mt-4">
+      <div class="content-card">
+
+        <!-- Flash messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+              </div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+        <div class="section-title">Account</div>
+        <h1 class="page-title">My Profile</h1>
+        <p class="page-subtitle">Update your personal details and goals.</p>
+
+        <!-- Avatar + namn -->
+        <div class="d-flex align-items-center gap-3 mb-4">
+          <div style="
+            width:68px; height:68px; border-radius:50%;
+            background: linear-gradient(135deg, var(--blue-mid), var(--blue-dark));
+            display:flex; align-items:center; justify-content:center;
+            font-size:1.7rem; font-weight:700; color:#fff; flex-shrink:0;
+            box-shadow: 0 4px 16px rgba(0,164,209,0.28);">
+            {{ user.name[0].upper() if user.name else '?' }}
+          </div>
+          <div>
+            <div style="font-size:1.2rem; font-weight:700; color:var(--text-dark);">{{ user.name.title() }}</div>
+            <div style="font-size:0.875rem; color:var(--text-muted);">{{ user.email }}</div>
+          </div>
+        </div>
+
+        <!-- Snabb-stats -->
+        <div class="row g-2 mb-4">
+          <div class="col-4">
+            <div class="meal-row flex-column text-center gap-0" style="padding:0.85rem 0.5rem;">
+              <div style="font-size:1.15rem; font-weight:700; font-family:'DM Mono',monospace; color:var(--blue-dark);">
+                {{ user.weight }} <span style="font-size:0.75rem; font-weight:500;">kg</span>
+              </div>
+              <div style="font-size:0.7rem; text-transform:uppercase; letter-spacing:.07em; color:var(--text-muted); font-weight:600;">Weight</div>
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="meal-row flex-column text-center gap-0" style="padding:0.85rem 0.5rem;">
+              <div style="font-size:1.15rem; font-weight:700; font-family:'DM Mono',monospace; color:var(--blue-dark);">
+                {{ user.height }} <span style="font-size:0.75rem; font-weight:500;">cm</span>
+              </div>
+              <div style="font-size:0.7rem; text-transform:uppercase; letter-spacing:.07em; color:var(--text-muted); font-weight:600;">Height</div>
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="meal-row flex-column text-center gap-0" style="padding:0.85rem 0.5rem;">
+              <div style="font-size:1.15rem; font-weight:700; font-family:'DM Mono',monospace; color:var(--blue-dark);">
+                {{ user.birthdate }}
+              </div>
+              <div style="font-size:0.7rem; text-transform:uppercase; letter-spacing:.07em; color:var(--text-muted); font-weight:600;">Born</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Formulär -->
+        <form method="POST" action="{{ url_for('profile') }}">
+
+          <div class="section-title">Personal info</div>
+
+          <div class="mb-3">
+            <label class="form-label">Name</label>
+            <input type="text" class="form-control" name="name"
+                   value="{{ user.name.title() }}" required>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Email</label>
+            <input type="email" class="form-control" name="email"
+                   value="{{ user.email }}" required>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Date of birth</label>
+            <input type="date" class="form-control" name="birthdate"
+                   value="{{ user.birthdate }}" required>
+          </div>
+
+          <!-- Kön -->
+          <div class="mb-3">
+            <label class="form-label">Gender</label>
+            <div class="d-flex gap-2">
+              <div class="flex-fill">
+                <input type="radio" class="btn-check" name="gender" id="male" value="male"
+                       {% if user.gender == 'male' %}checked{% endif %}>
+                <label class="btn btn-outline-green w-100" for="male">♂ Male</label>
+              </div>
+              <div class="flex-fill">
+                <input type="radio" class="btn-check" name="gender" id="female" value="female"
+                       {% if user.gender == 'female' %}checked{% endif %}>
+                <label class="btn btn-outline-green w-100" for="female">♀ Female</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="section-title">Body metrics</div>
+
+          <div class="row g-3 mb-3">
+            <div class="col-6">
+              <label class="form-label">Height (cm)</label>
+              <input type="number" class="form-control" name="height"
+                     value="{{ user.height }}" min="100" max="250" required>
+            </div>
+            <div class="col-6">
+              <label class="form-label">Weight (kg)</label>
+              <input type="number" class="form-control" name="weight" step="0.1"
+                     value="{{ user.weight }}" min="30" max="300" required>
+            </div>
+          </div>
+
+          <div class="section-title">Goal</div>
+
+          <div class="d-flex gap-2 mb-3">
+            <div class="flex-fill">
+              <input type="radio" class="btn-check" name="weight_goal" id="goal-loss" value="loss"
+                     {% if user.weight_goal == 'loss' %}checked{% endif %}>
+              <label class="btn btn-outline-green w-100" for="goal-loss"> Lose</label>
+            </div>
+            <div class="flex-fill">
+              <input type="radio" class="btn-check" name="weight_goal" id="goal-maintain" value="maintain"
+                     {% if user.weight_goal == 'maintain' %}checked{% endif %}>
+              <label class="btn btn-outline-green w-100" for="goal-maintain"> Maintain</label>
+            </div>
+            <div class="flex-fill">
+              <input type="radio" class="btn-check" name="weight_goal" id="goal-gain" value="gain"
+                     {% if user.weight_goal == 'gain' %}checked{% endif %}>
+              <label class="btn btn-outline-green w-100" for="goal-gain"> Gain</label>
+            </div>
+          </div>
+
+          <div class="section-title">Activity level</div>
+
+          <div class="mb-4">
+            <select class="form-select" name="activity_level" required>
+              <option value="sedentary"         {% if user.activity_level == 'sedentary' %}selected{% endif %}>Sedentary — desk job, little movement</option>
+              <option value="lightly_active"    {% if user.activity_level == 'lightly_active' %}selected{% endif %}>Lightly active — exercise 1–3 days/week</option>
+              <option value="moderately_active" {% if user.activity_level == 'moderately_active' %}selected{% endif %}>Moderately active — exercise 3–5 days/week</option>
+              <option value="very_active"       {% if user.activity_level == 'very_active' %}selected{% endif %}>Very active — hard exercise 6–7 days/week</option>
+              <option value="extra_active"      {% if user.activity_level == 'extra_active' %}selected{% endif %}>Extra active — physical job + daily exercise</option>
+            </select>
+          </div>
+
+          <div class="action-row">
+            <a href="{{ url_for('index') }}" class="btn btn-outline-green">Cancel</a>
+            <button type="submit" class="btn btn-primary-green">Save Changes</button>
+          </div>
+
+        </form>
+
+        <!-- Danger zone -->
+        <div class="mt-4 p-3" style="border:1.5px solid #f5c5c5; border-radius:var(--radius-sm); background:#fff8f8;">
+          <div style="font-size:0.7rem; text-transform:uppercase; letter-spacing:.08em; font-weight:700; color:var(--danger); margin-bottom:0.4rem;">
+            Danger zone
+          </div>
+          <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:0.9rem;">
+            Deleting your account is permanent and cannot be undone.
+          </p>
+          <form method="POST" action="{{ url_for('delete_account') }}"
+                onsubmit="return confirm('Are you sure? This cannot be undone.')">
+            <button type="submit" class="btn btn-sm"
+                    style="border:2px solid var(--danger); color:var(--danger);
+                           border-radius:var(--radius-sm); font-weight:600; padding:0.5rem 1.2rem;">
+              Delete Account
+            </button>
+          </form>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <footer class="text-center text-muted py-3 mt-5">
+    <div class="container">
+      <p class="mb-0">&copy; 2026 MacroPW INC. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
