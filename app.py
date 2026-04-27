@@ -464,7 +464,7 @@ def statistics():
                 FROM workout_log wl
                 JOIN workout w ON wl.workout_id = w.workout_id
                 WHERE wl.user_id = %s
-                AND wl.log_date >= CURRENT_DATE - INTERVAL '6 days'
+                AND wl.log_date >= date_trunc('week', CURRENT_DATE)
             """, (user_id,))
             workouts_week = cur.fetchone()
 
