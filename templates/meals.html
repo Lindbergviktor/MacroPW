@@ -68,7 +68,7 @@
               {% for ingredient in meal.ingredients %}
               <div class="ingredient-row">
                 <span>{{ ingredient.food.title() }}</span>
-                <span class="amount-badge">{{ ingredient.amount }}g</span>
+                <span class="amount-badge">{{ ingredient.amount|round|int }}g</span>
               </div>
               {% endfor %}
             </div>
@@ -132,7 +132,7 @@
                     <select class="form-select" name="food_id[]" required>
                       <option value="" disabled selected>Select Food</option>
                       {% for food in foods %}
-                      <option value="{{ food[0] }}">{{ food[1] }}</option>
+                      <option value="{{ food[0] }}">{{ food[1].title() }}</option>
                       {% endfor %}
                     </select>
                   </div>
