@@ -37,9 +37,9 @@ def get_db():
         conn.close()
                
 def get_all_foods():
-    """Hämtar alla livsmedel från databasen."""
+    """Hämtar alla livsmedel från databasen, sorterade i bokstavsordning."""
     with get_db() as cur:
-        cur.execute("SELECT * FROM food;")
+        cur.execute("SELECT * FROM food ORDER BY name")
         return cur.fetchall()
 
 
