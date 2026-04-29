@@ -48,14 +48,16 @@
           <div class="hero-card">
 
             <!-- Toprad med profil, datum och notifikationer -->
-            <div class="hero-top">
-              <button class="icon-btn" title="Profile">
-                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
-                  viewBox="0 0 24 24">
-                  <circle cx="12" cy="8" r="4" />
-                  <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
-                </svg>
-              </button>
+          <div class="hero-top">
+          <a href="{{ url_for('profile') }}">
+            <button class="icon-btn" title="Profile">
+              <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+                viewBox="0 0 24 24">
+                <circle cx="12" cy="8" r="4" />
+                <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
+              </svg>
+            </button>
+          </a>
 
               <div class="date-nav">
                 <button>&#8249;</button>

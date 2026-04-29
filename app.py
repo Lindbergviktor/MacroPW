@@ -386,6 +386,8 @@ def add_food():
 def add_lunch():
     return render_template("add_lunch.html")
 
+
+
 @app.route("/add_workout", methods=["GET", "POST"])
 @login_required
 def add_workout():
@@ -492,6 +494,10 @@ def statistics():
     user_id = session["user_id"]
 
     try:
+
+        calorie_goal = 2200
+        weekly_goal = calorie_goal * 7
+        
         with get_db() as cur:
             cur.execute("""
                 SELECT
@@ -540,6 +546,20 @@ def statistics():
             """, (user_id,))
             nutrition_last_7 = cur.fetchall()
 
+            cur.execute("""
+                SELECT
+                    COALESCE(SUM(f.calories * mli.amount / 100.0), 0),
+                    COALESCE(SUM(f.protein  * mli.amount / 100.0), 0),
+                    COALESCE(SUM(f.fat      * mli.amount / 100.0), 0),
+                    COALESCE(SUM(f.carbs    * mli.amount / 100.0), 0)
+                    FROM meal_log ml
+                    JOIN meal_log_item mli ON ml.log_id = mli.log_id
+                    JOIN food f ON mli.food_id = f.food_id
+                    WHERE ml.user_id = %s
+                    AND ml.log_date >= CURRENT_DATE - INTERVAL '6 days'
+            """, (user_id,))
+            nutrition_week = cur.fetchone()            
+
     except Exception:
         flash("Kunde inte hämta statistik.", "danger")
         return redirect(url_for("index"))
@@ -554,8 +574,14 @@ def statistics():
         workout_minutes_this_week=round(workouts_week[1] or 0),
         workout_calories_this_week=round(workouts_week[2] or 0),
         water_today=water_today or 0,
-        nutrition_last_7=nutrition_last_7
-    )
+        nutrition_last_7=nutrition_last_7,
+        calories_week=round(nutrition_week[0] or 0),
+        protein_week=round(nutrition_week[1] or 0, 1),
+        fat_week=round(nutrition_week[2] or 0, 1),
+        carbs_week=round(nutrition_week[3] or 0, 1),
+        weekly_goal=weekly_goal,
+        calorie_goal=calorie_goal
+        )
     
 
 
