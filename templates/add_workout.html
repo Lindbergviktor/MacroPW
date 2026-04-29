@@ -70,6 +70,12 @@
                             {% endfor %}
                         </select>
                     </div>
+
+                    <div class="mb-3">
+                    <label for="log_date" class="form-label">Date</label>
+                    <input type="date" class="form-control" id="log_date" name="log_date"
+                        value="{{ today }}" max="{{ today }}">
+                    </div>
  
                     <div class="mb-3">
                         <label for="duration" class="form-label">Duration (minutes)</label>

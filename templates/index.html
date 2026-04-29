@@ -174,22 +174,15 @@
 
       </div>
 
-      <!-- Workout Overview -->
+      <!-- Today's Workouts -->
       <div class="wo-card mt-4">
-        <!-- Gradient header -->
         <div class="wo-header">
           <div class="wo-stat">
-            <div class="wo-stat-label">Calories Burned</div>
-            <div class="wo-stat-value">{{ total_workout_calories }}</div>
-          </div>
-          <div class="wo-divider"></div>
-          <div class="wo-stat wo-stat-right">
-            <div class="wo-stat-label">Active Time</div>
-            <div class="wo-stat-value">{{ total_workout_minutes }} <span class="wo-unit">min</span></div>
+            <div class="wo-stat-label">Today's Workout Overview</div>
+            <div class="wo-stat-value">Today</div>
           </div>
         </div>
 
-        <!-- Workout list -->
         <div class="wo-body">
           {% if workouts_today %}
             {% for w in workouts_today %}
