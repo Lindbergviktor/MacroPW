@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, flash, ses
 from werkzeug.security import check_password_hash, generate_password_hash
 from db import get_db_connection
 from psycopg2 import errors
+from datetime import date
 from functools import wraps
 
 """
@@ -106,19 +107,13 @@ def index():
     # Bygger en dict med kalorier per kategori
     category_calories = {row[0]: round(row[1]) for row in category_rows}
 
-    # Räknar ut totalt antal kalorier och minuter för träning idag
-    total_workout_calories = sum(int(w[2]) for w in workouts_today)
-    total_workout_minutes = sum(int(w[1]) for w in workouts_today)
-
     return render_template("index.html",
         calories=round(totals[0]),
         protein=round(totals[1]),
         fat=round(totals[2]),
         carbs=round(totals[3]),
         category_calories=category_calories,
-        workouts_today=workouts_today,
-        total_workout_calories=total_workout_calories,
-        total_workout_minutes=total_workout_minutes
+        workouts_today=workouts_today
     )
 
 
@@ -413,6 +408,7 @@ def add_workout():
     if request.method == "POST":
         workout_id = request.form.get("workout_id")
         duration = request.form.get("duration")
+        log_date = request.form.get("log_date") or date.today().isoformat()
 
         if not workout_id:
             flash("Choose a workout.", "danger")
@@ -431,10 +427,11 @@ def add_workout():
         try:
             with get_db() as cur:
                 cur.execute("""
-                    INSERT INTO workout_log (duration, user_id, workout_id, weight)
-                    VALUES (%s, %s, %s, (SELECT weight FROM users WHERE user_id = %s))
-                """, (duration_val, session["user_id"], workout_id, session["user_id"]))
+                    INSERT INTO workout_log (duration, user_id, workout_id, weight, log_date)
+                    VALUES (%s, %s, %s, (SELECT weight FROM users WHERE user_id = %s), %s)
+                """, (duration_val, session["user_id"], workout_id, session["user_id"], log_date))
         except Exception:
+            app.logger.exception("Failed to save workout")
             flash("Databasfel vid sparande av träningspass.", "danger")
             return redirect(url_for("add_workout"))
 
@@ -454,7 +451,7 @@ def add_workout():
         flash("Kunde inte hämta träningspass.", "danger")
         return redirect(url_for("index"))
 
-    return render_template("add_workout.html", workouts=workouts)
+    return render_template("add_workout.html", workouts=workouts, today=date.today().isoformat())
 
 
 @app.route("/add_meal", methods=["POST"])
