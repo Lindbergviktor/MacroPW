@@ -87,6 +87,17 @@ def index():
             GROUP BY ml.name
         """, (session['user_id'],))
             category_rows = cur.fetchall()
+
+            cur.execute("""
+            SELECT w.name, wl.duration,
+                   ROUND(w.met * wl.weight * wl.duration / 60.0) as calories_burned
+            FROM workout_log wl
+            JOIN workout w ON wl.workout_id = w.workout_id
+            WHERE wl.user_id = %s AND DATE(wl.log_date) = CURRENT_DATE
+            ORDER BY wl.log_date DESC
+        """, (session['user_id'],))
+            workouts_today = cur.fetchall()
+
     except Exception:
         flash("Kunde inte hämta data.", "danger")  
         return redirect(url_for("start_page"))      
@@ -94,12 +105,19 @@ def index():
     # Bygger en dict med kalorier per kategori
     category_calories = {row[0]: round(row[1]) for row in category_rows}
 
+    # Räknar ut totalt antal kalorier och minuter för träning idag
+    total_workout_calories = sum(int(w[2]) for w in workouts_today)
+    total_workout_minutes = sum(int(w[1]) for w in workouts_today)
+
     return render_template("index.html",
         calories=round(totals[0]),
         protein=round(totals[1]),
         fat=round(totals[2]),
         carbs=round(totals[3]),
-        category_calories=category_calories
+        category_calories=category_calories,
+        workouts_today=workouts_today,
+        total_workout_calories=total_workout_calories,
+        total_workout_minutes=total_workout_minutes
     )
 
 @app.route("/start")

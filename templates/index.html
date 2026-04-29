@@ -173,6 +173,55 @@
         </div>
 
       </div>
+
+      <!-- Workout Overview -->
+      <div class="wo-card mt-4">
+        <!-- Gradient header -->
+        <div class="wo-header">
+          <div class="wo-stat">
+            <div class="wo-stat-label">Calories Burned</div>
+            <div class="wo-stat-value">{{ total_workout_calories }}</div>
+          </div>
+          <div class="wo-divider"></div>
+          <div class="wo-stat wo-stat-right">
+            <div class="wo-stat-label">Active Time</div>
+            <div class="wo-stat-value">{{ total_workout_minutes }} <span class="wo-unit">min</span></div>
+          </div>
+        </div>
+
+        <!-- Workout list -->
+        <div class="wo-body">
+          {% if workouts_today %}
+            {% for w in workouts_today %}
+            <div class="wo-row">
+              <div class="wo-icon-wrap">
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path d="M6.5 6.5h11M6.5 17.5h11M4 12h16M9 4v4M15 4v4M9 16v4M15 16v4"/>
+                </svg>
+              </div>
+              <div class="wo-info">
+                <div class="wo-name">{{ w[0] }}</div>
+                <div class="wo-meta">{{ w[1]|int }} min</div>
+              </div>
+              <div class="wo-cal-badge">
+                <span class="wo-cal-num">{{ w[2] }}</span>
+                <span class="wo-cal-unit">cal</span>
+              </div>
+            </div>
+            {% endfor %}
+          {% else %}
+            <div class="wo-empty">
+              <svg width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" style="opacity:.35;margin-bottom:.5rem;">
+                <path d="M6.5 6.5h11M6.5 17.5h11M4 12h16M9 4v4M15 4v4M9 16v4M15 16v4"/>
+              </svg>
+              <span>No workouts logged today</span>
+            </div>
+          {% endif %}
+
+          <a href="{{ url_for('add_workout') }}" class="wo-add-btn">+ Add Workout</a>
+        </div>
+      </div>
+
     </div>
   </div>
 
