@@ -193,9 +193,57 @@
                     </div>
                 </div>
 
-                <div class="action-row mt-4">
-                    <a href="{{ url_for('meals') }}" class="btn btn-outline-green">View Meals</a>
-                    <a href="{{ url_for('add_workout') }}" class="btn btn-primary-green">Add Workout</a>
+                <!-- Veckoöverblick -->
+    <div class="content-card mt-4">
+        <div class="section-title">Weekly Overview</div>
+        <h2 class="page-title" style="font-size: 1.25rem;">Senaste 7 dagarna</h2>
+
+        <div class="meal-list mt-3">
+            <div class="meal-row">
+                <div>
+                    <div class="meal-name">Kalorimål</div>
+                    <div class="meal-kcal">7 dagar × 2200 kcal</div>
+                </div>
+                <div class="mono">15 400 kcal</div>
+            </div>
+
+            <div class="meal-row">
+                <div>
+                    <div class="meal-name">Kalorier konsumerade</div>
+                    <div class="meal-kcal">Senaste 7 dagarna</div>
+                </div>
+                <div class="mono">{{ calories_week }} kcal</div>
+            </div>
+
+            <div class="meal-row">
+                <div>
+                    <div class="meal-name">Protein</div>
+                    <div class="meal-kcal">Senaste 7 dagarna</div>
+                </div>
+                <div class="mono">{{ protein_week }} g</div>
+            </div>
+
+            <div class="meal-row">
+                <div>
+                    <div class="meal-name">Fett</div>
+                    <div class="meal-kcal">Senaste 7 dagarna</div>
+                </div>
+                <div class="mono">{{ fat_week }} g</div>
+            </div>
+
+            <div class="meal-row">
+                <div>
+                    <div class="meal-name">Kolhydrater</div>
+                    <div class="meal-kcal">Senaste 7 dagarna</div>
+                </div>
+                <div class="mono">{{ carbs_week }} g</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="action-row mt-4">
+        <a href="{{ url_for('meals') }}" class="btn btn-outline-green">View Meals</a>
+        <a href="{{ url_for('add_workout') }}" class="btn btn-primary-green">Add Workout</a>
                 </div>
             </div>
         </div>
