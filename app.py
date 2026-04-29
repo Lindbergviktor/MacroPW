@@ -275,7 +275,8 @@ def meals():
         foods = get_all_foods()
         with get_db() as cur:
             cur.execute("""
-                SELECT m.meal_id, m.name, f.name, mi.amount
+                SELECT m.meal_id, m.name, f.name, mi.amount,
+                        f.calories, f.protein, f.fat, f.carbs
                 FROM meal m
                 JOIN meal_ingredient mi ON m.meal_id = mi.meal_id
                 JOIN food f ON mi.food_id = f.food_id
@@ -288,10 +289,23 @@ def meals():
         return redirect(url_for("index"))
 
     meals_dict = {}
-    for meal_id, meal_name, food_name, amount in rows:
+    for meal_id, meal_name, food_name, amount, cal, prot, fat, carbs in rows:
         if meal_id not in meals_dict:
-            meals_dict[meal_id] = {"name": meal_name, "meal_id": meal_id, "ingredients": []}
+            meals_dict[meal_id] = {
+                "name": meal_name,
+                "meal_id": meal_id,
+                "ingredients": [],
+                "total_calories": 0,
+                "total_protein": 0,
+                "total_fat": 0,
+                "total_carbs": 0
+
+            }
         meals_dict[meal_id]["ingredients"].append({"food": food_name, "amount": amount})
+        meals_dict[meal_id]["total_calories"] += cal * amount / 100
+        meals_dict[meal_id]["total_protein"] += prot * amount / 100
+        meals_dict[meal_id]["total_fat"] += fat * amount / 100
+        meals_dict[meal_id]["total_carbs"] += carbs * amount / 100
 
     return render_template("meals.html", foods=foods, meals=meals_dict.values())
 

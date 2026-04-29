@@ -722,3 +722,16 @@ footer {
     max-width: 1100px;
   }
 }
+
+.macro-summary {
+  border-top: 1px solid var(--border-soft);
+  padding-top: 0.75rem;
+}
+
+.macro-summary-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  padding: 0.15rem 0;
+}
