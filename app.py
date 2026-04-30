@@ -42,7 +42,28 @@ def get_all_foods():
         cur.execute("SELECT * FROM food;")
         return cur.fetchall()
 
-
+def get_meals_dict(rows):
+    """
+    Tar fram en dict på ingredienser och makrovärden från databasraden
+    """
+    meals_dict = {}
+    for meal_id, meal_name, food_name, amount, cal, prot, fat, carbs in rows:
+        if meal_id not in meals_dict:
+            meals_dict[meal_id] = {
+                "name": meal_name,
+                "meal_id": meal_id,
+                "ingredients": [],
+                "total_calories": 0,
+                "total_protein": 0,
+                "total_fat": 0,
+                "total_carbs": 0
+            }
+        meals_dict[meal_id]["ingredients"].append({"food": food_name, "amount": amount})
+        meals_dict[meal_id]["total_calories"] += cal * amount / 100
+        meals_dict[meal_id]["total_protein"] += prot * amount / 100
+        meals_dict[meal_id]["total_fat"] += fat * amount / 100
+        meals_dict[meal_id]["total_carbs"] += carbs * amount / 100
+    return meals_dict
 
 def login_required(f):
     """
@@ -288,24 +309,7 @@ def meals():
         flash("Kunde inte hämta måltider.", "danger")
         return redirect(url_for("index"))
 
-    meals_dict = {}
-    for meal_id, meal_name, food_name, amount, cal, prot, fat, carbs in rows:
-        if meal_id not in meals_dict:
-            meals_dict[meal_id] = {
-                "name": meal_name,
-                "meal_id": meal_id,
-                "ingredients": [],
-                "total_calories": 0,
-                "total_protein": 0,
-                "total_fat": 0,
-                "total_carbs": 0
-
-            }
-        meals_dict[meal_id]["ingredients"].append({"food": food_name, "amount": amount})
-        meals_dict[meal_id]["total_calories"] += cal * amount / 100
-        meals_dict[meal_id]["total_protein"] += prot * amount / 100
-        meals_dict[meal_id]["total_fat"] += fat * amount / 100
-        meals_dict[meal_id]["total_carbs"] += carbs * amount / 100
+    meals_dict = get_meals_dict(rows)
 
     return render_template("meals.html", foods=foods, meals=meals_dict.values())
 
