@@ -123,7 +123,7 @@ def index():
             workouts_today = cur.fetchall()
 
     except Exception:
-        flash("Kunde inte hämta data.", "danger")  
+        flash("Could not receieve data.", "danger")  
         return redirect(url_for("start_page"))      
 
     # Bygger en dict med kalorier per kategori
@@ -214,7 +214,7 @@ def login():
                 )
                 user = cur.fetchone()
         except Exception:
-            flash("Databasfel vid inloggning.", "danger")
+            flash("Database error in login.", "danger")
             return render_template("login.html")
 
         if user:
@@ -339,7 +339,7 @@ def register():
                 )
 
     except Exception:
-        flash("Databasfel vid registrering.", "danger") 
+        flash("Database error during registration", "danger") 
         return redirect(url_for("register"))  
 
     if existing:
@@ -375,7 +375,7 @@ def meals():
             """, (session['user_id'],))
             rows = cur.fetchall()
     except Exception:
-        flash("Kunde inte hämta måltider.", "danger")
+        flash("Could not retrieve meals", "danger")
         return redirect(url_for("index"))
 
     meals_dict = get_meals_dict(rows)
@@ -395,7 +395,7 @@ def foods():
     try:
         foods = get_all_foods()
     except Exception:
-        flash("Kunde inte hämta livsmedel.", "danger")
+        flash("Could not retrieve foods", "danger")
         return redirect(url_for("index"))   
      
     return render_template("foods.html", foods=foods)
@@ -506,7 +506,7 @@ def add_workout():
                 """, (duration_val, session["user_id"], workout_id, session["user_id"], log_date))
         except Exception:
             app.logger.exception("Failed to save workout")
-            flash("Databasfel vid sparande av träningspass.", "danger")
+            flash("Database error during saving workouts.", "danger")
             return redirect(url_for("add_workout"))
 
         flash("Workout saved.", "success")
@@ -522,7 +522,7 @@ def add_workout():
             """, (session["user_id"],))
             workouts = cur.fetchall()
     except Exception:
-        flash("Kunde inte hämta träningspass.", "danger")
+        flash("Could not retrieve workouts", "danger")
         return redirect(url_for("index"))
 
     return render_template("add_workout.html", workouts=workouts, today=date.today().isoformat())
@@ -572,7 +572,7 @@ def add_meal():
                     (meal_id, food_id, amount)
                 )
     except Exception:
-        flash("Databasfel vid skapande av måltid.", "danger")
+        flash("Database error during creation of meal", "danger")
         return redirect(url_for("meals"))
 
     return redirect(url_for("meals"))
@@ -650,7 +650,7 @@ def statistics():
             nutrition_week = cur.fetchone()            
 
     except Exception:
-        flash("Kunde inte hämta statistik.", "danger")
+        flash("Could not retrieve statistics.", "danger")
         return redirect(url_for("index"))
 
     return render_template(
@@ -691,7 +691,7 @@ def log_meal(meal_id):
             meal = cur.fetchone()
 
             if not meal:
-                flash("Måltiden hittades inte.", "danger")
+                flash("Meal could not be found", "danger")
                 return redirect(url_for('meals'))
 
             meal_category = request.form["meal_category"]
@@ -713,7 +713,7 @@ def log_meal(meal_id):
                      (log_id, food_id, amount)
                 )
     except Exception:
-        flash("Databasfel vid loggning av måltid.", "danger")
+        flash("Database error during logging of meal.", "danger")
         return redirect(url_for('meals'))
 
     flash("Måltid loggad!", "success")
@@ -727,7 +727,7 @@ def delete_meal(meal_id):
             cur.execute("SELECT user_id FROM meal WHERE meal_id = %s", (meal_id,))
             meal = cur.fetchone()
             if not meal or meal[0] != session['user_id']:
-                flash("Måltiden hittades inte.", "danger")
+                flash("Meal could not be found.", "danger")
                 return redirect(url_for('meals'))
 
             # Bryt kopplingen till logg-historiken innan radering
@@ -735,7 +735,7 @@ def delete_meal(meal_id):
             cur.execute("DELETE FROM meal_ingredient WHERE meal_id = %s", (meal_id,))
             cur.execute("DELETE FROM meal WHERE meal_id = %s", (meal_id,))
     except Exception:
-        flash("Databasfel vid borttagning av måltid.", "danger")
+        flash("Database error during removal of meal.", "danger")
         return redirect(url_for('meals'))
 
     flash("Meal deleted.", "success")
@@ -769,7 +769,7 @@ def edit_meal(meal_id):
                 cur.execute("SELECT user_id FROM meal WHERE meal_id = %s", (meal_id,))
                 meal = cur.fetchone()
                 if not meal or meal[0] != session['user_id']:
-                    flash("Måltiden hittades inte.", "danger")
+                    flash("Meal could not be found.", "danger")
                     return redirect(url_for('meals'))
 
                 cur.execute("UPDATE meal SET name = %s WHERE meal_id = %s", (meal_name, meal_id))
@@ -780,7 +780,7 @@ def edit_meal(meal_id):
                         (meal_id, food_id, amount)
                     )
         except Exception:
-            flash("Databasfel vid uppdatering av måltid.", "danger")
+            flash("Database error during updating meal.", "danger")
             return redirect(url_for('edit_meal', meal_id=meal_id))
 
         flash("Meal updated!", "success")
@@ -794,7 +794,7 @@ def edit_meal(meal_id):
                         (meal_id, session['user_id']))
             meal = cur.fetchone()
             if not meal:
-                flash("Måltiden hittades inte.", "danger")
+                flash("Meal could not be found.", "danger")
                 return redirect(url_for('meals'))
 
             cur.execute("""
@@ -805,7 +805,7 @@ def edit_meal(meal_id):
             """, (meal_id,))
             ingredients = cur.fetchall()
     except Exception:
-        flash("Kunde inte hämta måltid.", "danger")
+        flash("Could not retrieve meal.", "danger")
         return redirect(url_for('meals'))
 
     return render_template("edit_meal.html",
