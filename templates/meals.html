@@ -71,6 +71,26 @@
                 <span class="amount-badge">{{ ingredient.amount|round|int }}g</span>
               </div>
               {% endfor %}
+
+              <!-- Makrosammanfattning per måltid -->
+              <div class="macro-summary mt-3">
+                <div class="macro-summary-row">
+                  <span>Calories</span>
+                  <span class="mono">{{ meal.total_calories | round(0) | int }} kcal</span>
+                </div>
+                <div class="macro-summary-row">
+                  <span>Protein</span>
+                  <span class="mono">{{ meal.total_protein | round(1) }} g</span>
+                </div>
+                <div class="macro-summary-row">
+                  <span>Fat</span>
+                  <span class="mono">{{ meal.total_fat | round(1) }} g</span>
+                </div>
+                <div class="macro-summary-row">
+                  <span>Carbs</span>
+                  <span class="mono">{{ meal.total_carbs | round(1) }} g</span>
+                </div>
+              </div>
             </div>
 
             <!-- Log, Edit och Delete -->
@@ -127,17 +147,21 @@
               <!-- Ingredienslista -->
               <label class="form-label">Ingredients</label>
               <div id="ingredients-container">
-                <div class="row g-2 mb-2">
+                <div class="row g-2 mb-2 ingredient-row">
                   <div class="col-7">
-                    <select class="form-select" name="food_id[]" required>
+                    <select class="form-select food-select" name="food_id[]" required>
                       <option value="" disabled selected>Select Food</option>
                       {% for food in foods %}
-                      <option value="{{ food[0] }}">{{ food[1].title() }}</option>
+                      <option value="{{ food[0] }}"
+                              data-calories="{{ food[2] }}"
+                              data-protein="{{ food[3] }}"
+                              data-fat="{{ food[4] }}"
+                              data-carbs="{{ food[5] }}">{{ food[1] }}</option>
                       {% endfor %}
                     </select>
                   </div>
                   <div class="col-5">
-                    <input type="number" class="form-control" name="amount[]" placeholder="Amount (g)" step="0.1" required>
+                    <input type="number" class="form-control amount-input" name="amount[]" placeholder="Amount (g)" step="0.1" required>
                   </div>
                 </div>
               </div>
@@ -145,6 +169,26 @@
               <button type="button" class="btn btn-outline-secondary btn-sm mb-3" id="add-ingredient-btn">
                 + Add Ingredient
               </button>
+
+              <!-- Live makrosammanfattning i modalen -->
+              <div class="macro-summary mb-3" id="modal-macro-summary" style="display:none;">
+                <div class="macro-summary-row">
+                  <span>Calories</span>
+                  <span class="mono" id="summary-calories">0 kcal</span>
+                </div>
+                <div class="macro-summary-row">
+                  <span>Protein</span>
+                  <span class="mono" id="summary-protein">0 g</span>
+                </div>
+                <div class="macro-summary-row">
+                  <span>Fat</span>
+                  <span class="mono" id="summary-fat">0 g</span>
+                </div>
+                <div class="macro-summary-row">
+                  <span>Carbs</span>
+                  <span class="mono" id="summary-carbs">0 g</span>
+                </div>
+              </div>
 
               <button type="submit" class="btn btn-green w-100">Save Meal</button>
             </form>
@@ -156,30 +200,94 @@
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
 
-    <!-- Lägga till fler ingredienser dynamiskt -->
     <script>
+      // Räknar ut totala makron från alla ingrediensrader i modalen
+      function updateMacroSummary() {
+        let totalCalories = 0;
+        let totalProtein = 0;
+        let totalFat = 0;
+        let totalCarbs = 0;
+        let hasData = false;
+
+        document.querySelectorAll('#ingredients-container .ingredient-row').forEach(function (row) {
+          const select = row.querySelector('.food-select');
+          const amountInput = row.querySelector('.amount-input');
+          if (!select || !amountInput) return;
+
+          const selectedOption = select.options[select.selectedIndex];
+          const amount = parseFloat(amountInput.value);
+
+          if (selectedOption && selectedOption.value && amount > 0) {
+            const cal = parseFloat(selectedOption.dataset.calories) || 0;
+            const prot = parseFloat(selectedOption.dataset.protein) || 0;
+            const fat = parseFloat(selectedOption.dataset.fat) || 0;
+            const carbs = parseFloat(selectedOption.dataset.carbs) || 0;
+
+            totalCalories += cal * amount / 100;
+            totalProtein += prot * amount / 100;
+            totalFat += fat * amount / 100;
+            totalCarbs += carbs * amount / 100;
+            hasData = true;
+          }
+        });
+
+        const summary = document.getElementById('modal-macro-summary');
+        summary.style.display = hasData ? 'block' : 'none';
+        document.getElementById('summary-calories').textContent = Math.round(totalCalories) + ' kcal';
+        document.getElementById('summary-protein').textContent = totalProtein.toFixed(1) + ' g';
+        document.getElementById('summary-fat').textContent = totalFat.toFixed(1) + ' g';
+        document.getElementById('summary-carbs').textContent = totalCarbs.toFixed(1) + ' g';
+      }
+
+      // Lyssna på ändringar i ingredienscontainern
+      document.getElementById('ingredients-container').addEventListener('change', updateMacroSummary);
+      document.getElementById('ingredients-container').addEventListener('input', updateMacroSummary);
+
+      // Lägg till ny ingrediensrad
       document.getElementById('add-ingredient-btn').addEventListener('click', function () {
         const container = document.getElementById('ingredients-container');
         const row = document.createElement('div');
-        row.classList.add('row', 'g-2', 'mb-2');
+        row.classList.add('row', 'g-2', 'mb-2', 'ingredient-row');
         row.innerHTML = `
           <div class="col-7">
-            <select class="form-select" name="food_id[]" required>
-              <option value="" disabled selected>Välj livsmedel</option>
+            <select class="form-select food-select" name="food_id[]" required>
+              <option value="" disabled selected>Select Food</option>
               {% for food in foods %}
-              <option value="{{ food[0] }}">{{ food[1] }}</option>
+              <option value="{{ food[0] }}"
+                      data-calories="{{ food[2] }}"
+                      data-protein="{{ food[3] }}"
+                      data-fat="{{ food[4] }}"
+                      data-carbs="{{ food[5] }}">{{ food[1] }}</option>
               {% endfor %}
             </select>
           </div>
           <div class="col-4">
-            <input type="number" class="form-control" name="amount[]" placeholder="Amount (g)" step="0.1" required>
+            <input type="number" class="form-control amount-input" name="amount[]" placeholder="Amount (g)" step="0.1" required>
           </div>
           <div class="col-1 d-flex align-items-center">
-            <span class="remove-btn" onclick="this.closest('.row').remove()">✕</span>
+            <span style="cursor:pointer;" onclick="this.closest('.row').remove(); updateMacroSummary();">✕</span>
           </div>
         `;
         container.appendChild(row);
       });
+
+      // Nollställ modal när den stängs
+      document.getElementById('createMealModal').addEventListener('hidden.bs.modal', function () {
+        document.getElementById('modal-macro-summary').style.display = 'none';
+        document.getElementById('summary-calories').textContent = '0 kcal';
+        document.getElementById('summary-protein').textContent = '0 g';
+        document.getElementById('summary-fat').textContent = '0 g';
+        document.getElementById('summary-carbs').textContent = '0 g';
+      });
     </script>
+
+    <script>
+      setTimeout(function () {
+        document.querySelectorAll('.alert').forEach(function (el) {
+          el.style.display = 'none';
+        });
+      }, 3000);
+    </script>
+
   </body>
 </html>
