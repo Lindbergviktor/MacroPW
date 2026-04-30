@@ -131,7 +131,9 @@
                 <div class="meal-name">Frukost</div>
                 <div class="meal-kcal">{{ category_calories.get('Frukost', 0) }} kcal</div>
               </div>
-              <a href="{{ url_for('add_lunch') }}" class="add-btn">+</a>
+              <button type="button" class="add-btn" data-bs-toggle="modal" data-bs-target="#addBreakfastModal">
+                +
+              </button>
             </div>
 
             <div class="meal-row">
@@ -226,6 +228,58 @@
       <p class="mb-0">&copy; 2026 MacroPW INC. All rights reserved.</p>
     </div>
   </footer>
+
+  <!-- Modal för att lägga till nytt livsmedel -->
+  <div class="modal fade" id="addBreakfastModal" tabindex="-1" aria-labelledby="addBreakfastModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addBreakfastModalLabel">Add Breakfast</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+
+          <!-- Ingredienslista -->
+          <label class="form-label">Ingredients</label>
+          <div id="ingredients-container">
+            <div class="row g-2 mb-2">
+              <div class="col-7">
+                <select class="form-select" name="food_id[]" required>
+                  <option value="" disabled selected>Select Food</option>
+                  {% for food in foods %}
+                  <option value="{{ food[0] }}">{{ food[1] }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col-5">
+                <input type="number" class="form-control" name="amount[]" placeholder="Amount (g)" step="0.1" required>
+              </div>
+            </div>
+          </div> 
+                   
+          <form method="POST" action="#">
+            <!-- Log, Edit och Delete -->
+            <div class="card-footer d-flex flex-column gap-2">
+              <form method="POST" action="#">
+                <div class="mb-2">
+                  <select class="form-select form-select-sm" name="meal_category" required>
+                    <option value="" disabled selected>Välj kategori</option>
+                    <option value="Frukost">Frukost</option>
+                    <option value="Lunch">Lunch</option>
+                    <option value="Middag">Middag</option>
+                    <option value="Mellanmål">Mellanmål</option>
+                  </select>
+                </div>
+                <button type="submit" class="btn btn-primary-green w-100">Log Meal</button>
+              </form>
+            </div>
+              
+            <button type="submit" class="btn btn-green w-100">Save</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>

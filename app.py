@@ -85,6 +85,7 @@ def index():
     Hämtar dagens loggade kalorier och makron från databasen.
     """
     try:
+        foods = get_all_foods()
         with get_db() as cur:
             cur.execute("""
             SELECT 
@@ -134,10 +135,65 @@ def index():
         fat=round(totals[2]),
         carbs=round(totals[3]),
         category_calories=category_calories,
+        foods=foods,
         workouts_today=workouts_today
     )
 
+@app.route("/log_meal_index", methods=["POST"])
+@login_required
+def log_meal_index():
+    category = request.form["meal_category"]
+    meal_id = request.form.get ("meal_id") or None
+    food_ids = request.form.getlist ("Food_id[]")
+    amounts = request.form.getlist ("amount[]")
 
+    # Filtrerar bort tommar rader (användaren kan välja bara meal)
+    food_list = [(fid, amt) for fid, amt in zip(food_ids, amounts) if fid and amt ]
+
+    if not meal_id and not food_list:
+        flash("Choose a meal or add at least one food.", "danger")
+        return redirect(url_for("index"))
+    
+    #Validera mängder
+    for _, amt in food_list:
+        try:
+            if float(amt) <= 0:
+                flash("Amount must be greater than 0.", "danger")
+                return redirect(url_for("index"))
+        except ValueError:
+            flash("Amount must be a valid numer.", "danger")
+
+    try:
+        with get_db() as cur:
+            cur.execute(
+                "INSERT INTO meal_log (name, meal_id, user_id) VALUES (%s, %s, %s) RETURNING log_id",
+                (category, meal_id, session['user_id'])
+            )
+            log_id = cur.fetchone()[0]
+
+            #Kopiera ingredienser från sparad måltid
+            if meal_id:
+                cur.execute(
+                    "SELECT food_id, amount FROM meal_ingredient WHERE meal_id = %s", (meal_id)
+                )
+                for food_id, amount in cur.fetchall():
+                    cur.execute(
+                        "INSERT INTO meal_log_item (log_id, food_id, amount) VALUES (%s, %s, %s)",
+                        (log_id, food_id, amount)
+                    )
+
+            #Lägg till livsmedel
+            for food_id, amount in food_list:
+                cur.execute(
+                    "INSERT INTO meal_log_item (log_id, food_id, amount) VALUES (%s, %s, %s)",
+                        (log_id, food_id, amount)
+                )
+    except Exception:
+        flash("Database error.", "danger")
+        return redirect(url_for("index"))
+
+    flash("Food logged successfully!", "success")
+    return redirect(url_for("index"))
 
 @app.route("/start")
 def start_page():
