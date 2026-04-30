@@ -283,11 +283,11 @@ def register():
     email = request.form["email"]
     password = request.form["password"]
     gender = request.form["gender"]
-    height = request.form.get("height") or None
-    weight = request.form.get("weight") or None
-    activity_level = request.form.get("activity_level") or None
-    birthdate = request.form.get("birthdate") or None
-    weight_goal = request.form.get("weight_goal") or None
+    height = request.form("height")
+    weight = request.form("weight")
+    activity_level = request.form("activity_level")
+    birthdate = request.form("birthdate")
+    weight_goal = request.form("weight_goal")
 
     if not name.strip():
         flash("Name cannot be empty.", "danger")

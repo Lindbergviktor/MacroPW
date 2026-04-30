@@ -135,5 +135,12 @@
       container.appendChild(row);
     });
   </script>
+  <script>
+    setTimeout(function () {
+      document.querySelectorAll('.alert').forEach(function (el) {
+        el.style.display = 'none';
+      });
+    }, 3000);
+  </script>
 </body>
 </html>
