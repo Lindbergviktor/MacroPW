@@ -43,10 +43,23 @@ def get_all_foods():
         cur.execute("SELECT * FROM food ORDER BY name")
         return cur.fetchall()
 
-def get_meals_dict(rows):
+def get_meals_dict(user_id):
     """
-    Tar fram en dict på ingredienser och makrovärden från databasraden
+    Tar fram en dict på måltider med ingredienser och makrovärden från databasraden
     """
+    with get_db() as cur:
+            cur.execute("""
+                SELECT m.meal_id, m.name, f.name, mi.amount,
+                        f.calories, f.protein, f.fat, f.carbs
+                FROM meal m
+                JOIN meal_ingredient mi ON m.meal_id = mi.meal_id
+                JOIN food f ON mi.food_id = f.food_id
+                WHERE m.user_id = %s
+                ORDER BY m.meal_id
+            """, (user_id,)
+            )
+            rows = cur.fetchall()
+
     meals_dict = {}
     for meal_id, meal_name, food_name, amount, cal, prot, fat, carbs in rows:
         if meal_id not in meals_dict:
@@ -64,7 +77,7 @@ def get_meals_dict(rows):
         meals_dict[meal_id]["total_protein"] += prot * amount / 100
         meals_dict[meal_id]["total_fat"] += fat * amount / 100
         meals_dict[meal_id]["total_carbs"] += carbs * amount / 100
-    return meals_dict
+    return list(meals_dict.values())
 
 def login_required(f):
     """
@@ -85,7 +98,7 @@ def index():
     Hämtar dagens loggade kalorier och makron från databasen.
     """
     try:
-        foods = get_all_foods()
+        
         with get_db() as cur:
             cur.execute("""
             SELECT 
@@ -112,6 +125,9 @@ def index():
         """, (session['user_id'],))
             category_rows = cur.fetchall()
 
+            meals = get_meals_dict(session['user_id'])
+            foods = get_all_foods()
+
             cur.execute("""
             SELECT w.name, wl.duration,
                    ROUND(w.met * wl.weight * wl.duration / 60.0) as calories_burned
@@ -136,6 +152,7 @@ def index():
         carbs=round(totals[3]),
         category_calories=category_calories,
         foods=foods,
+        meals=meals,
         workouts_today=workouts_today
     )
 
@@ -144,14 +161,26 @@ def index():
 def log_meal_index():
     category = request.form["meal_category"]
     meal_id = request.form.get ("meal_id") or None
-    food_ids = request.form.getlist ("Food_id[]")
+    food_ids = request.form.getlist ("food_id[]")
     amounts = request.form.getlist ("amount[]")
 
-    # Filtrerar bort tommar rader (användaren kan välja bara meal)
-    food_list = [(fid, amt) for fid, amt in zip(food_ids, amounts) if fid and amt ]
+    paired = list(zip(food_ids, amounts))
 
+    #Kontrollerar matchning mellan food_id och amount
+    for fid, amt in paired:
+        if fid and not amt:
+            flash("You selected a food but left the amount empty.", "danger")
+            return redirect(url_for("index"))
+        if amt and not fid:
+            flash("You entered an amount but did not select a food.", "danger")
+            return redirect(url_for("index"))
+
+    #Filtrerar bort tomma rader
+    food_list = [(fid, amt) for fid, amt in paired if fid and amt]
+
+    #Kontrollerar att ett giltigt val gjorts
     if not meal_id and not food_list:
-        flash("Choose a meal or add at least one food.", "danger")
+        flash("Please select a meal or a food with an amount.", "danger")
         return redirect(url_for("index"))
     
     #Validera mängder
@@ -161,8 +190,8 @@ def log_meal_index():
                 flash("Amount must be greater than 0.", "danger")
                 return redirect(url_for("index"))
         except ValueError:
-            flash("Amount must be a valid numer.", "danger")
-
+            flash("Amount must be a valid number.", "danger")
+            return redirect(url_for("index"))
     try:
         with get_db() as cur:
             cur.execute(
@@ -174,7 +203,7 @@ def log_meal_index():
             #Kopiera ingredienser från sparad måltid
             if meal_id:
                 cur.execute(
-                    "SELECT food_id, amount FROM meal_ingredient WHERE meal_id = %s", (meal_id)
+                    "SELECT food_id, amount FROM meal_ingredient WHERE meal_id = %s", (meal_id,)
                 )
                 for food_id, amount in cur.fetchall():
                     cur.execute(
@@ -363,24 +392,12 @@ def meals():
     """
     try:
         foods = get_all_foods()
-        with get_db() as cur:
-            cur.execute("""
-                SELECT m.meal_id, m.name, f.name, mi.amount,
-                        f.calories, f.protein, f.fat, f.carbs
-                FROM meal m
-                JOIN meal_ingredient mi ON m.meal_id = mi.meal_id
-                JOIN food f ON mi.food_id = f.food_id
-                WHERE m.user_id = %s
-                ORDER BY m.meal_id
-            """, (session['user_id'],))
-            rows = cur.fetchall()
+        meals_dict = get_meals_dict(session['user_id'])   
     except Exception:
         flash("Kunde inte hämta måltider.", "danger")
         return redirect(url_for("index"))
 
-    meals_dict = get_meals_dict(rows)
-
-    return render_template("meals.html", foods=foods, meals=meals_dict.values())
+    return render_template("meals.html", foods=foods, meals=meals_dict)
 
 @app.route("/foods")
 @login_required
