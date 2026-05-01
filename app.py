@@ -4,6 +4,7 @@ from db import get_db_connection
 from psycopg2 import errors
 from datetime import date
 from functools import wraps
+import nutrition
 
 """
 Flask-applikation för kost- och träningshantering.
@@ -66,6 +67,24 @@ def get_meals_dict(rows):
         meals_dict[meal_id]["total_carbs"] += carbs * amount / 100
     return meals_dict
 
+def get_calorie_goal(user_id):
+    """
+    Hämtar användardatan och returnerar dagligt kalorimål.
+    """
+    with get_db() as cur:
+        cur.execute("""
+            SELECT gender, height, weight, activity_level, birthdate, weight_goal
+            FROM users WHERE user_id = %s
+        """, (user_id,))
+        row = cur.fetchone()
+
+        if not row:
+            return None
+        gender, height, weight, activity_level, birthdate, weight_goal = row
+
+        age = nutrition.calculate_age(birthdate)
+        return nutrition.calculate_calorie_goal(weight, height, age, gender, activity_level, weight_goal)
+
 def login_required(f):
     """
     Decorator som skyddar routes som kräver inloggning. Redirectar till startsidan om användaren inte är inloggad.
@@ -122,6 +141,8 @@ def index():
         """, (session['user_id'],))
             workouts_today = cur.fetchall()
 
+        calorie_goal = get_calorie_goal(session['user_id'])
+
     except Exception:
         flash("Could not receieve data.", "danger")  
         return redirect(url_for("start_page"))      
@@ -136,7 +157,8 @@ def index():
         carbs=round(totals[3]),
         category_calories=category_calories,
         foods=foods,
-        workouts_today=workouts_today
+        workouts_today=workouts_today,
+        calorie_goal=calorie_goal
     )
 
 @app.route("/log_meal_index", methods=["POST"])
@@ -283,11 +305,11 @@ def register():
     email = request.form["email"]
     password = request.form["password"]
     gender = request.form["gender"]
-    height = request.form("height")
-    weight = request.form("weight")
-    activity_level = request.form("activity_level")
-    birthdate = request.form("birthdate")
-    weight_goal = request.form("weight_goal")
+    height = request.form["height"]
+    weight = request.form["weight"]
+    activity_level = request.form["activity_level"]
+    birthdate = request.form["birthdate"]
+    weight_goal = request.form["weight_goal"]
 
     if not name.strip():
         flash("Name cannot be empty.", "danger")
@@ -584,8 +606,8 @@ def statistics():
 
     try:
 
-        calorie_goal = 2200
-        weekly_goal = calorie_goal * 7
+        calorie_goal = get_calorie_goal(user_id)
+        weekly_goal = calorie_goal * 7  
         
         with get_db() as cur:
             cur.execute("""
