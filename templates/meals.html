@@ -98,7 +98,7 @@
               <form method="POST" action="{{ url_for('log_meal', meal_id=meal.meal_id) }}">
                 <div class="mb-2">
                   <select class="form-select form-select-sm" name="meal_category" required>
-                    <option value="" disabled selected>Välj kategori</option>
+                    <option value="" selected>Välj kategori</option>
                     <option value="Frukost">Frukost</option>
                     <option value="Lunch">Lunch</option>
                     <option value="Middag">Middag</option>
@@ -150,7 +150,7 @@
                 <div class="row g-2 mb-2 ingredient-row">
                   <div class="col-7">
                     <select class="form-select food-select" name="food_id[]" required>
-                      <option value="" disabled selected>Select Food</option>
+                      <option value="" selected>Select Food</option>
                       {% for food in foods %}
                       <option value="{{ food[0] }}"
                               data-calories="{{ food[2] }}"
@@ -287,6 +287,25 @@
           el.style.display = 'none';
         });
       }, 3000);
+    </script>
+    <script>
+      // Nollställer alla formulär i en modal om den stängs
+      document.querySelectorAll('.modal').forEach(function (modal) {
+        modal.addEventListener('hidden.bs.modal', function () {
+          modal.querySelectorAll('form').forEach(function (form) {
+            form.reset();
+          });
+
+          // Behåller bara första ingrediensraden
+          const container = modal.querySelector('#ingredients-container');
+          if (container) {
+            const rows = container.querySelectorAll('.row');
+            rows.forEach(function (row, index) {
+              if (index > 0) row.remove();
+            });
+          }
+        });
+      });
     </script>
 
   </body>

@@ -232,7 +232,7 @@
                 <div class="row g-2 mb-2">
                   <div class="col-7">
                     <select class="form-select" name="food_id[]">
-                      <option value="" disabled selected>Select Food</option>
+                      <option value="" selected>Select Food</option>
                       {% for food in foods %}
                       <option value="{{ food[0] }}">{{ food[1].title() }}</option>
                       {% endfor %}
@@ -250,7 +250,7 @@
                 <div class="row g-2 mb-2">
                   <div class="col-12">
                     <select class="form-select" name="meal_id">
-                      <option value="" disabled selected>Select Meal</option>
+                      <option value="" selected>Select Meal</option>
                       {% for meal in meals %}
                       <option value="{{ meal.meal_id }}">{{ meal.name.title() }}</option>
                       {% endfor %}
@@ -302,6 +302,16 @@
       el.style.display = 'none';
     });
   }, 3000);
+</script>
+<script>
+  // Nollställer alla formulär i en modal om den stängs
+  document.querySelectorAll('.modal').forEach(function (modal) {
+    modal.addEventListener('hidden.bs.modal', function () {
+      modal.querySelectorAll('form').forEach(function (form) {
+        form.reset();
+      });
+    });
+  });
 </script>
 </body>
 

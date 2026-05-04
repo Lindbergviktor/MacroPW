@@ -62,7 +62,7 @@
                     <div class="mb-3">
                         <label for="workout_id" class="form-label">Workout</label>
                         <select class="form-select" id="workout_id" name="workout_id" required>
-                            <option value="" selected disabled>Select a workout</option>
+                            <option value="" selected>Select a workout</option>
                             {% for workout in workouts %}
                                 <option value="{{ workout[0] }}">
                                     {{ workout[1] }} (~{{ (workout[2] * workout[3])|int }} kcal/hr)
