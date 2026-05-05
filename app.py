@@ -549,7 +549,7 @@ def add_workout():
             return redirect(url_for("add_workout"))
 
         flash("Workout saved.", "success")
-        return redirect(url_for("statistics"))
+        return redirect(url_for("add_workout"))
 
     try:
         with get_db() as cur:
