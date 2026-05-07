@@ -77,8 +77,7 @@
                        placeholder="Amount (g)" step="0.1" value="{{ amount }}" required>
               </div>
               <div class="col-1 d-flex align-items-center">
-                <span class="remove-btn" style="cursor:pointer; color: var(--danger); font-size: 1.1rem;"
-                      onclick="this.closest('.ingredient-row').remove()">✕</span>
+                <span class="remove-btn" onclick="this.closest('.ingredient-row').remove()">✕</span>
               </div>
             </div>
             {% endfor %}
@@ -128,8 +127,7 @@
                  placeholder="Amount (g)" step="0.1" required>
         </div>
         <div class="col-1 d-flex align-items-center">
-          <span class="remove-btn" style="cursor:pointer; color: var(--danger); font-size: 1.1rem;"
-                onclick="this.closest('.ingredient-row').remove()">✕</span>
+          <span class="remove-btn" onclick="this.closest('.ingredient-row').remove()">✕</span>
         </div>
       `;
       container.appendChild(row);

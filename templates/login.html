@@ -22,7 +22,7 @@
   <!-- Inloggningsformulär -->
   <div class="auth-wrapper">
     <div class="auth-card">
-      <a href="{{ url_for('start_page') }}" class="text-muted-soft d-inline-block mb-3" style="font-size: 0.9rem;">← Back</a>
+      <a href="{{ url_for('start_page') }}" class="text-muted-soft back-link d-inline-block mb-3">← Back</a>
       <h2 class="auth-title">Log In</h2>
       <p class="auth-subtitle">Welcome back!</p>
 
@@ -48,12 +48,12 @@
           <label class="form-label">Password</label>
           <input type="password" class="form-control" name="password" required>
         </div>
-        <button type="submit" class="btn btn-primary-blue w-100" style="padding: 0.75rem;">Log In</button>
+        <button type="submit" class="btn btn-primary-blue w-100 py-3">Log In</button>
       </form>
 
       <!-- Länk till registrering -->
-      <p class="text-center mt-3 mb-0" style="font-size: 0.9rem; color: var(--text-muted);">
-        Don't have an account? <a href="{{ url_for('register') }}" style="color: var(--blue-dark); font-weight: 600;">Sign up</a>
+      <p class="text-center text-muted-soft mt-3 mb-0 small">
+        Don't have an account? <a href="{{ url_for('register') }}" class="inline-link">Sign up</a>
       </p>
     </div>
   </div>

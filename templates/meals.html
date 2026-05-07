@@ -114,8 +114,7 @@
                 <form method="POST" action="{{ url_for('delete_meal', meal_id=meal.meal_id) }}"
                       class="w-50"
                       onsubmit="return confirm('Delete this meal?')">
-                  <button type="submit" class="btn btn-sm w-100"
-                          style="border: 2px solid var(--danger); color: var(--danger); border-radius: var(--radius-sm); font-weight: 600;">
+                  <button type="submit" class="btn btn-danger-soft btn-sm w-100">
                     Delete
                   </button>
                 </form>
@@ -265,7 +264,7 @@
             <input type="number" class="form-control amount-input" name="amount[]" placeholder="Amount (g)" step="0.1" required>
           </div>
           <div class="col-1 d-flex align-items-center">
-            <span style="cursor:pointer;" onclick="this.closest('.row').remove(); updateMacroSummary();">✕</span>
+            <span class="remove-btn" onclick="this.closest('.row').remove(); updateMacroSummary();">✕</span>
           </div>
         `;
         container.appendChild(row);

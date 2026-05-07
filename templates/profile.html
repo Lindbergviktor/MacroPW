@@ -53,45 +53,40 @@
         <p class="page-subtitle">Update your personal details and goals.</p>
 
         <!-- Avatar + namn -->
-        <div class="d-flex align-items-center gap-3 mb-4">
-          <div style="
-            width:68px; height:68px; border-radius:50%;
-            background: linear-gradient(135deg, var(--blue-mid), var(--blue-dark));
-            display:flex; align-items:center; justify-content:center;
-            font-size:1.7rem; font-weight:700; color:#fff; flex-shrink:0;
-            box-shadow: 0 4px 16px rgba(0,164,209,0.28);">
+        <div class="profile-summary">
+          <div class="avatar-badge">
             {{ user.name[0].upper() if user.name else '?' }}
           </div>
           <div>
-            <div style="font-size:1.2rem; font-weight:700; color:var(--text-dark);">{{ user.name.title() }}</div>
-            <div style="font-size:0.875rem; color:var(--text-muted);">{{ user.email }}</div>
+            <div class="profile-name">{{ user.name.title() }}</div>
+            <div class="profile-email">{{ user.email }}</div>
           </div>
         </div>
 
         <!-- Snabb-stats -->
         <div class="row g-2 mb-4">
           <div class="col-4">
-            <div class="meal-row flex-column text-center gap-0" style="padding:0.85rem 0.5rem;">
-              <div style="font-size:1.15rem; font-weight:700; font-family:'DM Mono',monospace; color:var(--blue-dark);">
-                {{ user.weight }} <span style="font-size:0.75rem; font-weight:500;">kg</span>
+            <div class="meal-row flex-column profile-stat-card">
+              <div class="profile-stat-value">
+                {{ user.weight }} <span class="profile-stat-unit">kg</span>
               </div>
-              <div style="font-size:0.7rem; text-transform:uppercase; letter-spacing:.07em; color:var(--text-muted); font-weight:600;">Weight</div>
+              <div class="profile-stat-label">Weight</div>
             </div>
           </div>
           <div class="col-4">
-            <div class="meal-row flex-column text-center gap-0" style="padding:0.85rem 0.5rem;">
-              <div style="font-size:1.15rem; font-weight:700; font-family:'DM Mono',monospace; color:var(--blue-dark);">
-                {{ user.height }} <span style="font-size:0.75rem; font-weight:500;">cm</span>
+            <div class="meal-row flex-column profile-stat-card">
+              <div class="profile-stat-value">
+                {{ user.height }} <span class="profile-stat-unit">cm</span>
               </div>
-              <div style="font-size:0.7rem; text-transform:uppercase; letter-spacing:.07em; color:var(--text-muted); font-weight:600;">Height</div>
+              <div class="profile-stat-label">Height</div>
             </div>
           </div>
           <div class="col-4">
-            <div class="meal-row flex-column text-center gap-0" style="padding:0.85rem 0.5rem;">
-              <div style="font-size:1.15rem; font-weight:700; font-family:'DM Mono',monospace; color:var(--blue-dark);">
+            <div class="meal-row flex-column profile-stat-card">
+              <div class="profile-stat-value">
                 {{ user.birthdate }}
               </div>
-              <div style="font-size:0.7rem; text-transform:uppercase; letter-spacing:.07em; color:var(--text-muted); font-weight:600;">Born</div>
+              <div class="profile-stat-label">Born</div>
             </div>
           </div>
         </div>

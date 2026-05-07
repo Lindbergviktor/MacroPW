@@ -59,14 +59,12 @@
 
             <!-- Toprad med profil, datum och notifikationer -->
           <div class="hero-top">
-          <a href="{{ url_for('profile') }}">
-            <button class="icon-btn" title="Profile">
+          <a href="{{ url_for('profile') }}" class="icon-btn" title="Profile">
               <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
                 viewBox="0 0 24 24">
                 <circle cx="12" cy="8" r="4" />
                 <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
               </svg>
-            </button>
           </a>
 
               <div class="date-nav">
@@ -91,10 +89,10 @@
                   <path class="gauge-track" d="M 25 125 A 90 90 0 0 1 195 125" />
                   <path class="gauge-fill" d="M 25 125 A 90 90 0 0 1 195 125" />
                 </svg>
-                <div class="gauge-center" style="bottom:10px;">
+                <div class="gauge-center">
                   <div class="gauge-icon"></div>
                   <div class="gauge-kcal">{{ calories }} <span
-                      style="font-size:.95rem;font-weight:500;opacity:.85">Kcal</span></div>
+                      class="gauge-kcal-unit">Kcal</span></div>
                   <div class="gauge-sub">Of {{ calorie_goal}} Kcal</div>
                 </div>
               </div>
@@ -167,7 +165,7 @@
         <div class="wo-header">
           <div class="wo-stat">
             <div class="wo-stat-label">Today's Workout Overview</div>
-
+            <div class="wo-stat-value">{{ workouts_today|length }}</div>
           </div>
         </div>
 
