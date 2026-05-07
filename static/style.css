@@ -154,26 +154,37 @@ textarea {
 }
 
 .btn-primary,
-.btn-primary-green {
+.btn-primary-blue {
   background: var(--blue-dark);
   border: none;
   color: #fff;
 }
 
 .btn-primary:hover,
-.btn-primary-green:hover {
+.btn-primary-blue:hover {
   background: #008bb0;
   color: #fff;
 }
 
-.btn-outline-green {
+.btn-outline-blue {
   background: transparent;
   border: 2px solid var(--blue-dark);
   color: var(--blue-dark);
 }
 
-.btn-outline-green:hover {
+.btn-outline-blue:hover {
   background: var(--blue-dark);
+  color: #fff;
+}
+
+.btn-blue {
+  background: var(--blue-dark);
+  border: none;
+  color: #fff;
+}
+
+.btn-blue:hover {
+  background: #008bb0;
   color: #fff;
 }
 
