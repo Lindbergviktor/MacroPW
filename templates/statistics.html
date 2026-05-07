@@ -35,215 +35,142 @@
 
     <div class="page-wrapper">
         <div class="container mt-4">
-            <div class="content-card">
-                <div class="section-title">Overview</div>
-                <h1 class="page-title">Statistics</h1>
-                <p class="page-subtitle">Your logged nutrition, workouts and water intake.</p>
-
-                <!-- Top stats -->
-                <div class="row g-3 mt-1">
-                    <div class="col-12 col-md-6 col-lg-3">
-                        <div class="stat-card">
-                            <div class="stat-label">Calories today</div>
-                            <div class="stat-value">{{ calories_today }}</div>
+            <div class="statistics-shell">
+                <div class="stats-panel stats-panel-hero">
+                    <div class="stats-panel-head">
+                        <div>
+                            <div class="section-title">Overview</div>
+                            <h1 class="page-title section-heading mb-2">Statistics</h1>
+                            <p class="page-subtitle stats-hero-copy">A clearer view of your nutrition, hydration and workouts across today and the last 7 days.</p>
                         </div>
                     </div>
-
-                    <div class="col-12 col-md-6 col-lg-3">
-                        <div class="stat-card">
-                            <div class="stat-label">Protein today</div>
-                            <div class="stat-value">{{ protein_today }} g</div>
+                    <div class="stats-panel-grid stats-panel-grid-hero">
+                        <div class="stats-hero-card">
+                            <div class="stats-hero-label">Today's Calories</div>
+                            <div class="stats-hero-value">{{ calories_today }}</div>
+                            <div class="stats-hero-meta">Goal {{ calorie_goal }} kcal</div>
                         </div>
-                    </div>
-
-                    <div class="col-12 col-md-6 col-lg-3">
-                        <div class="stat-card">
-                            <div class="stat-label">Workouts this week</div>
-                            <div class="stat-value">{{ workouts_this_week }}</div>
+                        <div class="stats-hero-card">
+                            <div class="stats-hero-label">This Week's Workouts</div>
+                            <div class="stats-hero-value">{{ workouts_this_week }}</div>
+                            <div class="stats-hero-meta">{{ workout_minutes_this_week }} min active</div>
                         </div>
-                    </div>
-
-                    <div class="col-12 col-md-6 col-lg-3">
-                        <div class="stat-card">
-                            <div class="stat-label">Water today</div>
-                            <div class="stat-value">{{ water_today }} / 8</div>
+                        <div class="stats-hero-card">
+                            <div class="stats-hero-label">Water Today</div>
+                            <div class="stats-hero-value">{{ water_today }}/8</div>
+                            <div class="stats-hero-meta">Glasses logged</div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Summering av näring och träning -->
-                <div class="row g-4 mt-3">
-                    <div class="col-12 col-lg-6">
-                        <div class="content-card h-100">
-                            <div class="section-title">Nutrition</div>
-                            <h2 class="page-title section-heading">Today</h2>
-
-                            <div class="meal-list mt-3">
-                                <div class="meal-row">
-                                    <div>
-                                        <div class="meal-name">Calories</div>
-                                        <div class="meal-kcal">Logged today</div>
-                                    </div>
-                                    <div class="mono">{{ calories_today }} kcal</div>
-                                </div>
-
-                                <div class="meal-row">
-                                    <div>
-                                        <div class="meal-name">Protein</div>
-                                        <div class="meal-kcal">Logged today</div>
-                                    </div>
-                                    <div class="mono">{{ protein_today }} g</div>
-                                </div>
-
-                                <div class="meal-row">
-                                    <div>
-                                        <div class="meal-name">Fat</div>
-                                        <div class="meal-kcal">Logged today</div>
-                                    </div>
-                                    <div class="mono">{{ fat_today }} g</div>
-                                </div>
-
-                                <div class="meal-row">
-                                    <div>
-                                        <div class="meal-name">Carbs</div>
-                                        <div class="meal-kcal">Logged today</div>
-                                    </div>
-                                    <div class="mono">{{ carbs_today }} g</div>
-                                </div>
+                <div class="stats-top-grid">
+                    <section class="stats-panel stats-panel-today">
+                        <div class="stats-panel-head">
+                            <div>
+                                <div class="section-title">Today</div>
+                                <h2 class="page-title section-heading mb-0">Daily Snapshot</h2>
                             </div>
                         </div>
-                    </div>
 
-                    <div class="col-12 col-lg-6">
-                        <div class="content-card h-100">
-                            <div class="section-title">Training</div>
-                            <h2 class="page-title section-heading">This week</h2>
-
-                            <div class="meal-list mt-3">
-                                <div class="meal-row">
-                                    <div>
-                                        <div class="meal-name">Workouts</div>
-                                        <div class="meal-kcal">This week</div>
-                                    </div>
-                                    <div class="mono">{{ workouts_this_week }}</div>
-                                </div>
-
-                                <div class="meal-row">
-                                    <div>
-                                        <div class="meal-name">Duration</div>
-                                        <div class="meal-kcal">This week</div>
-                                    </div>
-                                    <div class="mono">{{ workout_minutes_this_week }} min</div>
-                                </div>
-
-                                <div class="meal-row">
-                                    <div>
-                                        <div class="meal-name">Workout calories</div>
-                                        <div class="meal-kcal">This week</div>
-                                    </div>
-                                    <div class="mono">{{ workout_calories_this_week }} kcal</div>
-                                </div>
-
-                                <div class="meal-row">
-                                    <div>
-                                        <div class="meal-name">Water</div>
-                                        <div class="meal-kcal">Today</div>
-                                    </div>
-                                    <div class="mono">{{ water_today }} glasses</div>
-                                </div>
+                        <div class="stats-panel-grid">
+                            <div class="stats-hero-card">
+                                <div class="stats-hero-label">Calories</div>
+                                <div class="stats-hero-value">{{ calories_today }}</div>
+                                <div class="stats-hero-meta">of {{ calorie_goal }} kcal</div>
+                            </div>
+                            <div class="stats-hero-card">
+                                <div class="stats-hero-label">Protein</div>
+                                <div class="stats-hero-value">{{ protein_today }} g</div>
+                                <div class="stats-hero-meta">logged today</div>
+                            </div>
+                            <div class="stats-hero-card">
+                                <div class="stats-hero-label">Fat</div>
+                                <div class="stats-hero-value">{{ fat_today }} g</div>
+                                <div class="stats-hero-meta">logged today</div>
+                            </div>
+                            <div class="stats-hero-card">
+                                <div class="stats-hero-label">Carbs</div>
+                                <div class="stats-hero-value">{{ carbs_today }} g</div>
+                                <div class="stats-hero-meta">logged today</div>
                             </div>
                         </div>
-                    </div>
+                    </section>
+
+                    <section class="stats-panel">
+                        <div class="stats-panel-head">
+                            <div>
+                                <div class="section-title">7 Day Total</div>
+                                <h2 class="page-title section-heading mb-0">Weekly Nutrition Overview</h2>
+                            </div>
+                        </div>
+
+                        <div class="stats-panel-grid stats-panel-grid-wide">
+                            <div class="stats-hero-card">
+                                <div class="stats-hero-label">Calorie Goal</div>
+                                <div class="stats-hero-value">{{ weekly_goal }} kcal</div>
+                                <div class="stats-hero-meta">7 day target</div>
+                            </div>
+                            <div class="stats-hero-card">
+                                <div class="stats-hero-label">Calories Logged</div>
+                                <div class="stats-hero-value">{{ calories_week }} kcal</div>
+                                <div class="stats-hero-meta">last 7 days</div>
+                            </div>
+                            <div class="stats-hero-card">
+                                <div class="stats-hero-label">Protein</div>
+                                <div class="stats-hero-value">{{ protein_week }} g</div>
+                                <div class="stats-hero-meta">last 7 days</div>
+                            </div>
+                            <div class="stats-hero-card">
+                                <div class="stats-hero-label">Fat</div>
+                                <div class="stats-hero-value">{{ fat_week }} g</div>
+                                <div class="stats-hero-meta">last 7 days</div>
+                            </div>
+                            <div class="stats-hero-card">
+                                <div class="stats-hero-label">Carbs</div>
+                                <div class="stats-hero-value">{{ carbs_week }} g</div>
+                                <div class="stats-hero-meta">last 7 days</div>
+                            </div>
+                        </div>
+                    </section>
                 </div>
 
-                <!-- Statistik för senaste veckan -->
-                <div class="table-card mt-4">
-                    <div class="p-3 pb-0">
-                        <div class="section-title">History</div>
-                        <h2 class="page-title section-heading">Last 7 days nutrition</h2>
-                    </div>
+                <div class="stats-bottom-grid">
+                    <section class="stats-panel stats-panel-week">
+                        <div class="stats-panel-head">
+                            <div>
+                                <div class="section-title">This Week</div>
+                                <h2 class="page-title section-heading mb-0">Training Summary</h2>
+                            </div>
+                        </div>
 
-                    <div class="table-responsive">
-                        <table class="table align-middle mb-0">
-                            <thead>
-                                <tr>
-                                    <th>Date</th>
-                                    <th>Calories</th>
-                                    <th>Protein</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% if nutrition_last_7 %}
-                                    {% for row in nutrition_last_7 %}
-                                    <tr>
-                                        <td>{{ row[0] }}</td>
-                                        <td>{{ row[1]|round(0) }} kcal</td>
-                                        <td>{{ row[2]|round(1) }} g</td>
-                                    </tr>
-                                    {% endfor %}
-                                {% else %}
-                                    <tr>
-                                        <td colspan="3" class="text-center text-muted py-4">
-                                            No meal data logged yet.
-                                        </td>
-                                    </tr>
-                                {% endif %}
-                            </tbody>
-                        </table>
-                    </div>
+                        <div class="stats-panel-grid">
+                            <div class="stats-hero-card">
+                                <div class="stats-hero-label">Workouts</div>
+                                <div class="stats-hero-value">{{ workouts_this_week }}</div>
+                                <div class="stats-hero-meta">sessions this week</div>
+                            </div>
+                            <div class="stats-hero-card">
+                                <div class="stats-hero-label">Workout Time</div>
+                                <div class="stats-hero-value">{{ workout_minutes_this_week }} min</div>
+                                <div class="stats-hero-meta">total active minutes</div>
+                            </div>
+                            <div class="stats-hero-card">
+                                <div class="stats-hero-label">Calories Burned</div>
+                                <div class="stats-hero-value">{{ workout_calories_this_week }} kcal</div>
+                                <div class="stats-hero-meta">estimated workout burn</div>
+                            </div>
+                            <div class="stats-hero-card">
+                                <div class="stats-hero-label">Water Today</div>
+                                <div class="stats-hero-value">{{ water_today }} glasses</div>
+                                <div class="stats-hero-meta">hydration check-in</div>
+                            </div>
+                        </div>
+                    </section>
                 </div>
 
-                <!-- Veckoöverblick -->
-    <div class="content-card mt-4">
-        <div class="section-title">Weekly Overview</div>
-        <h2 class="page-title section-heading">Senaste 7 dagarna</h2>
-
-        <div class="meal-list mt-3">
-            <div class="meal-row">
-                <div>
-                    <div class="meal-name">Kalorimål</div>
-                    <div class="meal-kcal">7 dagar × 2200 kcal</div>
-                </div>
-                <div class="mono">15 400 kcal</div>
-            </div>
-
-            <div class="meal-row">
-                <div>
-                    <div class="meal-name">Kalorier konsumerade</div>
-                    <div class="meal-kcal">Senaste 7 dagarna</div>
-                </div>
-                <div class="mono">{{ calories_week }} kcal</div>
-            </div>
-
-            <div class="meal-row">
-                <div>
-                    <div class="meal-name">Protein</div>
-                    <div class="meal-kcal">Senaste 7 dagarna</div>
-                </div>
-                <div class="mono">{{ protein_week }} g</div>
-            </div>
-
-            <div class="meal-row">
-                <div>
-                    <div class="meal-name">Fett</div>
-                    <div class="meal-kcal">Senaste 7 dagarna</div>
-                </div>
-                <div class="mono">{{ fat_week }} g</div>
-            </div>
-
-            <div class="meal-row">
-                <div>
-                    <div class="meal-name">Kolhydrater</div>
-                    <div class="meal-kcal">Senaste 7 dagarna</div>
-                </div>
-                <div class="mono">{{ carbs_week }} g</div>
-            </div>
-        </div>
-    </div>
-
-    <div class="action-row mt-4">
-        <a href="{{ url_for('meals') }}" class="btn btn-outline-blue">View Meals</a>
-        <a href="{{ url_for('add_workout') }}" class="btn btn-primary-blue">Add Workout</a>
+                <div class="action-row mt-4">
+                    <a href="{{ url_for('meals') }}" class="btn btn-outline-blue">View Meals</a>
+                    <a href="{{ url_for('add_workout') }}" class="btn btn-primary-blue">Add Workout</a>
                 </div>
             </div>
         </div>
@@ -258,9 +185,9 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         setTimeout(function () {
-        document.querySelectorAll('.alert').forEach(function (el) {
-            el.style.display = 'none';
-        });
+            document.querySelectorAll('.alert').forEach(function (el) {
+                el.style.display = 'none';
+            });
         }, 3000);
     </script>
 </body>
