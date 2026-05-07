@@ -157,6 +157,18 @@ def index():
         """, (session['user_id'],))
             workouts_today = cur.fetchall()
 
+            cur.execute("""
+                SELECT ml.log_id, ml_name, f.name, mli.amount,
+                    ROUND(f.calories * mli.amount / 100.0) as kal
+                FROM meal_log ml
+                JOIN meal_log_item mli ON ml.log_id = mli.log_id
+                JOIN food f ON mli.food_id = f.food_id
+                WHERE ml.user_id = %s
+                AND DATE(ml.log_date) = CURRENT_DATE
+                ORDER BY ml.name, ml.log_id
+            """, (session['user_id'],))
+            logged_items = cur.fetchall()
+
         calorie_goal = get_calorie_goal(session['user_id'])
 
     except Exception:
@@ -165,6 +177,17 @@ def index():
 
     # Bygger en dict med kalorier per kategori
     category_calories = {row[0]: round(row[1]) for row in category_rows}
+
+    logged_by_category = {}
+    for log_id, category, food_name, amount, kcal in logged_items:
+        if category not in logged_by_category:
+            logged_by_category[category] = []
+        logged_by_category[category].append({
+            "log_id": log_id,
+            "food": food_name,
+            "amount": amount,
+            "calories": kcal
+            })
 
     return render_template("index.html",
         calories=round(totals[0]),
