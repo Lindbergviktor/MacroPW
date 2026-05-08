@@ -97,6 +97,31 @@ def get_calorie_goal(user_id):
 
         age = nutrition.calculate_age(birthdate)
         return nutrition.calculate_calorie_goal(weight, height, age, gender, activity_level, weight_goal)
+    
+def get_macro_goals(user_id):
+    """Returnerar en dict med dagliga mål för kalorier, protein, fett och kolhydrater"""
+    with get_db() as cur:
+        cur.execute("""
+                    SELECT gender, height, weight, activity_level, birthdate, weight_goal
+                    FROM users WHERE user_id = %s
+                """, (user_id,))
+        row = cur.fetchone()
+        if not row:
+            return None
+        gender, height, weight, activity_level, birthdate, weight_goal = row
+
+    age = nutrition.calculate_age(birthdate)
+    calorie_goal = nutrition.calculate_calorie_goal(weight, height, age, gender, activity_level, weight_goal)
+    protein_goal = nutrition.calculate_protein_goal(weight)
+    fat_goal = nutrition.calculate_fat_goal(calorie_goal)
+    carb_goal = nutrition.calculate_carb_goal(calorie_goal, protein_goal, fat_goal)
+
+    return {
+        "calories": calorie_goal,
+        "protein": protein_goal,
+        "fat": fat_goal,
+        "carbs": carb_goal
+    }
 
 def login_required(f):
     """
@@ -157,7 +182,7 @@ def index():
         """, (session['user_id'],))
             workouts_today = cur.fetchall()
 
-        calorie_goal = get_calorie_goal(session['user_id'])
+        macro_goals = get_macro_goals(session['user_id'])
 
     except Exception:
         flash("Could not receieve data.", "danger")  
@@ -175,7 +200,8 @@ def index():
         foods=foods,
         meals=meals,
         workouts_today=workouts_today,
-        calorie_goal=calorie_goal
+        macro_goals=macro_goals
+        
     )
 
 @app.route("/log_meal_index", methods=["POST"])

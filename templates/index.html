@@ -93,7 +93,7 @@
                   <div class="gauge-icon"></div>
                   <div class="gauge-kcal">{{ calories }} <span
                       class="gauge-kcal-unit">Kcal</span></div>
-                  <div class="gauge-sub">Of {{ calorie_goal}} Kcal</div>
+                  <div class="gauge-sub">Of {{ macro_goals.calories }} Kcal</div>
                 </div>
               </div>
             </div>
@@ -102,7 +102,7 @@
             <div class="macro-row">
               <div class="macro-pill">
                 <div class="label">Protein</div>
-                <div><span class="value">{{ protein }}</span><span class="goal">/140</span></div>
+                <div><span class="value">{{ protein }}</span><span class="goal">/{{ macro_goals.protein }}</span></div>
                 <div class="macro-bar">
                   <div class="macro-bar-fill bar-protein"></div>
                 </div>
@@ -110,7 +110,7 @@
 
               <div class="macro-pill">
                 <div class="label">Fat</div>
-                <div><span class="value">{{ fat }}</span><span class="goal">/80</span></div>
+                <div><span class="value">{{ fat }}</span><span class="goal">/{{ macro_goals.fat }}</span></div>
                 <div class="macro-bar">
                   <div class="macro-bar-fill bar-fat"></div>
                 </div>
@@ -118,7 +118,7 @@
 
               <div class="macro-pill">
                 <div class="label">Carbs</div>
-                <div><span class="value">{{ carbs }}</span><span class="goal">/300</span></div>
+                <div><span class="value">{{ carbs }}</span><span class="goal">/{{ macro_goals.carbs }}</span></div>
                 <div class="macro-bar">
                   <div class="macro-bar-fill bar-carbs"></div>
                 </div>
@@ -264,6 +264,7 @@
       </div>
     </div>
   {% endfor %}
+
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 
