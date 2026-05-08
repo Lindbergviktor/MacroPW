@@ -5,7 +5,6 @@ from psycopg2 import errors
 from datetime import date
 from functools import wraps
 import nutrition
-import traceback
 
 """
 Flask-applikation för kost- och träningshantering.
@@ -186,7 +185,6 @@ def index():
         macro_goals = get_macro_goals(session['user_id'])
 
     except Exception:
-        print(traceback.format_exc())
         flash("Could not receieve data.", "danger")  
         return redirect(url_for("start_page"))      
 
