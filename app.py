@@ -270,6 +270,26 @@ def log_meal_index():
     flash("Food logged successfully!", "success")
     return redirect(url_for("index"))
 
+@app.route("/delete_log/<int:log_id>", methods=["POST"])
+@login_required
+def delete_log(log_id):
+    """Tar bort en loggad måltid på startsidan från dagens datum"""
+    try:
+        with get_db() as cur:
+            cur.execute("SELECT user_id FROM meal_log WHERE log_id = %s", (log_id,))
+            log = cur.fetchone()
+            if not log or log[0] != session['user_id']:
+                flash("Could not find log entry.", "danger")
+                return redirect(url_for('index'))
+            cur.execute("DELETE FROM meal_log_item WHERE log_id = %s", (log_id,))
+            cur.execute("DELETE FROM meal_log WHERE log_id = %s", (log_id,))
+    except Exception:
+        flash("Database error during deletion.", "danger")
+        return redirect(url_for('index'))
+    
+    flash("Removed.", "success")
+    return redirect(url_for('index'))
+
 @app.route("/start")
 def start_page():
     """Visar startsida för icke-inloggade användare"""

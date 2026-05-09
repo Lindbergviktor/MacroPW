@@ -153,7 +153,14 @@
                         <div class="d-flex justify-content-between align-items-center py-1"
                              style="font-size: 0.82rem; color: var(--text-muted); border-top: 1px solid var(--border-soft);">
                           <span>{{ item.food.title() }} — {{ item.amount }}g</span>
-                          <span class="mono">{{ item.kcal }} kcal</span>
+                          <div class="d-flex align-items-center gap-2">
+                            <span class="mono">{{ item.kcal }} kcal</span>
+                            <form method="POST" action="{{ url_for('delete_log', log_id=item.log_id) }}"
+                                  onsubmit="return confirm('Remove this entry?')">
+                              <button type="submit"
+                                      style="color: var(--danger); font-size: 0.75rem; padding: 0 4px; background: none; border: none;">✕</button>
+                            </form>
+                          </div>
                         </div>
                       {% endfor %}
                     </div>
