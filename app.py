@@ -158,7 +158,7 @@ def index():
             workouts_today = cur.fetchall()
 
             cur.execute("""
-                SELECT ml.log_id, ml_name, f.name, mli.amount,
+                SELECT ml.log_id, ml.name, f.name, mli.amount,
                     ROUND(f.calories * mli.amount / 100.0) as kal
                 FROM meal_log ml
                 JOIN meal_log_item mli ON ml.log_id = mli.log_id
@@ -198,7 +198,8 @@ def index():
         foods=foods,
         meals=meals,
         workouts_today=workouts_today,
-        calorie_goal=calorie_goal
+        calorie_goal=calorie_goal,
+        logged_by_category=logged_by_category
     )
 
 @app.route("/log_meal_index", methods=["POST"])

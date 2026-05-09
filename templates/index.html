@@ -94,8 +94,8 @@
                 <div class="gauge-center" style="bottom:10px;">
                   <div class="gauge-icon"></div>
                   <div class="gauge-kcal">{{ calories }} <span
-                      style="font-size:.95rem;font-weight:500;opacity:.85">Kcal</span></div>
-                  <div class="gauge-sub">Of {{ calorie_goal}} Kcal</div>
+                      class="gauge-kcal-unit">Kcal</span></div>
+                  <div class="gauge-sub">Of {{ calorie_goal }} Kcal</div>
                 </div>
               </div>
             </div>
@@ -137,14 +137,32 @@
           <div class="meal-list">
             {% for cat in ['Breakfast', 'Lunch', 'Dinner', 'Snack'] %}
               <div class="meal-row">
-                <div>
-                  <div class="meal-name">{{ cat}}</div>
-                  <div class="meal-kcal">{{ category_calories.get(cat, 0) }} kcal</div>
+                <div class="w-100">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                      <div class="meal-name">{{ cat }}</div>
+                      <div class="meal-kcal">{{ category_calories.get(cat, 0) }} kcal</div>
+                    </div>
+                    <button type="button" class="add-btn" data-bs-toggle="modal" data-bs-target="#logModal-{{ cat }}">+</button>
+                  </div>
+
+                  <!-- Loggade items per kategori -->
+                  {% if logged_by_category.get(cat) %}
+                    <div class="mt-2">
+                      {% for item in logged_by_category[cat] %}
+                        <div class="d-flex justify-content-between align-items-center py-1"
+                             style="font-size: 0.82rem; color: var(--text-muted); border-top: 1px solid var(--border-soft);">
+                          <span>{{ item.food.title() }} — {{ item.amount }}g</span>
+                          <span class="mono">{{ item.kcal }} kcal</span>
+                        </div>
+                      {% endfor %}
+                    </div>
+                  {% endif %}
                 </div>
-                <button type="button" class="add-btn" data-bs-toggle="modal" data-bs-target="#logModal-{{ cat }}">+</button>
               </div>
             {% endfor %}
-          </div>  
+          </div>
+
           <!-- Snabbknappar -->
           <div class="action-row">
             <a href="{{ url_for('meals') }}" class="btn btn-primary">Add Meal</a>
@@ -167,7 +185,6 @@
         <div class="wo-header">
           <div class="wo-stat">
             <div class="wo-stat-label">Today's Workout Overview</div>
-
           </div>
         </div>
 
@@ -213,7 +230,7 @@
     </div>
   </footer>
 
-  <!-- Modal för att lägga till nytt livsmedel -->
+  <!-- Modals för att logga mat per kategori -->
   {% for cat in ['Breakfast', 'Lunch', 'Dinner', 'Snack'] %}
     <div class="modal fade" id="logModal-{{ cat }}" tabindex="-1" aria-labelledby="addBreakfastModalLabel" aria-hidden="true">
       <div class="modal-dialog">
@@ -244,7 +261,7 @@
                 </div>
               </div>
 
-              <!-- Meals drowdown -->
+              <!-- Meals dropdown -->
               <label class="form-label">Meals</label>
               <div id="meals-container-{{ cat }}">
                 <div class="row g-2 mb-2">
@@ -266,53 +283,57 @@
       </div>
     </div>
   {% endfor %}
+
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 
   <!-- Vattentracker-logik -->
- <script>
-  const TOTAL = 8;
-  let filled = 0;
+  <script>
+    const TOTAL = 8;
+    let filled = 0;
 
-  function renderGlasses() {
-    const wrap = document.getElementById('waterGlasses');
-    if (!wrap) return;
-    wrap.innerHTML = '';
+    function renderGlasses() {
+      const wrap = document.getElementById('waterGlasses');
+      if (!wrap) return;
+      wrap.innerHTML = '';
 
-    for (let i = 0; i < TOTAL; i++) {
-      const g = document.createElement('button');
-      g.className = 'glass' + (i < filled ? ' filled' : '');
-      g.innerHTML = `<i class="bi ${i < filled ? 'bi-cup-straw' : 'bi-cup'}"></i>`;
-      g.title = i < filled ? 'Click to remove' : 'Click to add';
-      g.addEventListener('click', () => {
-        filled = (i < filled) ? i : i + 1;
-        renderGlasses();
-      });
-      wrap.appendChild(g);
+      for (let i = 0; i < TOTAL; i++) {
+        const g = document.createElement('button');
+        g.className = 'glass' + (i < filled ? ' filled' : '');
+        g.innerHTML = `<i class="bi ${i < filled ? 'bi-cup-straw' : 'bi-cup'}"></i>`;
+        g.title = i < filled ? 'Click to remove' : 'Click to add';
+        g.addEventListener('click', () => {
+          filled = (i < filled) ? i : i + 1;
+          renderGlasses();
+        });
+        wrap.appendChild(g);
+      }
+
+      document.getElementById('waterCount').textContent = `${filled} / ${TOTAL} glasses`;
     }
 
-    document.getElementById('waterCount').textContent = `${filled} / ${TOTAL} glasses`;
-  }
+    renderGlasses();
+  </script>
 
-  renderGlasses();
-</script>
-<script>
-  setTimeout(function () {
-    document.querySelectorAll('.alert').forEach(function (el) {
-      el.style.display = 'none';
-    });
-  }, 3000);
-</script>
-<script>
-  // Nollställer alla formulär i en modal om den stängs
-  document.querySelectorAll('.modal').forEach(function (modal) {
-    modal.addEventListener('hidden.bs.modal', function () {
-      modal.querySelectorAll('form').forEach(function (form) {
-        form.reset();
+  <script>
+    setTimeout(function () {
+      document.querySelectorAll('.alert').forEach(function (el) {
+        el.style.display = 'none';
+      });
+    }, 3000);
+  </script>
+
+  <script>
+    // Nollställer alla formulär i en modal om den stängs
+    document.querySelectorAll('.modal').forEach(function (modal) {
+      modal.addEventListener('hidden.bs.modal', function () {
+        modal.querySelectorAll('form').forEach(function (form) {
+          form.reset();
+        });
       });
     });
-  });
-</script>
+  </script>
+
 </body>
 
 </html>
