@@ -64,7 +64,7 @@
                 </div>
 
                 <div class="stats-top-grid">
-                    <section class="stats-panel stats-panel-today">
+                    <section class="stats-panel stats-panel-today stats-panel-weekly-overview">
                         <div class="stats-panel-head">
                             <div>
                                 <div class="section-title">Today</div>
@@ -72,23 +72,23 @@
                             </div>
                         </div>
 
-                        <div class="stats-panel-grid">
-                            <div class="stats-hero-card">
+                        <div class="stats-panel-grid stats-panel-grid-wide">
+                            <div class="stats-hero-card weekly-stat-card">
                                 <div class="stats-hero-label">Calories</div>
                                 <div class="stats-hero-value">{{ calories_today }}</div>
                                 <div class="stats-hero-meta">of {{ calorie_goal }} kcal</div>
                             </div>
-                            <div class="stats-hero-card">
+                            <div class="stats-hero-card weekly-stat-card">
                                 <div class="stats-hero-label">Protein</div>
                                 <div class="stats-hero-value">{{ protein_today }} g</div>
                                 <div class="stats-hero-meta">logged today</div>
                             </div>
-                            <div class="stats-hero-card">
+                            <div class="stats-hero-card weekly-stat-card">
                                 <div class="stats-hero-label">Fat</div>
                                 <div class="stats-hero-value">{{ fat_today }} g</div>
                                 <div class="stats-hero-meta">logged today</div>
                             </div>
-                            <div class="stats-hero-card">
+                            <div class="stats-hero-card weekly-stat-card">
                                 <div class="stats-hero-label">Carbs</div>
                                 <div class="stats-hero-value">{{ carbs_today }} g</div>
                                 <div class="stats-hero-meta">logged today</div>
@@ -96,7 +96,7 @@
                         </div>
                     </section>
 
-                    <section class="stats-panel">
+                    <section class="stats-panel stats-panel-weekly-overview">
                         <div class="stats-panel-head">
                             <div>
                                 <div class="section-title">7 Day Total</div>
@@ -105,27 +105,27 @@
                         </div>
 
                         <div class="stats-panel-grid stats-panel-grid-wide">
-                            <div class="stats-hero-card">
+                            <div class="stats-hero-card weekly-stat-card weekly-stat-goal">
                                 <div class="stats-hero-label">Calorie Goal</div>
                                 <div class="stats-hero-value">{{ weekly_goal }} kcal</div>
                                 <div class="stats-hero-meta">7 day target</div>
                             </div>
-                            <div class="stats-hero-card">
+                            <div class="stats-hero-card weekly-stat-card weekly-stat-calories">
                                 <div class="stats-hero-label">Calories Logged</div>
                                 <div class="stats-hero-value">{{ calories_week }} kcal</div>
                                 <div class="stats-hero-meta">last 7 days</div>
                             </div>
-                            <div class="stats-hero-card">
+                            <div class="stats-hero-card weekly-stat-card weekly-stat-protein">
                                 <div class="stats-hero-label">Protein</div>
                                 <div class="stats-hero-value">{{ protein_week }} g</div>
                                 <div class="stats-hero-meta">last 7 days</div>
                             </div>
-                            <div class="stats-hero-card">
+                            <div class="stats-hero-card weekly-stat-card weekly-stat-fat">
                                 <div class="stats-hero-label">Fat</div>
                                 <div class="stats-hero-value">{{ fat_week }} g</div>
                                 <div class="stats-hero-meta">last 7 days</div>
                             </div>
-                            <div class="stats-hero-card">
+                            <div class="stats-hero-card weekly-stat-card weekly-stat-carbs">
                                 <div class="stats-hero-label">Carbs</div>
                                 <div class="stats-hero-value">{{ carbs_week }} g</div>
                                 <div class="stats-hero-meta">last 7 days</div>
@@ -135,7 +135,7 @@
                 </div>
 
                 <div class="stats-bottom-grid">
-                    <section class="stats-panel stats-panel-week">
+                    <section class="stats-panel stats-panel-week stats-panel-weekly-overview">
                         <div class="stats-panel-head">
                             <div>
                                 <div class="section-title">This Week</div>
@@ -143,23 +143,23 @@
                             </div>
                         </div>
 
-                        <div class="stats-panel-grid">
-                            <div class="stats-hero-card">
+                        <div class="stats-panel-grid stats-panel-grid-wide">
+                            <div class="stats-hero-card weekly-stat-card">
                                 <div class="stats-hero-label">Workouts</div>
                                 <div class="stats-hero-value">{{ workouts_this_week }}</div>
                                 <div class="stats-hero-meta">sessions this week</div>
                             </div>
-                            <div class="stats-hero-card">
+                            <div class="stats-hero-card weekly-stat-card">
                                 <div class="stats-hero-label">Workout Time</div>
                                 <div class="stats-hero-value">{{ workout_minutes_this_week }} min</div>
                                 <div class="stats-hero-meta">total active minutes</div>
                             </div>
-                            <div class="stats-hero-card">
+                            <div class="stats-hero-card weekly-stat-card">
                                 <div class="stats-hero-label">Calories Burned</div>
                                 <div class="stats-hero-value">{{ workout_calories_this_week }} kcal</div>
                                 <div class="stats-hero-meta">estimated workout burn</div>
                             </div>
-                            <div class="stats-hero-card">
+                            <div class="stats-hero-card weekly-stat-card">
                                 <div class="stats-hero-label">Water Today</div>
                                 <div class="stats-hero-value">{{ water_today }} glasses</div>
                                 <div class="stats-hero-meta">hydration check-in</div>

@@ -806,7 +806,7 @@ textarea {
 
 .stats-panel-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 1rem;
   width: 100%;
   max-width: 100%;
@@ -882,9 +882,10 @@ textarea {
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(241, 251, 254, 0.92));
   border: 1px solid rgba(0, 164, 209, 0.1);
   border-radius: var(--radius-lg);
-  padding: 1.35rem;
+  padding: 1.4rem;
   box-shadow: var(--shadow-soft);
   width: 100%;
+  color: var(--text-dark);
 }
 
 .stats-panel-head {
@@ -893,6 +894,12 @@ textarea {
   align-items: center;
   gap: 0.45rem;
   margin-bottom: 0.2rem;
+  text-align: center;
+}
+
+.stats-panel-head,
+.stats-panel-head > div {
+  width: 100%;
   text-align: center;
 }
 
@@ -917,6 +924,7 @@ textarea {
 .stats-mini-card {
   background: rgba(255, 255, 255, 0.78);
   border: 1px solid rgba(0, 164, 209, 0.08);
+  box-shadow: var(--shadow-card);
 }
 
 .stats-stack {
@@ -934,6 +942,13 @@ textarea {
   border-radius: var(--radius);
   background: var(--section-bg);
   border: 1px solid rgba(0, 164, 209, 0.06);
+  box-shadow: var(--shadow-card);
+}
+
+.stats-panel-hero {
+  background: linear-gradient(135deg, rgba(117, 225, 255, 0.88) 0%, rgba(0, 164, 209, 0.88) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  box-shadow: var(--shadow-card);
 }
 
 .stats-row-value {
@@ -971,6 +986,12 @@ textarea {
   text-align: center;
 }
 
+.stats-panel-weekly-overview .section-title,
+.stats-panel-weekly-overview .section-heading {
+  margin-left: auto;
+  margin-right: auto;
+}
+
 .stats-panel-hero .stats-panel-grid-hero {
   width: 100%;
   margin-top: 0.9rem;
@@ -994,6 +1015,53 @@ textarea {
 
 .stats-panel:not(.stats-panel-hero) .stats-hero-meta {
   font-size: 0.68rem;
+}
+
+.weekly-stat-card {
+  border-width: 2px;
+  background: rgba(255, 255, 255, 0.78);
+  border-color: rgba(255, 255, 255, 0.34);
+  box-shadow: var(--shadow-card);
+}
+
+.weekly-stat-goal {
+}
+
+.weekly-stat-calories {
+}
+
+.weekly-stat-protein {
+}
+
+.weekly-stat-fat {
+}
+
+.weekly-stat-carbs {
+}
+
+.weekly-stat-card .stats-hero-label,
+.weekly-stat-card .stats-hero-meta {
+  color: var(--text-muted);
+}
+
+.weekly-stat-goal .stats-hero-value {
+  color: var(--text-dark);
+}
+
+.weekly-stat-calories .stats-hero-value {
+  color: #1f8b4c;
+}
+
+.weekly-stat-protein .stats-hero-value {
+  color: #f28a1a;
+}
+
+.weekly-stat-fat .stats-hero-value {
+  color: #d1bc00;
+}
+
+.weekly-stat-carbs .stats-hero-value {
+  color: #e85f0f;
 }
 
 .stats-summary-banner {
@@ -1227,6 +1295,14 @@ footer {
     max-width: 1000px;
     margin: 0 auto;
     padding: 0 2rem;
+  }
+
+  .stats-panel-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .stats-panel-grid-wide {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .desktop-grid {
