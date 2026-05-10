@@ -12,6 +12,15 @@
     href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@500&display=swap"
     rel="stylesheet">
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <style>
+    .gauge-burned {
+      font-size: .72rem;
+      color: hsl(92, 100%, 3%);
+      font-weight: 600;
+      margin-top: .15rem;
+      letter-spacing: .01em;
+    }
+  </style>
 </head>
 
 <body>
@@ -96,6 +105,10 @@
                   <div class="gauge-kcal">{{ calories }} <span
                       class="gauge-kcal-unit">Kcal</span></div>
                   <div class="gauge-sub">Of {{ macro_goals.calories }} Kcal</div>
+                  {% set burned = workouts_today | sum(attribute=2) | int %}
+                  {% if burned > 0 %}
+                  <div class="gauge-burned">+{{ burned }} from exercise</div>
+                  {% endif %}
                 </div>
               </div>
             </div>

@@ -48,7 +48,7 @@
                         <div class="stats-hero-card">
                             <div class="stats-hero-label">Today's Calories</div>
                             <div class="stats-hero-value">{{ calories_today }}</div>
-                            <div class="stats-hero-meta">Goal {{ calorie_goal }} kcal</div>
+                            <div class="stats-hero-meta">Goal {{ calorie_goal }} kcal{% if calories_burned_today > 0 %} (+{{ calories_burned_today }} exercise){% endif %}</div>
                         </div>
                         <div class="stats-hero-card">
                             <div class="stats-hero-label">This Week's Workouts</div>
@@ -76,7 +76,7 @@
                             <div class="stats-hero-card weekly-stat-card">
                                 <div class="stats-hero-label">Calories</div>
                                 <div class="stats-hero-value">{{ calories_today }}</div>
-                                <div class="stats-hero-meta">of {{ calorie_goal }} kcal</div>
+                                <div class="stats-hero-meta">of {{ calorie_goal }} kcal{% if calories_burned_today > 0 %} (+{{ calories_burned_today }} exercise){% endif %}</div>
                             </div>
                             <div class="stats-hero-card weekly-stat-card">
                                 <div class="stats-hero-label">Protein</div>

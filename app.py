@@ -98,8 +98,11 @@ def get_calorie_goal(user_id):
         age = nutrition.calculate_age(birthdate)
         return nutrition.calculate_calorie_goal(weight, height, age, gender, activity_level, weight_goal)
     
-def get_macro_goals(user_id):
-    """Returnerar en dict med dagliga mål för kalorier, protein, fett och kolhydrater"""
+def get_macro_goals(user_id, calories_burned=0):
+    """Returnerar en dict med dagliga mål för kalorier, protein, fett och kolhydrater.
+    
+    calories_burned läggs till kalorimålet så att träning kompenseras.
+    """
     with get_db() as cur:
         cur.execute("""
                     SELECT gender, height, weight, activity_level, birthdate, weight_goal
@@ -112,6 +115,7 @@ def get_macro_goals(user_id):
 
     age = nutrition.calculate_age(birthdate)
     calorie_goal = nutrition.calculate_calorie_goal(weight, height, age, gender, activity_level, weight_goal)
+    calorie_goal += round(calories_burned)
     protein_goal = nutrition.calculate_protein_goal(weight)
     fat_goal = nutrition.calculate_fat_goal(calorie_goal)
     carb_goal = nutrition.calculate_carb_goal(calorie_goal, protein_goal, fat_goal)
@@ -182,7 +186,8 @@ def index():
         """, (session['user_id'],))
             workouts_today = cur.fetchall()
 
-        macro_goals = get_macro_goals(session['user_id'])
+        calories_burned_today = sum(w[2] for w in workouts_today)
+        macro_goals = get_macro_goals(session['user_id'], calories_burned_today)
 
     except Exception:
         flash("Could not receieve data.", "danger")  
@@ -649,7 +654,16 @@ def statistics():
 
     try:
 
-        calorie_goal = get_calorie_goal(user_id)
+        with get_db() as cur:
+            cur.execute("""
+                SELECT COALESCE(SUM(ROUND(w.met * wl.weight * wl.duration / 60.0)), 0)
+                FROM workout_log wl
+                JOIN workout w ON wl.workout_id = w.workout_id
+                WHERE wl.user_id = %s AND DATE(wl.log_date) = CURRENT_DATE
+            """, (user_id,))
+            calories_burned_today = int(cur.fetchone()[0])
+
+        calorie_goal = get_calorie_goal(user_id) + calories_burned_today
         weekly_goal = calorie_goal * 7  
         
         with get_db() as cur:
@@ -734,7 +748,8 @@ def statistics():
         fat_week=round(nutrition_week[2] or 0, 1),
         carbs_week=round(nutrition_week[3] or 0, 1),
         weekly_goal=weekly_goal,
-        calorie_goal=calorie_goal
+        calorie_goal=calorie_goal,
+        calories_burned_today=calories_burned_today
         )
     
 
