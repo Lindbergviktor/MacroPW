@@ -12,15 +12,6 @@
     href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@500&display=swap"
     rel="stylesheet">
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-  <style>
-    .gauge-burned {
-      font-size: .72rem;
-      color: hsl(92, 100%, 3%);
-      font-weight: 600;
-      margin-top: .15rem;
-      letter-spacing: .01em;
-    }
-  </style>
 </head>
 
 <body>
@@ -105,10 +96,6 @@
                   <div class="gauge-kcal">{{ calories }} <span
                       class="gauge-kcal-unit">Kcal</span></div>
                   <div class="gauge-sub">Of {{ macro_goals.calories }} Kcal</div>
-                  {% set burned = workouts_today | sum(attribute=2) | int %}
-                  {% if burned > 0 %}
-                  <div class="gauge-burned">+{{ burned }} from exercise</div>
-                  {% endif %}
                 </div>
               </div>
             </div>
@@ -244,17 +231,20 @@
               <div id="ingredients-container-{{ cat }}">
                 <div class="row g-2 mb-2">
                   <div class="col-7">
-                    <select class="form-select" name="food_id[]">
+                    <select class="form-select food-select-live" name="food_id[]" data-cat="{{ cat }}">
                       <option value="" selected>Select Food</option>
                       {% for food in foods %}
-                      <option value="{{ food[0] }}">{{ food[1].title() }}</option>
+                      <option value="{{ food[0] }}" data-calories="{{ food[2] }}">{{ food[1].title() }}</option>
                       {% endfor %}
                     </select>
                   </div>
                   <div class="col-5">
-                    <input type="number" class="form-control" name="amount[]" placeholder="Amount (g)" step="0.1">
+                    <input type="number" class="form-control amount-input-live" name="amount[]" placeholder="Amount (g)" step="0.1" data-cat="{{ cat }}">
                   </div>
                 </div>
+              </div>
+              <div id="calorie-preview-{{ cat }}" style="display:none; font-size:.85rem; color:#888; margin-bottom:.5rem;">
+                ≈ <span class="calorie-preview-value">0</span> kcal
               </div>
 
               <!-- Meals drowdown -->
@@ -341,6 +331,34 @@
         form.reset();
       });
     });
+  });
+</script>
+<script>
+  // Live-kalorier i måltidsmodaler
+  function updateCaloriePreview(cat) {
+    const select = document.querySelector(`.food-select-live[data-cat="${cat}"]`);
+    const amountInput = document.querySelector(`.amount-input-live[data-cat="${cat}"]`);
+    const preview = document.getElementById(`calorie-preview-${cat}`);
+    if (!select || !amountInput || !preview) return;
+
+    const selectedOption = select.options[select.selectedIndex];
+    const cal = parseFloat(selectedOption?.dataset?.calories) || 0;
+    const amount = parseFloat(amountInput.value) || 0;
+
+    if (cal > 0 && amount > 0) {
+      const total = Math.round(cal * amount / 100);
+      preview.querySelector('.calorie-preview-value').textContent = total;
+      preview.style.display = 'block';
+    } else {
+      preview.style.display = 'none';
+    }
+  }
+
+  ['Breakfast', 'Lunch', 'Dinner', 'Snack'].forEach(function(cat) {
+    const select = document.querySelector(`.food-select-live[data-cat="${cat}"]`);
+    const input = document.querySelector(`.amount-input-live[data-cat="${cat}"]`);
+    if (select) select.addEventListener('change', () => updateCaloriePreview(cat));
+    if (input)  input.addEventListener('input',  () => updateCaloriePreview(cat));
   });
 </script>
 </body>
