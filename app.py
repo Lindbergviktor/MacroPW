@@ -325,6 +325,26 @@ def profile():
         activity_level = request.form['activity_level']
         birthdate     = request.form['birthdate']
 
+        try:
+            height_value = int(height)
+        except ValueError:
+            flash("Height must be a whole number.", "danger")
+            return redirect(url_for("profile"))
+
+        if height_value <= 0:
+            flash("Height must be a positive number.", "danger")
+            return redirect(url_for("profile"))
+
+        try:
+            weight_value = float(weight)
+        except ValueError:
+            flash("Weight must be a number.", "danger")
+            return redirect(url_for("profile"))
+
+        if weight_value <= 0:
+            flash("Weight must be a positive number.", "danger")
+            return redirect(url_for("profile"))
+
         with get_db() as cur:
             cur.execute("""
                 UPDATE users
@@ -408,6 +428,26 @@ def register():
         return redirect(url_for("register"))
     
     try:
+        height_value = int(height)
+    except ValueError:
+        flash("Height must be a whole number.", "danger")
+        return redirect(url_for("register"))
+
+    if height_value <= 0:
+        flash("Height must be a positive number.", "danger")
+        return redirect(url_for("register"))
+
+    try:
+        weight_value = float(weight)
+    except ValueError:
+        flash("Weight must be a number.", "danger")
+        return redirect(url_for("register"))
+
+    if weight_value <= 0:
+        flash("Weight must be a positive number.", "danger")
+        return redirect(url_for("register"))
+    
+    try:
         with get_db() as cur:
             cur.execute("SELECT user_id FROM users WHERE email = %s", (email,))
             existing = cur.fetchone()
@@ -417,7 +457,7 @@ def register():
                     """INSERT INTO users
                     (name, email, password, gender, height, weight, activity_level, birthdate, weight_goal)
                     VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)""",
-                    (name, email, password, gender, height, weight, activity_level, birthdate, weight_goal)
+                    (name, email, password, gender, height_value, weight_value, activity_level, birthdate, weight_goal)
                 )
 
     except Exception:
