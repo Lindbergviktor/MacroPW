@@ -160,7 +160,7 @@
                     </select>
                   </div>
                   <div class="col-5">
-                    <input type="number" class="form-control amount-input" name="amount[]" placeholder="Amount (g)" step="0.1" required>
+                    <input type="number" class="form-control amount-input" name="amount[]" min="0" placeholder="Amount (g)" step="0.1" required>
                   </div>
                 </div>
               </div>
@@ -256,12 +256,12 @@
                       data-calories="{{ food[2] }}"
                       data-protein="{{ food[3] }}"
                       data-fat="{{ food[4] }}"
-                      data-carbs="{{ food[5] }}">{{ food[1] }}</option>
+                      data-carbs="{{ food[5] }}">{{ food[1].title() }}</option>
               {% endfor %}
             </select>
           </div>
           <div class="col-4">
-            <input type="number" class="form-control amount-input" name="amount[]" placeholder="Amount (g)" step="0.1" required>
+            <input type="number" class="form-control amount-input" name="amount[]" min="0" placeholder="Amount (g)" step="0.1" required>
           </div>
           <div class="col-1 d-flex align-items-center">
             <span class="remove-btn" onclick="this.closest('.row').remove(); updateMacroSummary();">✕</span>
