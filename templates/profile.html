@@ -137,12 +137,12 @@
             <div class="col-6">
               <label class="form-label">Height (cm)</label>
               <input type="number" class="form-control" name="height"
-                     value="{{ user.height }}" min="100" max="250" required>
+                     value="{{ user.height }}" min="1" required>
             </div>
             <div class="col-6">
               <label class="form-label">Weight (kg)</label>
               <input type="number" class="form-control" name="weight" step="0.1"
-                     value="{{ user.weight }}" min="30" max="300" required>
+                     value="{{ user.weight }}" min="1" required>
             </div>
           </div>
 
@@ -170,11 +170,11 @@
 
           <div class="mb-4">
             <select class="form-select" name="activity_level" required>
-              <option value="sedentary"         {% if user.activity_level == 'sedentary' %}selected{% endif %}>Sedentary — desk job, little movement</option>
-              <option value="lightly_active"    {% if user.activity_level == 'lightly_active' %}selected{% endif %}>Lightly active — exercise 1–3 days/week</option>
-              <option value="moderately_active" {% if user.activity_level == 'moderately_active' %}selected{% endif %}>Moderately active — exercise 3–5 days/week</option>
-              <option value="very_active"       {% if user.activity_level == 'very_active' %}selected{% endif %}>Very active — hard exercise 6–7 days/week</option>
-              <option value="extra_active"      {% if user.activity_level == 'extra_active' %}selected{% endif %}>Extra active — physical job + daily exercise</option>
+              <option value="sedentary"         {% if user.activity_level == 'sedentary' %}selected{% endif %}>Sedentary — Desk job, minimal daily movement</option>
+              <option value="lightly_active"    {% if user.activity_level == 'lightly_active' %}selected{% endif %}>Lightly active — Light walking during the day</option>
+              <option value="moderately_active" {% if user.activity_level == 'moderately_active' %}selected{% endif %}>Moderately active — Regular walking or active commute</option>
+              <option value="very_active"       {% if user.activity_level == 'very_active' %}selected{% endif %}>Very active — Physically demanding daily routine</option>
+              <option value="extra_active"      {% if user.activity_level == 'extra_active' %}selected{% endif %}>Extra active — Heavy manual labor throughout the day</option>
             </select>
           </div>
 

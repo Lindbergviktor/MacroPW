@@ -681,6 +681,8 @@ def add_meal():
                     "INSERT INTO meal_ingredient (meal_id, food_id, amount) VALUES (%s, %s, %s)",
                     (meal_id, food_id, amount)
                 )
+
+            flash("Meal added!", "success")
     except Exception:
         flash("Database error during creation of meal", "danger")
         return redirect(url_for("meals"))
