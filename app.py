@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, flash, ses
 from werkzeug.security import check_password_hash, generate_password_hash
 from db import get_db_connection
 from psycopg2 import errors
-from datetime import date
+from datetime import date, timedelta
 from functools import wraps
 import nutrition
 
@@ -745,7 +745,9 @@ def statistics():
                 SELECT
                     DATE(ml.log_date),
                     COALESCE(SUM(f.calories * mli.amount / 100.0), 0),
-                    COALESCE(SUM(f.protein  * mli.amount / 100.0), 0)
+                    COALESCE(SUM(f.protein  * mli.amount / 100.0), 0),
+                    COALESCE(SUM(f.fat      * mli.amount / 100.0), 0),
+                    COALESCE(SUM(f.carbs    * mli.amount / 100.0), 0)
                 FROM meal_log ml
                 JOIN meal_log_item mli ON ml.log_id = mli.log_id
                 JOIN food f ON mli.food_id = f.food_id
@@ -774,6 +776,38 @@ def statistics():
         flash("Could not retrieve statistics.", "danger")
         return redirect(url_for("index"))
 
+    nutrition_map = {
+        row[0]: {
+            "calories": round(row[1] or 0),
+            "protein": round(row[2] or 0, 1),
+            "fat": round(row[3] or 0, 1),
+            "carbs": round(row[4] or 0, 1),
+        }
+        for row in nutrition_last_7
+    }
+
+    calorie_chart_days = []
+    for offset in range(6, -1, -1):
+        current_day = date.today() - timedelta(days=offset)
+        day_stats = nutrition_map.get(current_day, {
+            "calories": 0,
+            "protein": 0,
+            "fat": 0,
+            "carbs": 0,
+        })
+        calorie_chart_days.append({
+            "date": current_day,
+            "label": current_day.strftime("%a"),
+            "calories": day_stats["calories"],
+            "protein": day_stats["protein"],
+            "fat": day_stats["fat"],
+            "carbs": day_stats["carbs"],
+        })
+
+    calorie_chart_max = max(
+        [day["calories"] for day in calorie_chart_days] + [round(calorie_goal or 0), 1]
+    )
+
     return render_template(
         "statistics.html",
         calories_today=round(nutrition_today[0] or 0),
@@ -785,6 +819,8 @@ def statistics():
         workout_calories_this_week=round(workouts_week[2] or 0),
         water_today=water_today or 0,
         nutrition_last_7=nutrition_last_7,
+        calorie_chart_days=calorie_chart_days,
+        calorie_chart_max=calorie_chart_max,
         calories_week=round(nutrition_week[0] or 0),
         protein_week=round(nutrition_week[1] or 0, 1),
         fat_week=round(nutrition_week[2] or 0, 1),
