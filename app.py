@@ -190,7 +190,7 @@ def index():
         macro_goals = get_macro_goals(session['user_id'], calories_burned_today)
 
     except Exception:
-        flash("Could not receieve data.", "danger")  
+        flash("Could not receive data.", "danger")  
         return redirect(url_for("start_page"))      
 
     # Bygger en dict med kalorier per kategori
@@ -213,9 +213,9 @@ def index():
 @login_required
 def log_meal_index():
     category = request.form["meal_category"]
-    meal_id = request.form.get ("meal_id") or None
-    food_ids = request.form.getlist ("food_id[]")
-    amounts = request.form.getlist ("amount[]")
+    meal_id = request.form.get("meal_id") or None
+    food_ids = request.form.getlist("food_id[]")
+    amounts = request.form.getlist("amount[]")
 
     paired = list(zip(food_ids, amounts))
 
