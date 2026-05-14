@@ -158,13 +158,15 @@ def index():
             workouts_today = cur.fetchall()
 
             cur.execute("""
-                SELECT ml.log_id, ml.name, f.name, mli.amount,
-                    ROUND(f.calories * mli.amount / 100.0) as kal
+                SELECT ml.log_id, ml.name AS category,
+                       COALESCE(m.name, 'Custom') AS meal_name,
+                       f.food_id, f.name, mli.amount,
+                       ROUND(f.calories * mli.amount / 100.0) as kal
                 FROM meal_log ml
                 JOIN meal_log_item mli ON ml.log_id = mli.log_id
                 JOIN food f ON mli.food_id = f.food_id
-                WHERE ml.user_id = %s
-                AND DATE(ml.log_date) = CURRENT_DATE
+                LEFT JOIN meal m ON ml.meal_id = m.meal_id
+                WHERE ml.user_id = %s AND DATE(ml.log_date) = CURRENT_DATE
                 ORDER BY ml.name, ml.log_id
             """, (session['user_id'],))
             logged_items = cur.fetchall()
@@ -179,16 +181,22 @@ def index():
     category_calories = {row[0]: round(row[1]) for row in category_rows}
 
     logged_by_category = {}
-    for log_id, category, food_name, amount, kcal in logged_items:
+    for log_id, category, meal_name, food_id, food_name, amount, kcal in logged_items:
         if category not in logged_by_category:
-            logged_by_category[category] = []
-        logged_by_category[category].append({
-            "log_id": log_id,
+            logged_by_category[category] = {}
+        if log_id not in logged_by_category[category]:
+            logged_by_category[category][log_id]= {
+                "log_id": log_id,
+                "meal_name": meal_name,
+                "ingredients": []
+
+            }
+        logged_by_category[category][log_id]["ingredients"].append({
+            "food_id": food_id,
             "food": food_name,
             "amount": amount,
-            "calories": kcal
-            })
-
+            "kcal": kcal    
+        })
     return render_template("index.html",
         calories=round(totals[0]),
         protein=round(totals[1]),
@@ -283,11 +291,64 @@ def delete_log(log_id):
                 return redirect(url_for('index'))
             cur.execute("DELETE FROM meal_log_item WHERE log_id = %s", (log_id,))
             cur.execute("DELETE FROM meal_log WHERE log_id = %s", (log_id,))
+
     except Exception:
         flash("Database error during deletion.", "danger")
         return redirect(url_for('index'))
     
     flash("Removed.", "success")
+    return redirect(url_for('index'))
+
+@app.route("/delete_log_item/<int:log_id>/<int:food_id>", methods=["POST"])
+@login_required
+def delete_log_item(log_id, food_id):
+    """Tar bort EN enskild ingrediens från en loggad måltid"""
+    try:
+        with get_db() as cur:
+            cur.execute("SELECT user_id FROM meal_log WHERE log_id = %s", (log_id,))
+            log = cur.fetchone()
+            if not log or log[0] != session['user_id']:
+                flash("Could not find log entry.", "danger")
+                return redirect(url_for('index'))
+            cur.execute(
+                "DELETE FROM meal_log_item WHERE log_id = %s AND food_id = %s",
+                (log_id, food_id)
+            )
+    except Exception:
+        flash("Database error during deletion.", "danger")
+        return redirect(url_for('index'))
+    
+    return redirect(url_for('index'))
+
+@app.route("/edit_log_item/<int:log_id>/<int:food_id>", methods=["POST"])
+@login_required
+def edit_log_item(log_id, food_id):
+    """Uppdaterar mängden på en enskild ingrediens i en loggad måltid"""
+    amount = request.form.get("amount")
+    try:
+        amount_val = float(amount)
+        if amount_val <= 0:
+            flash("Amount must be greater than 0.", "danger")
+            return redirect(url_for('index'))
+    except (TypeError, ValueError):
+        flash("Amount must be a valid number.")
+        return redirect(url_for('index'))
+    
+    try:
+        with get_db() as cur:
+            cur.execute("SELECT user_id FROM meal_log WHERE log_id = %s", (log_id,))
+            log = cur.fetchone()
+            if not log or log[0] != session['user_id']:
+                flash("Could not find log entry.", "danger")
+                return redirect(url_for('index'))
+            cur.execute(
+                "UPDATE meal_log_item SET amount = %s WHERE log_id = %s AND food_id = %s",
+                (amount_val, log_id, food_id)
+            )
+    except Exception:
+        flash("Database error during update.", "danger")
+        return redirect(url_for('index'))
+    
     return redirect(url_for('index'))
 
 @app.route("/start")
