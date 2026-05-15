@@ -236,7 +236,8 @@ def index():
         foods=foods,
         meals=meals,
         workouts_today=workouts_today,
-        macro_goals=macro_goals
+        macro_goals=macro_goals,
+        logged_by_category=logged_by_category
         
     )
 
