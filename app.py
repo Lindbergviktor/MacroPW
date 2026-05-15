@@ -751,13 +751,13 @@ def add_meal():
 
     Förväntar sig formulärdata:
     - meal_name (sträng)
-    - food_id[] (lista av id:n)
+    - food_nameß[] (lista av id:n)
     - amount[] (lista av mängder)
 
     Validerar input och sparar i databasen.
     """
     meal_name = request.form["meal_name"].strip().lower()
-    food_ids = request.form.getlist("food_id[]")
+    food_names = request.form.getlist("food_id[]")
     amounts = request.form.getlist("amount[]")
 
     if not meal_name.strip():
@@ -781,10 +781,15 @@ def add_meal():
             )
             meal_id = cur.fetchone()[0]
 
-            for food_id, amount in zip(food_ids, amounts):
+            for food_name, amount in zip(food_names, amounts):
+                cur.execute("SELECT food_id FROM food WHERE name = %s", (food_name.strip().lower(),))
+                food=cur.fetchone()
+                if not food:
+                    flash(f"Food '{food_name}' not found.", "danger")
+                    return redirect(url_for("meals"))
                 cur.execute(
                     "INSERT INTO meal_ingredient (meal_id, food_id, amount) VALUES (%s, %s, %s)",
-                    (meal_id, food_id, amount)
+                    (meal_id, food[0], amount)
                 )
 
             flash("Meal added!", "success")
@@ -977,6 +982,7 @@ def edit_meal(meal_id):
         meal_name = request.form["meal_name"].strip().lower()
         food_ids = request.form.getlist("food_id[]")
         amounts = request.form.getlist("amount[]")
+        food_names = request.form.getlist("food_name[]")
 
         if not meal_name:
             flash("Name cannot be empty.", "danger")
@@ -1006,6 +1012,16 @@ def edit_meal(meal_id):
                         "INSERT INTO meal_ingredient (meal_id, food_id, amount) VALUES (%s, %s, %s)",
                         (meal_id, food_id, amount)
                     )
+                
+                for food_name, amount in zip(food_names, amounts[len(food_ids):]):
+                    cur.execute("SELECT food_id FROM food WHERE name = %s", (food_name.strip().lower(),))
+                    food = cur.fetchone()
+                    if not food:
+                        flash(f"food '{food_name}' not found", "danger")
+                        return redirect(url_for('edit_meal', meal_id=meal_id))
+                    cur.execute("INSERT INTO meal_ingredient (meal_id, food_id, amount) VALUES (%s, %s, %s)",
+                                (meal_id, food[0], amount)
+                                )
         except Exception:
             flash("Database error during updating meal.", "danger")
             return redirect(url_for('edit_meal', meal_id=meal_id))
