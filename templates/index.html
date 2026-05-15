@@ -151,14 +151,53 @@
           <div class="meal-list">
             {% for cat in ['Breakfast', 'Lunch', 'Dinner', 'Snack'] %}
               <div class="meal-row">
-                <div>
-                  <div class="meal-name">{{ cat}}</div>
-                  <div class="meal-kcal">{{ category_calories.get(cat, 0) }} kcal</div>
+                <div class="w-100">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                      <div class="meal-name">{{ cat }}</div>
+                      <div class="meal-kcal">{{ category_calories.get(cat, 0) }} kcal</div>
+                    </div>
+                    <button type="button" class="add-btn" data-bs-toggle="modal" data-bs-target="#logModal-{{ cat }}">+</button>
+                  </div>
+
+                  <!-- Loggade måltider per kategori -->
+                  {% if logged_by_category.get(cat) %}
+                    {% for log_id, log_entry in logged_by_category[cat].items() %}
+                      <div class="log-entry">
+
+                        <!-- Måltidsrubrik med delete-knapp för hela måltiden -->
+                        <div class="log-entry-header">
+                          <span class="log-entry-name">{{ log_entry.meal_name.title() }}</span>
+                          <form method="POST" action="{{ url_for('delete_log', log_id=log_id) }}"
+                                onsubmit="return confirm('Remove entire meal?')">
+                            <button type="submit" class="log-delete-btn">✕ Remove all</button>
+                          </form>
+                        </div>
+
+                        <!-- Enskilda ingredienser med redigering av mängd -->
+                        {% for item in log_entry.ingredients %}
+                          <div class="log-entry-item">
+                              <span>{{ item.food.title() }} — {{ item.amount }}g</span>
+                              <button type="button" onclick="toggleEdit('edit-{{ log_id }}-{{ item.food_id }}')">✎</button>
+
+                              <form id="edit-{{ log_id }}-{{ item.food_id }}" method="POST" 
+                                    action="{{ url_for('edit_log_item', log_id=log_id, food_id=item.food_id) }}"
+                                    class="log-item-amount-form" style="display:none;">
+                                  <input type="number" name="amount" value="{{ item.amount }}" step="0.1" min="0.1" class="log-item-amount-input">
+                                  <button type="submit" class="log-item-save-btn">✓</button>
+                              </form>
+                            </div>
+                        {% endfor %}
+
+                      </div>
+                    {% endfor %}
+                  {% endif %}
+
                 </div>
-                <button type="button" class="add-btn" data-bs-toggle="modal" data-bs-target="#logModal-{{ cat }}">+</button>
               </div>
             {% endfor %}
-          </div>  
+          </div>
+
           <!-- Snabbknappar -->
           <div class="action-row">
             <a href="{{ url_for('meals') }}" class="btn btn-primary">Add Meal</a>
@@ -227,7 +266,7 @@
     </div>
   </footer>
 
-  <!-- Modal för att lägga till nytt livsmedel -->
+  <!-- Modals för att logga mat per kategori -->
   {% for cat in ['Breakfast', 'Lunch', 'Dinner', 'Snack'] %}
     <div class="modal fade" id="logModal-{{ cat }}" tabindex="-1" aria-labelledby="addBreakfastModalLabel" aria-hidden="true">
       <div class="modal-dialog">
@@ -261,7 +300,7 @@
                 ≈ <span class="calorie-preview-value">0</span> kcal
               </div>
 
-              <!-- Meals drowdown -->
+              <!-- Meals dropdown -->
               <label class="form-label">Meals</label>
               <div id="meals-container-{{ cat }}">
                 <div class="row g-2 mb-2">
@@ -308,25 +347,25 @@
   const TOTAL = 8;
   let filled = 0;
 
-  function renderGlasses() {
-    const wrap = document.getElementById('waterGlasses');
-    if (!wrap) return;
-    wrap.innerHTML = '';
+    function renderGlasses() {
+      const wrap = document.getElementById('waterGlasses');
+      if (!wrap) return;
+      wrap.innerHTML = '';
 
-    for (let i = 0; i < TOTAL; i++) {
-      const g = document.createElement('button');
-      g.className = 'glass' + (i < filled ? ' filled' : '');
-      g.innerHTML = `<i class="bi ${i < filled ? 'bi-cup-straw' : 'bi-cup'}"></i>`;
-      g.title = i < filled ? 'Click to remove' : 'Click to add';
-      g.addEventListener('click', () => {
-        filled = (i < filled) ? i : i + 1;
-        renderGlasses();
-      });
-      wrap.appendChild(g);
+      for (let i = 0; i < TOTAL; i++) {
+        const g = document.createElement('button');
+        g.className = 'glass' + (i < filled ? ' filled' : '');
+        g.innerHTML = `<i class="bi ${i < filled ? 'bi-cup-straw' : 'bi-cup'}"></i>`;
+        g.title = i < filled ? 'Click to remove' : 'Click to add';
+        g.addEventListener('click', () => {
+          filled = (i < filled) ? i : i + 1;
+          renderGlasses();
+        });
+        wrap.appendChild(g);
+      }
+
+      document.getElementById('waterCount').textContent = `${filled} / ${TOTAL} glasses`;
     }
-
-    document.getElementById('waterCount').textContent = `${filled} / ${TOTAL} glasses`;
-  }
 
   renderGlasses();
 </script>
@@ -375,6 +414,15 @@
     if (input)  input.addEventListener('input',  () => updateCaloriePreview(cat));
   });
 </script>
+
+<!--Funktion som togglar ett formulär för att redigera mängden på registrerade måltider.-->
+<script>
+  function toggleEdit(id) {
+  const form = document.getElementById(id);
+  form.style.display = form.style.display === 'none' ? 'flex' : 'none';
+}
+</script>
+
 </body>
 
 </html>
