@@ -163,17 +163,14 @@
                         <!-- Enskilda ingredienser med redigering av mängd -->
                         {% for item in log_entry.ingredients %}
                           <div class="log-entry-item">
-                            <span>{{ item.food.title() }}</span>
-                            <div class="d-flex align-items-center gap-2">
-                              <form method="POST" action="{{ url_for('edit_log_item', log_id=log_id, food_id=item.food_id) }}"
-                                    class="log-item-amount-form">
-                                <input type="number" name="amount" value="{{ item.amount }}"
-                                       step="0.1" min="0.1" class="log-item-amount-input">
-                                <button type="submit" class="log-item-save-btn">✓</button>
-                              </form>
-                              <span class="mono">{{ item.kcal }} kcal</span>
-                              <form method="POST" action="{{ url_for('delete_log_item', log_id=log_id, food_id=item.food_id) }}">
-                                <button type="submit" class="log-delete-btn">✕</button>
+                              <span>{{ item.food.title() }} — {{ item.amount }}g</span>
+                              <button type="button" onclick="toggleEdit('edit-{{ log_id }}-{{ item.food_id }}')">✎</button>
+
+                              <form id="edit-{{ log_id }}-{{ item.food_id }}" method="POST" 
+                                    action="{{ url_for('edit_log_item', log_id=log_id, food_id=item.food_id) }}"
+                                    class="log-item-amount-form" style="display:none;">
+                                  <input type="number" name="amount" value="{{ item.amount }}" step="0.1" min="0.1" class="log-item-amount-input">
+                                  <button type="submit" class="log-item-save-btn">✓</button>
                               </form>
                             </div>
                           </div>
@@ -358,6 +355,13 @@
       });
     });
   </script>
+
+<script>
+  function toggleEdit(id) {
+  const form = document.getElementById(id);
+  form.style.display = form.style.display === 'none' ? 'flex' : 'none';
+}
+</script>
 
 </body>
 
