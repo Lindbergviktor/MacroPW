@@ -186,6 +186,20 @@ def index():
         """, (session['user_id'],))
             workouts_today = cur.fetchall()
 
+            cur.execute("""
+                SELECT ml.log_id, ml.name AS category,
+                       COALESCE(m.name, 'Custom') AS meal_name,
+                       f.food_id, f.name, mli.amount,
+                       ROUND(f.calories * mli.amount / 100.0) as kal
+                FROM meal_log ml
+                JOIN meal_log_item mli ON ml.log_id = mli.log_id
+                JOIN food f ON mli.food_id = f.food_id
+                LEFT JOIN meal m ON ml.meal_id = m.meal_id
+                WHERE ml.user_id = %s AND DATE(ml.log_date) = CURRENT_DATE
+                ORDER BY ml.name, ml.log_id
+            """, (session['user_id'],))
+            logged_items = cur.fetchall()
+
         calories_burned_today = sum(w[2] for w in workouts_today)
         macro_goals = get_macro_goals(session['user_id'], calories_burned_today)
 
@@ -196,6 +210,23 @@ def index():
     # Bygger en dict med kalorier per kategori
     category_calories = {row[0]: round(row[1]) for row in category_rows}
 
+    logged_by_category = {}
+    for log_id, category, meal_name, food_id, food_name, amount, kcal in logged_items:
+        if category not in logged_by_category:
+            logged_by_category[category] = {}
+        if log_id not in logged_by_category[category]:
+            logged_by_category[category][log_id]= {
+                "log_id": log_id,
+                "meal_name": meal_name,
+                "ingredients": []
+
+            }
+        logged_by_category[category][log_id]["ingredients"].append({
+            "food_id": food_id,
+            "food": food_name,
+            "amount": amount,
+            "kcal": kcal    
+        })
     return render_template("index.html",
         calories=round(totals[0]),
         protein=round(totals[1]),
@@ -205,7 +236,8 @@ def index():
         foods=foods,
         meals=meals,
         workouts_today=workouts_today,
-        macro_goals=macro_goals
+        macro_goals=macro_goals,
+        logged_by_category=logged_by_category
         
     )
 
@@ -276,6 +308,79 @@ def log_meal_index():
 
     flash("Food logged successfully!", "success")
     return redirect(url_for("index"))
+
+@app.route("/delete_log/<int:log_id>", methods=["POST"])
+@login_required
+def delete_log(log_id):
+    """Tar bort en loggad måltid på startsidan från dagens datum"""
+    try:
+        with get_db() as cur:
+            cur.execute("SELECT user_id FROM meal_log WHERE log_id = %s", (log_id,))
+            log = cur.fetchone()
+            if not log or log[0] != session['user_id']:
+                flash("Could not find log entry.", "danger")
+                return redirect(url_for('index'))
+            cur.execute("DELETE FROM meal_log_item WHERE log_id = %s", (log_id,))
+            cur.execute("DELETE FROM meal_log WHERE log_id = %s", (log_id,))
+
+    except Exception:
+        flash("Database error during deletion.", "danger")
+        return redirect(url_for('index'))
+    
+    flash("Removed.", "success")
+    return redirect(url_for('index'))
+
+@app.route("/delete_log_item/<int:log_id>/<int:food_id>", methods=["POST"])
+@login_required
+def delete_log_item(log_id, food_id):
+    """Tar bort EN enskild ingrediens från en loggad måltid"""
+    try:
+        with get_db() as cur:
+            cur.execute("SELECT user_id FROM meal_log WHERE log_id = %s", (log_id,))
+            log = cur.fetchone()
+            if not log or log[0] != session['user_id']:
+                flash("Could not find log entry.", "danger")
+                return redirect(url_for('index'))
+            cur.execute(
+                "DELETE FROM meal_log_item WHERE log_id = %s AND food_id = %s",
+                (log_id, food_id)
+            )
+    except Exception:
+        flash("Database error during deletion.", "danger")
+        return redirect(url_for('index'))
+    
+    return redirect(url_for('index'))
+
+@app.route("/edit_log_item/<int:log_id>/<int:food_id>", methods=["POST"])
+@login_required
+def edit_log_item(log_id, food_id):
+    """Uppdaterar mängden på en enskild ingrediens i en loggad måltid"""
+    amount = request.form.get("amount")
+    try:
+        amount_val = float(amount)
+        if amount_val <= 0:
+            flash("Amount must be greater than 0.", "danger")
+            return redirect(url_for('index'))
+    except (TypeError, ValueError):
+        flash("Amount must be a valid number.")
+        return redirect(url_for('index'))
+    
+    try:
+        with get_db() as cur:
+            cur.execute("SELECT user_id FROM meal_log WHERE log_id = %s", (log_id,))
+            log = cur.fetchone()
+            if not log or log[0] != session['user_id']:
+                flash("Could not find log entry.", "danger")
+                return redirect(url_for('index'))
+            cur.execute(
+                "UPDATE meal_log_item SET amount = %s WHERE log_id = %s AND food_id = %s",
+                (amount_val, log_id, food_id)
+            )
+    except Exception:
+        flash("Database error during update.", "danger")
+        return redirect(url_for('index'))
+    
+    return redirect(url_for('index'))
 
 @app.route("/start")
 def start_page():
@@ -646,13 +751,13 @@ def add_meal():
 
     Förväntar sig formulärdata:
     - meal_name (sträng)
-    - food_id[] (lista av id:n)
+    - food_nameß[] (lista av id:n)
     - amount[] (lista av mängder)
 
     Validerar input och sparar i databasen.
     """
     meal_name = request.form["meal_name"].strip().lower()
-    food_ids = request.form.getlist("food_id[]")
+    food_names = request.form.getlist("food_id[]")
     amounts = request.form.getlist("amount[]")
 
     if not meal_name.strip():
@@ -676,10 +781,15 @@ def add_meal():
             )
             meal_id = cur.fetchone()[0]
 
-            for food_id, amount in zip(food_ids, amounts):
+            for food_name, amount in zip(food_names, amounts):
+                cur.execute("SELECT food_id FROM food WHERE name = %s", (food_name.strip().lower(),))
+                food=cur.fetchone()
+                if not food:
+                    flash(f"Food '{food_name}' not found.", "danger")
+                    return redirect(url_for("meals"))
                 cur.execute(
                     "INSERT INTO meal_ingredient (meal_id, food_id, amount) VALUES (%s, %s, %s)",
-                    (meal_id, food_id, amount)
+                    (meal_id, food[0], amount)
                 )
 
             flash("Meal added!", "success")
@@ -908,6 +1018,7 @@ def edit_meal(meal_id):
         meal_name = request.form["meal_name"].strip().lower()
         food_ids = request.form.getlist("food_id[]")
         amounts = request.form.getlist("amount[]")
+        food_names = request.form.getlist("food_name[]")
 
         if not meal_name:
             flash("Name cannot be empty.", "danger")
@@ -937,6 +1048,16 @@ def edit_meal(meal_id):
                         "INSERT INTO meal_ingredient (meal_id, food_id, amount) VALUES (%s, %s, %s)",
                         (meal_id, food_id, amount)
                     )
+                
+                for food_name, amount in zip(food_names, amounts[len(food_ids):]):
+                    cur.execute("SELECT food_id FROM food WHERE name = %s", (food_name.strip().lower(),))
+                    food = cur.fetchone()
+                    if not food:
+                        flash(f"food '{food_name}' not found", "danger")
+                        return redirect(url_for('edit_meal', meal_id=meal_id))
+                    cur.execute("INSERT INTO meal_ingredient (meal_id, food_id, amount) VALUES (%s, %s, %s)",
+                                (meal_id, food[0], amount)
+                                )
         except Exception:
             flash("Database error during updating meal.", "danger")
             return redirect(url_for('edit_meal', meal_id=meal_id))

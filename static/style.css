@@ -1785,7 +1785,6 @@ footer {
   }
 }
 
-
 .macro-summary {
   border-top: 1px solid var(--border-soft);
   padding-top: 0.75rem;
@@ -1797,4 +1796,64 @@ footer {
   font-size: 0.85rem;
   color: var(--text-muted);
   padding: 0.15rem 0;
+}
+
+.log-entry {
+  border-top: 1px solid var(--border-soft);
+  padding-top: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.log-entry-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.25rem;
+}
+
+.log-entry-name {
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.log-entry-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.2rem 0;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+.log-delete-btn {
+  color: var(--danger);
+  background: none;
+  border: none;
+  font-size: 0.75rem;
+  cursor: pointer;
+  padding: 0;
+}
+
+.log-item-amount-form {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.log-item-amount-input {
+  width: 70px;
+  padding: 0.15rem 0.4rem;
+  font-size: 0.8rem;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-sm);
+  background: #fff;
+}
+
+.log-item-save-btn {
+  color: var(--blue-dark);
+  background: none;
+  border: none;
+  font-size: 0.75rem;
+  cursor: pointer;
+  padding: 0;
 }
