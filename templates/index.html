@@ -29,20 +29,20 @@
   <!-- Navbar -->
   <nav class="navbar navbar-expand-lg" data-bs-theme="dark">
     <div class="container-fluid">
-      <a class="navbar-brand" href="{{ url_for('index') }}">MacroPW</a>
+      <a class="navbar-brand" href="{{ url_for('dashboard.index') }}">MacroPW</a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navbarNav">
         <div class="navbar-nav">
-          <a class="nav-link active" href="{{ url_for('index') }}">Start</a>
-          <a class="nav-link" href="{{ url_for('meals') }}">Meal log</a>
-          <a class="nav-link" href="{{ url_for('add_workout') }}">Workouts</a>
-          <a class="nav-link" href="{{ url_for('statistics') }}">Statistics</a>
+          <a class="nav-link active" href="{{ url_for('dashboard.index') }}">Start</a>
+          <a class="nav-link" href="{{ url_for('meals.meals') }}">Meal log</a>
+          <a class="nav-link" href="{{ url_for('workouts.add_workout') }}">Workouts</a>
+          <a class="nav-link" href="{{ url_for('statistics.statistics') }}">Statistics</a>
         </div>
         <div class="navbar-nav ms-auto">
-          <a class="nav-link" href="{{ url_for('profile') }}">Profile</a>
-          <a class="nav-link" href="{{ url_for('logout') }}">Log Out</a>
+          <a class="nav-link" href="{{ url_for('profile.profile') }}">Profile</a>
+          <a class="nav-link" href="{{ url_for('auth.logout') }}">Log Out</a>
         </div>
       </div>
     </div>
@@ -69,7 +69,7 @@
 
             <!-- Toprad med profil, datum och notifikationer -->
           <div class="hero-top">
-          <a href="{{ url_for('profile') }}" class="icon-btn" title="Profile">
+          <a href="{{ url_for('profile.profile') }}" class="icon-btn" title="Profile">
               <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
                 viewBox="0 0 24 24">
                 <circle cx="12" cy="8" r="4" />
@@ -168,7 +168,7 @@
                         <!-- Måltidsrubrik med delete-knapp för hela måltiden -->
                         <div class="log-entry-header">
                           <span class="log-entry-name">{{ log_entry.meal_name.title() }}</span>
-                          <form method="POST" action="{{ url_for('delete_log', log_id=log_id) }}"
+                          <form method="POST" action="{{ url_for('dashboard.delete_log', log_id=log_id) }}"
                                 onsubmit="return confirm('Remove entire meal?')">
                             <button type="submit" class="log-delete-btn">✕ Remove all</button>
                           </form>
@@ -181,7 +181,7 @@
                               <button type="button" onclick="toggleEdit('edit-{{ log_id }}-{{ item.food_id }}')">✎</button>
 
                               <form id="edit-{{ log_id }}-{{ item.food_id }}" method="POST" 
-                                    action="{{ url_for('edit_log_item', log_id=log_id, food_id=item.food_id) }}"
+                                    action="{{ url_for('dashboard.edit_log_item', log_id=log_id, food_id=item.food_id) }}"
                                     class="log-item-amount-form" style="display:none;">
                                   <input type="number" name="amount" value="{{ item.amount }}" step="0.1" min="0.1" class="log-item-amount-input">
                                   <button type="submit" class="log-item-save-btn">✓</button>
@@ -200,7 +200,7 @@
 
           <!-- Snabbknappar -->
           <div class="action-row">
-            <a href="{{ url_for('meals') }}" class="btn btn-primary">Add Meal</a>
+            <a href="{{ url_for('meals.meals') }}" class="btn btn-primary">Add Meal</a>
           </div>
         </div>
 
@@ -252,7 +252,7 @@
             </div>
           {% endif %}
 
-          <a href="{{ url_for('add_workout') }}" class="wo-add-btn">+ Add Workout</a>
+          <a href="{{ url_for('workouts.add_workout') }}" class="wo-add-btn">+ Add Workout</a>
         </div>
       </div>
 
@@ -277,7 +277,7 @@
           </div>
 
           <div class="modal-body">
-            <form method="POST" action="{{ url_for('log_meal_index') }}">
+            <form method="POST" action="{{ url_for('dashboard.log_meal_index') }}">
               <input type="hidden" name="meal_category" value="{{ cat }}">
               <!-- Ingrediens-dropdown -->
               <label class="form-label">Ingredients</label>

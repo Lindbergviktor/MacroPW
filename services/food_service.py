@@ -1,0 +1,22 @@
+from db import get_db
+
+
+def get_all_foods():
+    """Hämtar alla livsmedel från databasen, sorterade i bokstavsordning."""
+    with get_db() as cur:
+        cur.execute("SELECT * FROM food ORDER BY name")
+        return cur.fetchall()
+
+
+def get_food_id_by_name(name):
+    with get_db() as cur:
+        cur.execute("SELECT food_id FROM food WHERE name = %s", (name,))
+        return cur.fetchone()
+
+
+def add_food(name, calories, protein, fat, carbs):
+    with get_db() as cur:
+        cur.execute(
+            "INSERT INTO food (name, calories, protein, fat, carbs) VALUES (%s, %s, %s, %s, %s)",
+            (name, calories, protein, fat, carbs),
+        )

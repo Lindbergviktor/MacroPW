@@ -15,20 +15,20 @@
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg" data-bs-theme="dark">
       <div class="container-fluid">
-        <a class="navbar-brand" href="{{ url_for('index') }}">MacroPW</a>
+        <a class="navbar-brand" href="{{ url_for('dashboard.index') }}">MacroPW</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
           <div class="navbar-nav">
-            <a class="nav-link" href="{{ url_for('index') }}">Start</a>
-            <a class="nav-link active" aria-current="page" href="{{ url_for('meals') }}">Meal log</a>
-            <a class="nav-link" href="{{ url_for('add_workout') }}">Workouts</a>
-            <a class="nav-link" href="{{ url_for('statistics') }}">Statistics</a>
+            <a class="nav-link" href="{{ url_for('dashboard.index') }}">Start</a>
+            <a class="nav-link active" aria-current="page" href="{{ url_for('meals.meals') }}">Meal log</a>
+            <a class="nav-link" href="{{ url_for('workouts.add_workout') }}">Workouts</a>
+            <a class="nav-link" href="{{ url_for('statistics.statistics') }}">Statistics</a>
           </div>
           <div class="navbar-nav ms-auto">
-            <a class="nav-link" href="{{ url_for('profile') }}">Profile</a>
-            <a class="nav-link" href="{{ url_for('logout') }}">Log Out</a>
+            <a class="nav-link" href="{{ url_for('profile.profile') }}">Profile</a>
+            <a class="nav-link" href="{{ url_for('auth.logout') }}">Log Out</a>
           </div>
         </div>
       </div>
@@ -53,7 +53,7 @@
       <div class="d-flex justify-content-between align-items-center mb-3">
         <h4 class="mb-0">My Meals</h4>
         <div class="d-flex gap-2">
-          <a href="{{ url_for('foods') }}" class="btn btn-blue">Show Foods</a>
+          <a href="{{ url_for('foods.foods') }}" class="btn btn-blue">Show Foods</a>
           <button type="button" class="btn btn-blue" data-bs-toggle="modal" data-bs-target="#createMealModal">+ Create Meal</button>
         </div>
       </div>
@@ -95,7 +95,7 @@
 
             <!-- Log, Edit och Delete -->
             <div class="card-footer d-flex flex-column gap-2">
-              <form method="POST" action="{{ url_for('log_meal', meal_id=meal.meal_id) }}">
+              <form method="POST" action="{{ url_for('meals.log_meal', meal_id=meal.meal_id) }}">
                 <div class="mb-2">
                   <select class="form-select form-select-sm" name="meal_category" required>
                     <option value="" disabled selected>Select category</option>
@@ -109,9 +109,9 @@
               </form>
 
               <div class="d-flex gap-2">
-                <a href="{{ url_for('edit_meal', meal_id=meal.meal_id) }}"
+                <a href="{{ url_for('meals.edit_meal', meal_id=meal.meal_id) }}"
                    class="btn btn-outline-blue btn-sm w-50">Edit</a>
-                <form method="POST" action="{{ url_for('delete_meal', meal_id=meal.meal_id) }}"
+                <form method="POST" action="{{ url_for('meals.delete_meal', meal_id=meal.meal_id) }}"
                       class="w-50"
                       onsubmit="return confirm('Delete this meal?')">
                   <button type="submit" class="btn btn-danger-soft btn-sm w-100">
@@ -144,7 +144,7 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
-            <form method="POST" action="{{ url_for('add_meal') }}">
+            <form method="POST" action="{{ url_for('meals.add_meal') }}">
               <div class="mb-3">
                 <label class="form-label">Name</label>
                 <input type="text" class="form-control" name="meal_name" required>

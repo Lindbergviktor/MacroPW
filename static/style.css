@@ -831,83 +831,10 @@ textarea {
   color: var(--text-muted);
 }
 
-.stats-chart {
-  margin-top: 1.2rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.95rem;
-}
-
 .stats-line-chart {
   margin-top: 1.2rem;
 }
 
-.stats-line-chart-meta {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 0.85rem;
-}
-
-.stats-line-chart-svg {
-  width: 100%;
-  height: 260px;
-  display: block;
-}
-
-.stats-axis-line {
-  stroke: rgba(34, 56, 62, 0.22);
-  stroke-width: 1.5;
-}
-
-.stats-grid-line {
-  stroke: rgba(0, 164, 209, 0.12);
-  stroke-width: 1;
-  stroke-dasharray: 4 6;
-}
-
-.stats-line-path {
-  fill: none;
-  stroke: var(--blue-dark);
-  stroke-width: 3;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
-.stats-line-point {
-  fill: #fff;
-  stroke: var(--blue-dark);
-  stroke-width: 2.5;
-}
-
-.stats-point-label,
-.stats-axis-label {
-  fill: var(--text-muted);
-  font-size: 12px;
-  font-family: "DM Sans", sans-serif;
-}
-
-.stats-point-label {
-  fill: var(--text-dark);
-  font-size: 11px;
-  font-weight: 600;
-}
-
-.stats-chart-row {
-  display: flex;
-  flex-direction: column;
-  gap: 0.45rem;
-}
-
-.stats-chart-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: 1rem;
-}
-
-.stats-chart-track,
 .stats-progress {
   width: 100%;
   height: 10px;
@@ -916,7 +843,6 @@ textarea {
   overflow: hidden;
 }
 
-.stats-chart-fill,
 .stats-progress-fill {
   height: 100%;
   border-radius: 999px;
@@ -944,11 +870,6 @@ textarea {
 }
 
 .stats-list-row span {
-  color: var(--text-muted);
-}
-
-.stats-empty {
-  padding: 0.15rem 0;
   color: var(--text-muted);
 }
 

@@ -1,0 +1,62 @@
+from flask import Blueprint, flash, redirect, render_template, request, session, url_for
+
+from services.user_service import get_user_profile_row, update_user_profile
+
+profile_bp = Blueprint("profile", __name__)
+
+
+@profile_bp.route("/profile", methods=["GET", "POST"])
+def profile():
+    if "user_id" not in session:
+        return redirect(url_for("auth.login"))
+
+    user_id = session["user_id"]
+
+    if request.method == "POST":
+        name = request.form["name"]
+        email = request.form["email"]
+        gender = request.form["gender"]
+        height = request.form["height"]
+        weight = request.form["weight"]
+        weight_goal = request.form["weight_goal"]
+        activity_level = request.form["activity_level"]
+        birthdate = request.form["birthdate"]
+
+        try:
+            height_value = int(height)
+        except ValueError:
+            flash("Height must be a whole number.", "danger")
+            return redirect(url_for("profile.profile"))
+
+        if height_value <= 0:
+            flash("Height must be a positive number.", "danger")
+            return redirect(url_for("profile.profile"))
+
+        try:
+            weight_value = float(weight)
+        except ValueError:
+            flash("Weight must be a number.", "danger")
+            return redirect(url_for("profile.profile"))
+
+        if weight_value <= 0:
+            flash("Weight must be a positive number.", "danger")
+            return redirect(url_for("profile.profile"))
+
+        update_user_profile(
+            user_id,
+            name,
+            email,
+            gender,
+            height,
+            weight,
+            weight_goal,
+            activity_level,
+            birthdate,
+        )
+
+        flash("Profile updated!", "success")
+        return redirect(url_for("profile.profile"))
+
+    row, cols = get_user_profile_row(user_id)
+    user = dict(zip(cols, row))
+    return render_template("profile.html", user=user)

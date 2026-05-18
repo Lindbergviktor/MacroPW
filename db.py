@@ -1,5 +1,7 @@
-import psycopg2
+from contextlib import contextmanager
 import configparser
+
+import psycopg2
 
 # Läser konfiguration från config.ini
 config = configparser.ConfigParser()
@@ -29,3 +31,19 @@ def get_db_connection():
     except psycopg2.Error as e:
         print(f"Database connection failed: {e}")
         raise
+
+
+@contextmanager
+def get_db():
+    """Ger en cursor med automatisk commit/rollback och städning."""
+    conn = get_db_connection()
+    cur = conn.cursor()
+    try:
+        yield cur
+        conn.commit()
+    except Exception:
+        conn.rollback()
+        raise
+    finally:
+        cur.close()
+        conn.close()

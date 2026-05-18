@@ -15,14 +15,14 @@
   <!-- Navbar -->
   <nav class="navbar navbar-expand-lg" data-bs-theme="dark">
     <div class="container-fluid">
-      <a class="navbar-brand" href="{{ url_for('start_page') }}">MacroPW</a>
+      <a class="navbar-brand" href="{{ url_for('auth.start_page') }}">MacroPW</a>
     </div>
   </nav>
 
   <!-- Inloggningsformulär -->
   <div class="auth-wrapper">
     <div class="auth-card">
-      <a href="{{ url_for('start_page') }}" class="text-muted-soft back-link d-inline-block mb-3">← Back</a>
+      <a href="{{ url_for('auth.start_page') }}" class="text-muted-soft back-link d-inline-block mb-3">← Back</a>
       <h2 class="auth-title">Log In</h2>
       <p class="auth-subtitle">Welcome back!</p>
 
@@ -39,7 +39,7 @@
       {% endwith %}
 
       <!-- Inloggningsformulär -->
-      <form method="POST" action="{{ url_for('login') }}">
+      <form method="POST" action="{{ url_for('auth.login') }}">
         <div class="mb-3">
           <label class="form-label">Email</label>
           <input type="email" class="form-control" name="email" required>
@@ -53,7 +53,7 @@
 
       <!-- Länk till registrering -->
       <p class="text-center text-muted-soft mt-3 mb-0 small">
-        Don't have an account? <a href="{{ url_for('register') }}" class="inline-link">Sign up</a>
+        Don't have an account? <a href="{{ url_for('auth.register') }}" class="inline-link">Sign up</a>
       </p>
     </div>
   </div>
