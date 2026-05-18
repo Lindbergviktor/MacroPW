@@ -757,7 +757,7 @@ def add_meal():
     Validerar input och sparar i databasen.
     """
     meal_name = request.form["meal_name"].strip().lower()
-    food_names = request.form.getlist("food_id[]")
+    food_names = request.form.getlist("food_name[]")
     amounts = request.form.getlist("amount[]")
 
     if not meal_name.strip():

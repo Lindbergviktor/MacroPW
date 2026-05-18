@@ -186,16 +186,8 @@
         row.classList.add('row', 'g-2', 'mb-2', 'ingredient-row');
         row.innerHTML = `
           <div class="col-7">
-            <select class="form-select food-select" name="food_id[]" required>
-              <option value="" disabled selected>Select Food</option>
-              {% for food in foods %}
-              <option value="{{ food[0] }}"
-                      data-calories="{{ food[2] }}"
-                      data-protein="{{ food[3] }}"
-                      data-fat="{{ food[4] }}"
-                      data-carbs="{{ food[5] }}">{{ food[1].title() }}</option>
-              {% endfor %}
-            </select>
+            <input type="text" class="form-control" name="food_name[]"
+                  list="food-options" placeholder="Search food..." required autocomplete="off">
           </div>
           <div class="col-4">
             <input type="number" class="form-control amount-input" name="amount[]" min="1" placeholder="Amount (g)" step="0.1" required>
