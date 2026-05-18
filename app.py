@@ -1,3 +1,10 @@
+"""Startpunkt för Flask-applikationen.
+
+Den här filens ansvar är att skapa Flask-appen, ladda grundläggande
+konfiguration och registrera alla blueprints som tillsammans bygger upp
+applikationens webbroutes.
+"""
+
 from flask import Flask
 
 from routes.auth import auth_bp

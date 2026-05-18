@@ -1,3 +1,10 @@
+"""Blueprint för startsidan och dagens loggning.
+
+Den här filen ansvarar för dashboarden på `/`, inklusive visning av dagens
+mat- och träningsdata samt routes för att logga, redigera och ta bort
+dagliga måltidsloggar.
+"""
+
 from flask import Blueprint, flash, redirect, render_template, request, session, url_for
 
 from routes.auth import login_required

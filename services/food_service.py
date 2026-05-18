@@ -1,3 +1,9 @@
+"""Tjänster för livsmedelsdata.
+
+Den här filen ansvarar för databasoperationer kopplade till livsmedel,
+som att hämta listor, slå upp livsmedel och skapa nya poster.
+"""
+
 from db import get_db
 
 

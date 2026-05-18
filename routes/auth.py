@@ -1,3 +1,10 @@
+"""Blueprint för autentisering och sessionsflöden.
+
+Den här filen ansvarar för routes kring start, inloggning, registrering,
+utloggning och kontoavslut, samt decoratorn som skyddar routes som kräver
+att användaren är inloggad.
+"""
+
 from functools import wraps
 
 from flask import Blueprint, flash, redirect, render_template, request, session, url_for

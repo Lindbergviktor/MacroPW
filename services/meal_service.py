@@ -1,3 +1,9 @@
+"""Tjänster för måltider och måltidsloggar.
+
+Den här filen ansvarar för databaslogik kring sparade måltider,
+ingredienser och loggning av måltider i användarens dagliga historik.
+"""
+
 from db import get_db
 
 

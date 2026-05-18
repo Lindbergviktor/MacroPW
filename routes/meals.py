@@ -1,3 +1,10 @@
+"""Blueprint för måltider och måltidsmallar.
+
+Den här filen ansvarar för att visa, skapa, redigera, radera och logga
+sparade måltider. Den kopplar ihop formulär och templates med tjänsterna
+som hanterar databaslogiken.
+"""
+
 from flask import Blueprint, flash, redirect, render_template, request, session, url_for
 
 from routes.auth import login_required

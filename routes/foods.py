@@ -1,3 +1,10 @@
+"""Blueprint för livsmedelshantering.
+
+Den här filen ansvarar för att visa sparade livsmedel och ta emot nya
+livsmedel från formulär i webbgränssnittet. Själva databasoperationerna
+delegeras vidare till tjänstelagret.
+"""
+
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 from psycopg2 import errors
 

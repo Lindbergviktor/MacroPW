@@ -1,3 +1,10 @@
+"""Tjänster för användardata och användarmål.
+
+Den här filen ansvarar för databasoperationer och hjälplogik kopplad till
+användare, såsom inloggningsuppslag, profiluppdateringar, kontoskapande
+och beräkning av kalori- och makromål.
+"""
+
 from db import get_db
 import nutrition
 

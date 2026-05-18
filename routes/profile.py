@@ -1,3 +1,9 @@
+"""Blueprint för användarprofilen.
+
+Den här filen ansvarar för visning och uppdatering av användarens
+profiluppgifter, såsom namn, kroppsdata, aktivitetsnivå och mål.
+"""
+
 from flask import Blueprint, flash, redirect, render_template, request, session, url_for
 
 from services.user_service import get_user_profile_row, update_user_profile

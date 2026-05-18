@@ -1,3 +1,9 @@
+"""Blueprint för träningsloggning.
+
+Den här filen ansvarar för träningssidan där användaren kan visa tillgängliga
+övningar och spara träningspass med längd och datum.
+"""
+
 from datetime import date
 
 from flask import Blueprint, flash, redirect, render_template, request, session, url_for

@@ -1,3 +1,10 @@
+"""Tjänster för statistik och diagramunderlag.
+
+Den här filen ansvarar för att hämta statistikdata från databasen och
+omvandla den till strukturer som statistikvyn kan använda direkt, till
+exempel veckosummeringar och dagliga diagramvärden.
+"""
+
 from datetime import date, timedelta
 
 from db import get_db

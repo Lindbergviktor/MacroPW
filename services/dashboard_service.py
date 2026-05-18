@@ -1,3 +1,10 @@
+"""Tjänster för dashboardens datainsamling och formatering.
+
+Den här filen ansvarar för att hämta dagens sammanställda data till startsidan
+och för att strukturera loggade poster i ett format som templates enkelt kan
+rendera.
+"""
+
 from db import get_db
 
 

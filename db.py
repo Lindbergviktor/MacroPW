@@ -1,3 +1,10 @@
+"""Databaslager för applikationens PostgreSQL-anslutningar.
+
+Den här filen ansvarar för att läsa databasinställningar, skapa nya
+anslutningar och erbjuda en enkel context manager som resten av
+applikationen använder för säkra databasoperationer.
+"""
+
 from contextlib import contextmanager
 import configparser
 

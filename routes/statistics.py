@@ -1,3 +1,10 @@
+"""Blueprint för statistikvyn.
+
+Den här filen ansvarar för att hämta och presentera sammanställd statistik
+för kost, träning och mål, samt att skicka färdig data vidare till
+statistiktemplaten.
+"""
+
 from flask import Blueprint, flash, redirect, render_template, session, url_for
 
 from routes.auth import login_required

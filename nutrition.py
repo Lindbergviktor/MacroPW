@@ -1,4 +1,9 @@
-"""Beräkning av personligt kalorimål (BMR, TDEE, viktmålsjustering)."""
+"""Beräkningshjälp för kalorier och makron.
+
+Den här filen innehåller ren affärslogik för energi- och makroberäkningar.
+Den används av tjänstelagret för att räkna ut mål baserat på användarens
+profil, men känner inte till något om Flask, routes eller databasen.
+"""
 from datetime import date
 
 activity_factors = {

@@ -1,3 +1,9 @@
+"""Tjänster för träningsdata.
+
+Den här filen ansvarar för databasoperationer kopplade till träningspass,
+som att hämta tillgängliga workouts och spara användarens träningsloggar.
+"""
+
 from db import get_db
 
 
