@@ -73,7 +73,7 @@
         <section class="content-card stats-minimal-card">
           <div class="section-title">Graph</div>
           <h2 class="page-title section-heading">Calories Last 7 Days</h2>
-          <p class="page-subtitle">A bar chart showing every day in the last week.</p>
+          <p class="page-subtitle">A line chart showing every day in the last week.</p>
 
           <div class="stats-line-chart">
             <div class="stats-line-chart-meta">
@@ -81,7 +81,7 @@
               <span class="stats-chart-value">{{ calorie_chart_max }} kcal max</span>
             </div>
             <div class="stats-chart-canvas-wrap">
-              <canvas id="calorieBarChart" class="stats-chart-canvas" aria-label="Calorie chart for the last seven days"
+              <canvas id="calorieLineChart" class="stats-chart-canvas" aria-label="Calorie chart for the last seven days"
                 data-labels='{{ calorie_chart_days | map(attribute="label") | list | tojson }}'
                 data-values='{{ calorie_chart_days | map(attribute="calories") | list | tojson }}'
                 data-max='{{ calorie_chart_max | tojson }}'></canvas>

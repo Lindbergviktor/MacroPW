@@ -1,10 +1,10 @@
-const calorieBarChart = document.getElementById("calorieBarChart");
+const calorieLineChart = document.getElementById("calorieLineChart");
 
-if (calorieBarChart && typeof Chart !== "undefined") {
-  const chartStyles = getComputedStyle(calorieBarChart);
-  const chartLabels = JSON.parse(calorieBarChart.dataset.labels || "[]");
-  const chartValues = JSON.parse(calorieBarChart.dataset.values || "[]");
-  const chartMax = Number.parseFloat(calorieBarChart.dataset.max || "0") || 0;
+if (calorieLineChart && typeof Chart !== "undefined") {
+  const chartStyles = getComputedStyle(calorieLineChart);
+  const chartLabels = JSON.parse(calorieLineChart.dataset.labels || "[]");
+  const chartValues = JSON.parse(calorieLineChart.dataset.values || "[]");
+  const chartMax = Number.parseFloat(calorieLineChart.dataset.max || "0") || 0;
   const chartBarBorderWidth =
     Number.parseFloat(chartStyles.getPropertyValue("--stats-bar-border-width")) || 1.5;
   const chartBarRadius =
@@ -20,8 +20,8 @@ if (calorieBarChart && typeof Chart !== "undefined") {
   const chartAxisFontWeightX =
     chartStyles.getPropertyValue("--stats-axis-font-weight-x").trim() || "600";
 
-  new Chart(calorieBarChart, {
-    type: "bar",
+  new Chart(calorieLineChart, {
+    type: "line",
     data: {
       labels: chartLabels,
       datasets: [
@@ -31,9 +31,15 @@ if (calorieBarChart && typeof Chart !== "undefined") {
           backgroundColor: chartStyles.getPropertyValue("--stats-bar-fill").trim(),
           borderColor: chartStyles.getPropertyValue("--stats-bar-border").trim(),
           borderWidth: chartBarBorderWidth,
-          borderRadius: chartBarRadius,
-          borderSkipped: false,
-          hoverBackgroundColor: chartStyles.getPropertyValue("--stats-bar-hover").trim(),
+          fill: false,
+          tension: 0,
+          pointRadius: 4,
+          pointHoverRadius: 6,
+          pointBackgroundColor: chartStyles.getPropertyValue("--stats-bar-border").trim(),
+          pointBorderColor: "#ffffff",
+          pointBorderWidth: 2,
+          pointHoverBackgroundColor: chartStyles.getPropertyValue("--stats-bar-hover").trim(),
+          pointHoverBorderColor: "#ffffff",
         },
       ],
     },
@@ -49,6 +55,8 @@ if (calorieBarChart && typeof Chart !== "undefined") {
         },
         tooltip: {
           displayColors: false,
+          intersect: false,
+          mode: "index",
           callbacks: {
             label(context) {
               return `${context.parsed.y} kcal`;
@@ -59,7 +67,8 @@ if (calorieBarChart && typeof Chart !== "undefined") {
       scales: {
         x: {
           grid: {
-            display: false,
+            color: chartStyles.getPropertyValue("--stats-grid-line").trim(),
+            drawBorder: false,
           },
           ticks: {
             color: chartStyles.getPropertyValue("--stats-axis-text").trim(),
@@ -95,6 +104,10 @@ if (calorieBarChart && typeof Chart !== "undefined") {
             color: chartStyles.getPropertyValue("--stats-axis-line").trim(),
           },
         },
+      },
+      interaction: {
+        intersect: false,
+        mode: "index",
       },
     },
   });
