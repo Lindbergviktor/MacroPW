@@ -9,7 +9,10 @@ from functools import wraps
 
 from flask import Blueprint, flash, redirect, render_template, request, session, url_for
 
-from services.user_service import create_user, delete_user_account, get_user_by_email, get_user_for_login
+from services.user_service import create_user, delete_user_account, get_user_by_email, get_user_for_login, email_exists
+
+import re
+
 
 auth_bp = Blueprint("auth", __name__)
 
@@ -69,94 +72,76 @@ def register():
     """Hanterar registrering av användare."""
     if request.method == "GET":
         return render_template("register.html")
+    
+    form_data = request.form
 
-    name = request.form["name"]
-    email = request.form["email"]
-    password = request.form["password"]
-    gender = request.form["gender"]
-    height = request.form["height"]
-    weight = request.form["weight"]
-    activity_level = request.form["activity_level"]
-    birthdate = request.form["birthdate"]
-    weight_goal = request.form["weight_goal"]
+    name = form_data.get("name", "").strip()
+    email = form_data.get("email", "").strip()
+    password = form_data.get("password", "")
+    confirm_password = form_data.get("confirm_password", "")
+    gender = form_data.get("gender", "")
+    height = form_data.get("height", "")
+    weight = form_data.get("weight", "")
+    activity_level = form_data.get("activity_level", "")
+    birthdate = form_data.get("birthdate", "")
+    weight_goal = form_data.get("weight_goal", "")
 
-    if not name.strip():
-        flash("Name cannot be empty.", "danger")
-        return redirect(url_for("auth.register"))
+    def fail(message):
+        flash(message, "danger")
+        return render_template("register.html", form_data=form_data)
+    
+    # Textfält
+    if not name:
+        return fail("Name cannot be empty.")
+    if not email:
+        return fail("Email cannot be empty.")
+    if not re.match(r"^[^@\s]+@[^@\s]+\.[^@\s]+$", email):
+        return fail("Please enter a valid email address.")
 
-    if not email.strip():
-        flash("Email cannot be empty.", "danger")
-        return redirect(url_for("auth.register"))
-
-    if not password.strip():
-        flash("Password cannot be empty.", "danger")
-        return redirect(url_for("auth.register"))
-
+    # Lösenord
+    if not password:
+        return fail("Password cannot be empty.")
     if len(password) < 8:
-        flash("Password must be at least 8 characters.", "danger")
-        return redirect(url_for("auth.register"))
-
+        return fail("Password must be at least 8 characters.")
     if not any(c.isupper() for c in password):
-        flash("Password must contain at least one uppercase letter.", "danger")
-        return redirect(url_for("auth.register"))
-
+        return fail("Password must contain at least one uppercase letter.")
     if not any(c.isdigit() for c in password):
-        flash("Password must contain at least one number.", "danger")
-        return redirect(url_for("auth.register"))
-
-    if not height or not weight or not activity_level:
-        flash("Height, weight and activity level are required.", "danger")
-        return redirect(url_for("auth.register"))
-
-    if not birthdate:
-        flash("Date of birth is required.", "danger")
-        return redirect(url_for("auth.register"))
-
-    if not weight_goal:
-        flash("Goal is required.", "danger")
-        return redirect(url_for("auth.register"))
-
+        return fail("Password must contain at least one number.")
+    if password != confirm_password:
+        return fail("Passwords do not match.")
+    
+    # Numeriska fält
     try:
         height_value = int(height)
+        if height_value <= 0:
+            return fail("Height must be a positive number.")
     except ValueError:
-        flash("Height must be a whole number.", "danger")
-        return redirect(url_for("auth.register"))
-
-    if height_value <= 0:
-        flash("Height must be a positive number.", "danger")
-        return redirect(url_for("auth.register"))
+        return fail("Height must be a whole number.")
 
     try:
         weight_value = float(weight)
+        if weight_value <= 0:
+            return fail("Weight must be a positive number.")
     except ValueError:
-        flash("Weight must be a number.", "danger")
-        return redirect(url_for("auth.register"))
+        return fail("Weight must be a valid number.")
 
-    if weight_value <= 0:
-        flash("Weight must be a positive number.", "danger")
-        return redirect(url_for("auth.register"))
+    # Obligatoriska val
+    if not gender:
+        return fail("Gender is required.")
+    if not activity_level:
+        return fail("Activity level is required.")
+    if not birthdate:
+        return fail("Date of birth is required.")
+    if not weight_goal:
+        return fail("Weight goal is required.")
 
+    # Databasoperationer
     try:
-        existing = get_user_by_email(email)
-        if not existing:
-            create_user(
-                name,
-                email,
-                password,
-                gender,
-                height_value,
-                weight_value,
-                activity_level,
-                birthdate,
-                weight_goal,
-            )
+        if email_exists(email):
+            return fail("Email already registered.")
+        create_user(name, email, password, gender, height_value, weight_value, activity_level, birthdate, weight_goal)
     except Exception:
-        flash("Database error during registration", "danger")
-        return redirect(url_for("auth.register"))
-
-    if existing:
-        flash("Email already registered.", "danger")
-        return redirect(url_for("auth.register"))
+        return fail("Database error during registration.")
 
     flash("Account created! You can now log in.", "success")
     return render_template("login.html")

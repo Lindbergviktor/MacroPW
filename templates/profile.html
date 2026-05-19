@@ -146,27 +146,41 @@
             </div>
           </div>
 
-          <div class="section-title">Goal</div>
+          <div class="section-title">Weight Goal</div>
 
           <div class="d-flex gap-2 mb-3">
             <div class="flex-fill">
               <input type="radio" class="btn-check" name="weight_goal" id="goal-loss" value="loss"
                      {% if user.weight_goal == 'loss' %}checked{% endif %}>
-              <label class="btn btn-outline-blue w-100" for="goal-loss"> Lose</label>
+              <label class="btn btn-outline-blue w-100" for="goal-loss"> Lose weight</label>
             </div>
             <div class="flex-fill">
               <input type="radio" class="btn-check" name="weight_goal" id="goal-maintain" value="maintain"
                      {% if user.weight_goal == 'maintain' %}checked{% endif %}>
-              <label class="btn btn-outline-blue w-100" for="goal-maintain"> Maintain</label>
+              <label class="btn btn-outline-blue w-100" for="goal-maintain"> Maintain weight</label>
             </div>
             <div class="flex-fill">
               <input type="radio" class="btn-check" name="weight_goal" id="goal-gain" value="gain"
                      {% if user.weight_goal == 'gain' %}checked{% endif %}>
-              <label class="btn btn-outline-blue w-100" for="goal-gain"> Gain</label>
+              <label class="btn btn-outline-blue w-100" for="goal-gain"> Gain weight</label>
             </div>
           </div>
 
           <div class="section-title">Activity level</div>
+
+          <a class="text-muted small d-block mb-2" data-bs-toggle="collapse" href="#activityInfo">ⓘ More info</a>
+          <div class="collapse mb-2" id="activityInfo">
+            <div class="form-text p-2 border rounded">
+              This refers to your <strong>daily lifestyle and movement</strong>, not planned workouts.
+              Workouts are logged separately and factored in automatically.
+              <br><br>
+              <strong>Sedentary</strong> — Desk job, mostly sitting. Example: office worker who drives to work.<br>
+              <strong>Lightly active</strong> — Some walking during the day. Example: teacher, retail worker.<br>
+              <strong>Moderately active</strong> — Regular walking or active commute. Example: nurse, cyclist commuter.<br>
+              <strong>Very active</strong> — Physically demanding routine. Example: construction worker, postman.<br>
+              <strong>Extra active</strong> — Heavy manual labor all day. Example: farmer, moving company worker.
+            </div>
+          </div>
 
           <div class="mb-4">
             <select class="form-select" name="activity_level" required>

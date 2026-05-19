@@ -43,55 +43,73 @@
       <form method="POST" action="{{ url_for('auth.register') }}">
         <div class="mb-3">
           <label class="form-label">Name</label>
-          <input type="text" class="form-control" name="name" required>
+          <input type="text" class="form-control" name="name" required value="{{ form_data.get('name', '') if form_data else '' }}">
         </div>
         <div class="mb-3">
           <label class="form-label">Email</label>
-          <input type="email" class="form-control" name="email" required>
+          <input type="text" class="form-control" name="email" required value="{{ form_data.get('email', '') if form_data else '' }}">
         </div>
         <div class="mb-3">
           <label class="form-label">Password</label>
           <input type="password" class="form-control" name="password" required>
+          <div class="form-text text-muted">Must contain at least 8 characters, one uppercase letter and one number.</div>
         </div>
         <div class="mb-3">
-          <label class="form-label">Gender</label>
-          <select class="form-select" name="gender" required>
-            <option value="" disabled selected>Select gender</option>
-            <option value="male">Male</option>
-            <option value="female">Female</option>
-          </select>
+          <label class="form-label">Confirm Password</label>
+          <input type="password" class="form-control" name="confirm_password" required>
         </div>
         <!-- Obligatoriska fält för beräkning av kaloribudget -->
         <div class="mb-3">
+          <label class="form-label">Gender</label>
+          <select class="form-select" name="gender" required>
+            <option value="" {{ 'selected' if not form_data }}>Select gender</option>
+            <option value="male" {{ 'selected' if form_data and form_data.get('gender') == 'male' }}>Male</option>
+            <option value="female" {{ 'selected' if form_data and form_data.get('gender') == 'female' }}>Female</option>
+          </select>
+        </div>
+        <div class="mb-3">
           <label class="form-label">Height (cm)</label>
-          <input type="number" class="form-control" name="height" min="1" required>
+          <input type="number" class="form-control" name="height" min="1" required value="{{ form_data.get('height', '') if form_data else '' }}">
         </div>
         <div class="mb-3">
           <label class="form-label">Weight (kg)</label>
-          <input type="number" class="form-control" name="weight" min="1" step="0.1" required>
+          <input type="number" class="form-control" name="weight" min="1" step="0.1" required value="{{ form_data.get('weight', '') if form_data else '' }}">
         </div>
         <div class="mb-3">
           <label class="form-label">Activity level</label>
+          <a class="text-muted small d-block mb-2" data-bs-toggle="collapse" href="#activityInfo">ⓘ More info</a>
+          <div class="collapse mb-2" id="activityInfo">
+            <div class="form-text p-2 border rounded">
+              This refers to your <strong>daily lifestyle and movement</strong>, not planned workouts.
+              Workouts are logged separately and factored in automatically.
+              <br><br>
+              <strong>Sedentary</strong> — Desk job, mostly sitting. Example: office worker who drives to work.<br>
+              <strong>Lightly active</strong> — Some walking during the day. Example: teacher, retail worker.<br>
+              <strong>Moderately active</strong> — Regular walking or active commute. Example: nurse, cyclist commuter.<br>
+              <strong>Very active</strong> — Physically demanding routine. Example: construction worker, postman.<br>
+              <strong>Extra active</strong> — Heavy manual labor all day. Example: farmer, moving company worker.
+            </div>
+          </div>
           <select class="form-select" name="activity_level" required>
-            <option value="" disabled selected>Select activity level</option>
-            <option value="sedentary">Sedentary — Desk job, minimal daily movement</option>
-            <option value="lightly_active">Lightly active — Light walking during the day</option>
-            <option value="moderately_active">Moderately active — Regular walking or active commute</option>
-            <option value="very_active">Very active — Physically demanding daily routine</option>
-            <option value="extra_active">Extra active — Heavy manual labor throughout the day</option>
+            <option value="" {{ 'selected' if not form_data }}>Select activity level</option>
+            <option value="sedentary" {{ 'selected' if form_data and form_data.get('activity_level') == 'sedentary' }}>Sedentary — Desk job, minimal daily movement</option>
+            <option value="lightly_active" {{ 'selected' if form_data and form_data.get('activity_level') == 'lightly_active' }}>Lightly active — Some walking during the day</option>
+            <option value="moderately_active" {{ 'selected' if form_data and form_data.get('activity_level') == 'moderately_active' }}>Moderately active — Regular walking or active commute</option>
+            <option value="very_active" {{ 'selected' if form_data and form_data.get('activity_level') == 'very_active' }}>Very active — Physically demanding daily routine</option>
+            <option value="extra_active" {{ 'selected' if form_data and form_data.get('activity_level') == 'extra_active' }}>Extra active — Heavy manual labor all day</option>
           </select>
         </div>
         <div class="mb-3">
           <label class="form-label">Date of birth</label>
-          <input type="date" class="form-control" name="birthdate" required>
+          <input type="date" class="form-control" name="birthdate" required value="{{ form_data.get('birthdate', '') if form_data else '' }}">
         </div>
         <div class="mb-3">
-          <label class="form-label">Goal</label>
+          <label class="form-label">Weight Goal</label>
           <select class="form-select" name="weight_goal" required>
-            <option value="" disabled selected>Select goal</option>
-            <option value="loss">Lose weight</option>
-            <option value="maintain">Maintain weight</option>
-            <option value="gain">Gain weight</option>
+            <option value="" {{ 'selected' if not form_data }}>Select goal</option>
+            <option value="loss" {{ 'selected' if form_data and form_data.get('weight_goal') == 'loss' }}>Lose weight</option>
+            <option value="maintain" {{ 'selected' if form_data and form_data.get('weight_goal') == 'maintain' }}>Maintain weight</option>
+            <option value="gain" {{ 'selected' if form_data and form_data.get('weight_goal') == 'gain' }}>Gain weight</option>
           </select>
         </div>
         <button type="submit" class="btn btn-primary-blue w-100 py-3">Create Account</button>
@@ -116,12 +134,6 @@
       disableMobile: true
     });
 </script>
-<script>
-  setTimeout(function () {
-    document.querySelectorAll('.alert').forEach(function (el) {
-      el.style.display = 'none';
-    });
-  }, 3000);
-</script>
+
 </body>
 </html>

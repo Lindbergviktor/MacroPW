@@ -22,7 +22,13 @@ def get_user_by_email(email):
     with get_db() as cur:
         cur.execute("SELECT user_id FROM users WHERE email = %s", (email,))
         return cur.fetchone()
+    
 
+def email_exists(email):
+    with get_db() as cur:
+        cur.execute("SELECT user_id FROM users WHERE email = %s", (email,))
+        return cur.fetchone() is not None
+    
 
 def create_user(
     name,
