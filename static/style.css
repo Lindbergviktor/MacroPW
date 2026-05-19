@@ -387,25 +387,11 @@ textarea {
   justify-content: center;
 }
 
-.gauge-svg {
-  overflow: visible;
-  transform: translateY(-28px);
-}
-
-.gauge-track {
-  fill: none;
-  stroke: rgba(255, 255, 255, 0.9);
-  stroke-width: 14;
-  stroke-linecap: round;
-}
-
-.gauge-fill {
-  fill: none;
-  stroke: var(--blue-mid);
-  stroke-width: 12;
-  stroke-linecap: round;
-  stroke-dasharray: 1000;
-  transition: stroke-dashoffset 0.6s ease;
+.gauge-chart {
+  display: block;
+  width: 220px;
+  height: 135px;
+  transform: translateY(-18px);
 }
 
 .gauge-center {
@@ -422,11 +408,6 @@ textarea {
   font-size: 0.95rem;
   font-weight: 500;
   opacity: 0.85;
-}
-
-.gauge-icon {
-  font-size: 1.4rem;
-  margin-bottom: 0.3rem;
 }
 
 .gauge-kcal {

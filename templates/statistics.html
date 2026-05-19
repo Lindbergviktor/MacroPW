@@ -41,7 +41,6 @@
   </nav>
 
   {% set today_calorie_pct = ((calories_today / calorie_goal) * 100) if calorie_goal else 0 %}
-  {% set water_pct = ((water_today / 8) * 100) if 8 else 0 %}
   {% set week_calorie_pct = ((calories_week / weekly_goal) * 100) if weekly_goal else 0 %}
   <div class="page-wrapper">
     <div class="container mt-4">
