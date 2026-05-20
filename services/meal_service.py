@@ -14,12 +14,12 @@ def get_meals_dict(user_id):
             """
             SELECT m.meal_id, m.name, f.name, mi.amount,
                    f.calories, f.protein, f.fat, f.carbs
-            FROM meal m
-            JOIN meal_ingredient mi ON m.meal_id = mi.meal_id
-            JOIN food f ON mi.food_id = f.food_id
-            WHERE m.user_id = %s
-            ORDER BY m.meal_id
-        """,
+                   FROM meal m
+                   JOIN meal_ingredient mi ON m.meal_id = mi.meal_id
+                   JOIN food f ON mi.food_id = f.food_id
+                   WHERE m.user_id = %s
+                   ORDER BY m.meal_id
+            """,
             (user_id,),
         )
         rows = cur.fetchall()
