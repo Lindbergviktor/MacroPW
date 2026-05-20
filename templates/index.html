@@ -289,7 +289,11 @@
                     <select class="form-select food-select-live" name="food_id[]" data-cat="{{ cat }}">
                       <option value="" selected>Select Food</option>
                       {% for food in foods %}
-                      <option value="{{ food[0] }}" data-calories="{{ food[2] }}">{{ food[1].title() }}</option>
+                      <option value="{{ food[0] }}"
+                              data-calories="{{ food[2] }}"
+                              data-protein="{{ food[3]  }}"
+                              data-fat="{{ food[4] }}"
+                              data-carbs="{{ food[5] }}">{{ food[1].title() }}</option>
                       {% endfor %}
                     </select>
                   </div>
@@ -299,7 +303,10 @@
                 </div>
               </div>
               <div id="calorie-preview-{{ cat }}" style="display:none; font-size:.85rem; color:#888; margin-bottom:.5rem;">
-                ≈ <span class="calorie-preview-value">0</span> kcal
+                ≈ <span class="calorie-preview-value">0</span> kcal &nbsp;
+                Protein: <span class="protein-preview-value">0</span>g &nbsp;
+                Fat: <span class="fat-preview-value">0</span>g &nbsp;
+                Carbs: <span class="carbs-preview-value">0</span>g
               </div>
 
               <!-- Meals dropdown -->
@@ -416,24 +423,29 @@
 </script>
 <script>
   // Live-kalorier i måltidsmodaler
-  function updateCaloriePreview(cat) {
-    const select = document.querySelector(`.food-select-live[data-cat="${cat}"]`);
-    const amountInput = document.querySelector(`.amount-input-live[data-cat="${cat}"]`);
-    const preview = document.getElementById(`calorie-preview-${cat}`);
-    if (!select || !amountInput || !preview) return;
+function updateCaloriePreview(cat) {
+  const select = document.querySelector(`.food-select-live[data-cat="${cat}"]`);
+  const amountInput = document.querySelector(`.amount-input-live[data-cat="${cat}"]`);
+  const preview = document.getElementById(`calorie-preview-${cat}`);
+  if (!select || !amountInput || !preview) return;
 
-    const selectedOption = select.options[select.selectedIndex];
-    const cal = parseFloat(selectedOption?.dataset?.calories) || 0;
-    const amount = parseFloat(amountInput.value) || 0;
+  const selectedOption = select.options[select.selectedIndex];
+  const cal = parseFloat(selectedOption?.dataset?.calories) || 0;
+  const prot = parseFloat(selectedOption?.dataset?.protein) || 0;
+  const fat = parseFloat(selectedOption?.dataset?.fat) || 0;
+  const carbs = parseFloat(selectedOption?.dataset?.carbs) || 0;
+  const amount = parseFloat(amountInput.value) || 0;
 
-    if (cal > 0 && amount > 0) {
-      const total = Math.round(cal * amount / 100);
-      preview.querySelector('.calorie-preview-value').textContent = total;
-      preview.style.display = 'block';
-    } else {
-      preview.style.display = 'none';
-    }
+  if (cal > 0 && amount > 0) {
+    preview.querySelector('.calorie-preview-value').textContent = Math.round(cal * amount / 100);
+    preview.querySelector('.protein-preview-value').textContent = (prot * amount / 100).toFixed(1);
+    preview.querySelector('.fat-preview-value').textContent = (fat * amount / 100).toFixed(1);
+    preview.querySelector('.carbs-preview-value').textContent = (carbs * amount / 100).toFixed(1);
+    preview.style.display = 'block';
+  } else {
+    preview.style.display = 'none';
   }
+}
 
   ['Breakfast', 'Lunch', 'Dinner', 'Snack'].forEach(function(cat) {
     const select = document.querySelector(`.food-select-live[data-cat="${cat}"]`);
