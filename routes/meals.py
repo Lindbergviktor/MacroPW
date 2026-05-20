@@ -37,12 +37,6 @@ def meals():
     return render_template("meals.html", foods=foods, meals=meals_dict)
 
 
-@meals_bp.route("/add-lunch")
-@login_required
-def add_lunch():
-    return render_template("add_lunch.html")
-
-
 @meals_bp.route("/add_meal", methods=["POST"])
 @login_required
 def add_meal():
@@ -98,7 +92,7 @@ def log_meal(meal_id):
         flash("Database error during logging of meal.", "danger")
         return redirect(url_for("meals.meals"))
 
-    flash("Måltid loggad!", "success")
+    flash("Meal registered!", "success")
     return redirect(url_for("dashboard.index"))
 
 
