@@ -9,7 +9,7 @@ from functools import wraps
 
 from flask import Blueprint, flash, redirect, render_template, request, session, url_for
 
-from services.user_service import create_user, delete_user_account, get_user_by_email, get_user_for_login, email_exists
+from services.user_service import create_user, delete_user_account, get_user_for_login, email_exists
 
 import re
 
