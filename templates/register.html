@@ -42,25 +42,25 @@
       <!-- Formulärfält för ny användare -->
       <form method="POST" action="{{ url_for('auth.register') }}">
         <div class="mb-3">
-          <label class="form-label">Name</label>
+          <label class="form-label">Name*</label>
           <input type="text" class="form-control" name="name" required placeholder="Full name or username" value="{{ form_data.get('name', '') if form_data else '' }}">
         </div>
         <div class="mb-3">
-          <label class="form-label">Email</label>
+          <label class="form-label">Email*</label>
           <input type="text" class="form-control" name="email" required placeholder="your@email.com" value="{{ form_data.get('email', '') if form_data else '' }}">
         </div>
         <div class="mb-3">
-          <label class="form-label">Password</label>
+          <label class="form-label">Password*</label>
           <input type="password" class="form-control" name="password" required>
           <div class="form-text text-muted">Must contain at least 8 characters, one uppercase letter and one number.</div>
         </div>
         <div class="mb-3">
-          <label class="form-label">Confirm Password</label>
+          <label class="form-label">Confirm Password*</label>
           <input type="password" class="form-control" name="confirm_password" required>
         </div>
         <!-- Obligatoriska fält för beräkning av kaloribudget -->
         <div class="mb-3">
-          <label class="form-label">Gender</label>
+          <label class="form-label">Gender*</label>
           <select class="form-select" name="gender" required>
             <option value="" {{ 'selected' if not form_data }}>Select gender</option>
             <option value="male" {{ 'selected' if form_data and form_data.get('gender') == 'male' }}>Male</option>
@@ -68,15 +68,15 @@
           </select>
         </div>
         <div class="mb-3">
-          <label class="form-label">Height (cm)</label>
+          <label class="form-label">Height (cm)*</label>
           <input type="number" class="form-control" name="height" min="1" required value="{{ form_data.get('height', '') if form_data else '' }}">
         </div>
         <div class="mb-3">
-          <label class="form-label">Weight (kg)</label>
+          <label class="form-label">Weight (kg)*</label>
           <input type="number" class="form-control" name="weight" min="1" step="0.1" required value="{{ form_data.get('weight', '') if form_data else '' }}">
         </div>
         <div class="mb-3">
-          <label class="form-label">Activity level</label>
+          <label class="form-label">Activity level*</label>
           <a class="text-muted small d-block mb-2" data-bs-toggle="collapse" href="#activityInfo">ⓘ More info</a>
           <div class="collapse mb-2" id="activityInfo">
             <div class="form-text p-2 border rounded">
@@ -100,11 +100,11 @@
           </select>
         </div>
         <div class="mb-3">
-          <label class="form-label">Date of birth</label>
+          <label class="form-label">Date of birth*</label>
           <input type="date" class="form-control" name="birthdate" required value="{{ form_data.get('birthdate', '') if form_data else '' }}">
         </div>
         <div class="mb-3">
-          <label class="form-label">Weight Goal</label>
+          <label class="form-label">Weight Goal*</label>
           <select class="form-select" name="weight_goal" required>
             <option value="" {{ 'selected' if not form_data }}>Select goal</option>
             <option value="loss" {{ 'selected' if form_data and form_data.get('weight_goal') == 'loss' }}>Lose weight</option>
