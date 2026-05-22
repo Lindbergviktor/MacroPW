@@ -279,6 +279,7 @@
           </div>
 
           <div class="modal-body">
+            <p class="text-muted small mb-3">Log your food by picking an ingredient, a saved meal or a mix of both.</p>
             <form method="POST" action="{{ url_for('dashboard.log_meal_index') }}">
               <input type="hidden" name="meal_category" value="{{ cat }}">
               <!-- Ingrediens-dropdown -->
@@ -311,6 +312,7 @@
 
               <!-- Meals dropdown -->
               <label class="form-label">Meals</label>
+              <p class="text-muted small mb-2"><a href="{{ url_for('meals.meals') }}" class="text-muted-soft">Manage your meals →</a></p>
               <div id="meals-container-{{ cat }}">
                 <div class="row g-2 mb-2">
                   <div class="col-12">
