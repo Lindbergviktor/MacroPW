@@ -19,6 +19,7 @@ from services.meal_service import (
     update_log_item_amount,
 )
 from services.user_service import get_macro_goals
+from services.dashboard_service import build_logged_by_category, get_dashboard_data, get_water_today, set_water_today
 
 dashboard_bp = Blueprint("dashboard", __name__)
 
@@ -34,6 +35,7 @@ def index():
         workouts_today = dashboard_data["workouts_today"]
         calories_burned_today = sum(w[2] for w in workouts_today)
         macro_goals = get_macro_goals(session["user_id"], calories_burned_today)
+        water_today = get_water_today(session["user_id"])
     except Exception:
         flash("Could not receive data.", "danger")
         return redirect(url_for("auth.start_page"))
@@ -53,6 +55,7 @@ def index():
         workouts_today=workouts_today,
         macro_goals=macro_goals,
         logged_by_category=logged_by_category,
+        water_today=water_today,
     )
 
 
@@ -159,3 +162,12 @@ def edit_log_item(log_id, food_id):
         return redirect(url_for("dashboard.index"))
 
     return redirect(url_for("dashboard.index"))
+
+
+@dashboard_bp.route("/water", methods=["POST"])
+@login_required
+def update_water():
+    glasses = request.form.get("glasses", type=int)
+    if glasses is not None and glasses >= 0:
+        set_water_today(session["user_id"], glasses)
+    return "", 204
