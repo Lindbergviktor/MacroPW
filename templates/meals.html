@@ -137,84 +137,152 @@
     </datalist>
 
     <!-- Modal för att skapa ny måltid -->
+    <!-- Modal för att skapa ny måltid -->
     <div class="modal fade" id="createMealModal" tabindex="-1" aria-labelledby="createMealModalLabel" aria-hidden="true">
-      <div class="modal-dialog">
+    <div class="modal-dialog">
         <div class="modal-content">
-          <div class="modal-header">
+        <div class="modal-header">
             <h5 class="modal-title" id="createMealModalLabel">Create Meal</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
+        </div>
+        <div class="modal-body">
             <form method="POST" action="{{ url_for('meals.add_meal') }}">
-              <div class="mb-3">
+            <div class="mb-3">
                 <label class="form-label">Name</label>
                 <input type="text" class="form-control" name="meal_name" required>
-              </div>
+            </div>
 
-              <!-- Ingredienslista med sökning -->
-              <label class="form-label">Ingredients</label>
-              <div id="ingredients-container">
+            <label class="form-label">Ingredients</label>
+            <div id="ingredients-container">
                 <div class="row g-2 mb-2 ingredient-row">
-                  <div class="col-7">
-                    <input type="text" class="form-control" name="food_name[]"
-                           list="food-options" placeholder="Search food..." required autocomplete="off">
-                  </div>
-                  <div class="col-5">
-                    <input type="number" class="form-control amount-input" name="amount[]" min="1" placeholder="Amount (g)" step="0.1" required>
-                  </div>
+                <div class="col-7">
+                    <input type="text" class="form-control food-search-input"
+                        list="food-options" placeholder="Search food..." required autocomplete="off">
+                    <!-- Dold select med data-attribut för makroberäkning -->
+                    <select class="food-select-hidden" name="food_name[]" style="display:none;">
+                    <option value="">Select Food</option>
+                    {% for food in foods %}
+                    <option value="{{ food[1].title() }}"
+                            data-calories="{{ food[2] }}"
+                            data-protein="{{ food[3] }}"
+                            data-fat="{{ food[4] }}"
+                            data-carbs="{{ food[5] }}">{{ food[1].title() }}</option>
+                    {% endfor %}
+                    </select>
                 </div>
-              </div>
+                <div class="col-5">
+                    <input type="number" class="form-control amount-input" name="amount[]" min="1" placeholder="Amount (g)" step="0.1" required>
+                </div>
+                </div>
+            </div>
 
-              <button type="button" class="btn btn-outline-secondary btn-sm mb-3" id="add-ingredient-btn">
+            <button type="button" class="btn btn-outline-secondary btn-sm mb-3" id="add-ingredient-btn">
                 + Add Ingredient
-              </button>
+            </button>
 
-              <button type="submit" class="btn btn-blue w-100">Save Meal</button>
+            <!-- Live makrosammanfattning -->
+            <div class="macro-summary mb-3" id="modal-macro-summary" style="display:none;">
+                <div class="macro-summary-row">
+                <span>Calories</span>
+                <span class="mono" id="summary-calories">0 kcal</span>
+                </div>
+                <div class="macro-summary-row">
+                <span>Protein</span>
+                <span class="mono" id="summary-protein">0 g</span>
+                </div>
+                <div class="macro-summary-row">
+                <span>Fat</span>
+                <span class="mono" id="summary-fat">0 g</span>
+                </div>
+                <div class="macro-summary-row">
+                <span>Carbs</span>
+                <span class="mono" id="summary-carbs">0 g</span>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-blue w-100">Save Meal</button>
             </form>
-          </div>
         </div>
-      </div>
+        </div>
+    </div>
     </div>
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
 
     <script>
-      // Lägg till ny ingrediensrad
-      document.getElementById('add-ingredient-btn').addEventListener('click', function () {
-        const container = document.getElementById('ingredients-container');
-        const row = document.createElement('div');
-        row.classList.add('row', 'g-2', 'mb-2', 'ingredient-row');
-        row.innerHTML = `
-          <div class="col-7">
-            <input type="text" class="form-control" name="food_name[]"
-                  list="food-options" placeholder="Search food..." required autocomplete="off">
-          </div>
-          <div class="col-4">
-            <input type="number" class="form-control amount-input" name="amount[]" min="1" placeholder="Amount (g)" step="0.1" required>
-          </div>
-          <div class="col-1 d-flex align-items-center">
-            <span style="cursor:pointer;" onclick="this.closest('.row').remove()">✕</span>
-          </div>
-        `;
-        container.appendChild(row);
-      });
+    // Synkar textfält med dold select och räknar om makron
+    function syncSearchToSelect(row) {
+        const searchInput = row.querySelector('.food-search-input');
+        const hiddenSelect = row.querySelector('.food-select-hidden');
+        if (!searchInput || !hiddenSelect) return;
 
-      // Nollställ modal när den stängs
-      document.querySelectorAll('.modal').forEach(function (modal) {
-        modal.addEventListener('hidden.bs.modal', function () {
-          modal.querySelectorAll('form').forEach(function (form) {
-            form.reset();
-          });
-          const container = modal.querySelector('#ingredients-container');
-          if (container) {
-            const rows = container.querySelectorAll('.row');
-            rows.forEach(function (row, index) {
-              if (index > 0) row.remove();
-            });
-          }
+        const typed = searchInput.value.trim().toLowerCase();
+        let found = false;
+        for (const option of hiddenSelect.options) {
+        if (option.value.toLowerCase() === typed) {
+            hiddenSelect.value = option.value;
+            found = true;
+            break;
+        }
+        }
+        if (!found) hiddenSelect.value = '';
+        updateMacroSummary();
+    }
+
+    function updateMacroSummary() {
+        let totalCalories = 0, totalProtein = 0, totalFat = 0, totalCarbs = 0;
+        let hasData = false;
+
+        document.querySelectorAll('#ingredients-container .ingredient-row').forEach(function(row) {
+        const hiddenSelect = row.querySelector('.food-select-hidden');
+        const amountInput = row.querySelector('.amount-input');
+        if (!hiddenSelect || !amountInput) return;
+
+        const option = hiddenSelect.options[hiddenSelect.selectedIndex];
+        const amount = parseFloat(amountInput.value);
+
+        if (option && option.value && amount > 0) {
+            totalCalories += parseFloat(option.dataset.calories || 0) * amount / 100;
+            totalProtein  += parseFloat(option.dataset.protein  || 0) * amount / 100;
+            totalFat      += parseFloat(option.dataset.fat      || 0) * amount / 100;
+            totalCarbs    += parseFloat(option.dataset.carbs    || 0) * amount / 100;
+            hasData = true;
+        }
         });
-      });
+
+        const summary = document.getElementById('modal-macro-summary');
+        summary.style.display = hasData ? 'block' : 'none';
+        document.getElementById('summary-calories').textContent = Math.round(totalCalories) + ' kcal';
+        document.getElementById('summary-protein').textContent  = totalProtein.toFixed(1) + ' g';
+        document.getElementById('summary-fat').textContent      = totalFat.toFixed(1) + ' g';
+        document.getElementById('summary-carbs').textContent    = totalCarbs.toFixed(1) + ' g';
+    }
+
+    // Lyssna på ändringar i container
+    document.getElementById('ingredients-container').addEventListener('input', function(e) {
+        const row = e.target.closest('.ingredient-row');
+        if (row) syncSearchToSelect(row);
+    });
+
+    // Lägg till ny ingrediensrad
+    document.getElementById('add-ingredient-btn').addEventListener('click', function() {
+        const container = document.getElementById('ingredients-container');
+        const firstRow = container.querySelector('.ingredient-row');
+        const newRow = document.createElement('div');
+        newRow.classList.add('row', 'g-2', 'mb-2', 'ingredient-row');
+        newRow.innerHTML = firstRow.innerHTML.replace(/value="[^"]*"/g, 'value=""');
+        container.appendChild(newRow);
+    });
+
+    // Nollställ modal när den stängs
+    document.getElementById('createMealModal').addEventListener('hidden.bs.modal', function() {
+        document.getElementById('modal-macro-summary').style.display = 'none';
+        const container = document.getElementById('ingredients-container');
+        const rows = container.querySelectorAll('.ingredient-row');
+        rows.forEach(function(row, index) { if (index > 0) row.remove(); });
+        container.querySelectorAll('input, select').forEach(el => el.value = '');
+    });
     </script>
 
     <script>
