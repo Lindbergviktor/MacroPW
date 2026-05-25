@@ -306,7 +306,7 @@ textarea {
 
 .workout-action-row .btn-primary-blue {
   flex-basis: 100%;
-  order: 2;
+  order: -1;
 }
 
 .workout-secondary-btn {
