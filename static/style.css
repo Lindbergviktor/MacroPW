@@ -1437,17 +1437,9 @@ footer {
 @media (min-width: 992px) {
   .page-wrapper {
     max-width: 1180px;
-    height: calc(100vh - 56px);
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
   }
 
   .container {
-    flex: 1;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
   }
 
   .stats-panel-hero {
@@ -1475,14 +1467,11 @@ footer {
   }
 
   .desktop-grid {
-    flex: 1;
-    overflow: hidden;
     display: grid;
     grid-template-columns: minmax(0, 1.14fr) minmax(320px, 0.86fr);
     grid-template-areas:
       "hero meals"
-      "hero water"
-      "workout workout";
+      "workout water";
     gap: 1.6rem;
     align-items: start;
   }
@@ -1530,6 +1519,146 @@ footer {
     align-items: center;
   }
 }
+
+/* ===== Meal entry count badge ===== */
+.meal-entry-count {
+  background: var(--blue-dark);
+  color: #fff;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "DM Mono", monospace;
+}
+
+/* ===== Detail modal ===== */
+.detail-modal-header {
+  background: linear-gradient(135deg, #75e1ff 0%, #00A4D1 100%);
+  color: #111;
+  border-bottom: none;
+  padding: 1.2rem 1.4rem;
+}
+
+.detail-modal-header .btn-close {
+  filter: none;
+  opacity: 0.7;
+}
+
+.detail-modal-kcal {
+  font-size: 0.8rem;
+  opacity: 0.75;
+  font-family: "DM Mono", monospace;
+  margin-top: 0.15rem;
+}
+
+.detail-modal-body {
+  padding: 1rem 1.4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.detail-modal-footer {
+  border-top: 1px solid rgba(0, 164, 209, 0.1);
+  padding: 0.75rem 1.4rem;
+}
+
+.detail-entry {
+  background: var(--section-bg);
+  border-radius: var(--radius-sm);
+  padding: 0.75rem 1rem;
+}
+
+.detail-entry-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.detail-entry-name {
+  font-weight: 700;
+  font-size: 0.88rem;
+  color: var(--text-dark);
+}
+
+.detail-entry-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.3rem 0;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  border-top: 1px solid rgba(0, 164, 209, 0.08);
+}
+
+.detail-item-name {
+  flex: 1;
+  color: var(--text-dark);
+}
+
+.detail-item-amount {
+  font-family: "DM Mono", monospace;
+  font-size: 0.78rem;
+}
+
+.detail-item-kcal {
+  font-family: "DM Mono", monospace;
+  font-size: 0.78rem;
+  color: var(--blue-deep);
+}
+
+.detail-item-actions {
+  display: flex;
+  gap: 0.35rem;
+  align-items: center;
+}
+
+.detail-edit-btn {
+  background: none;
+  border: none;
+  color: var(--blue-dark);
+  cursor: pointer;
+  font-size: 0.85rem;
+  padding: 0.1rem 0.3rem;
+}
+
+.detail-delete-btn {
+  background: none;
+  border: none;
+  color: var(--danger);
+  cursor: pointer;
+  font-size: 0.78rem;
+  padding: 0.1rem 0.3rem;
+}
+
+.detail-edit-form {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  padding: 0.4rem 0;
+  border-top: 1px solid rgba(0, 164, 209, 0.08);
+}
+
+.detail-edit-form .form-control {
+  width: 80px;
+  padding: 0.3rem 0.5rem;
+  font-size: 0.82rem;
+}
+
+.detail-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem 1rem;
+  color: var(--text-muted);
+  font-size: 0.88rem;
+}
+
 /* ===== Workout Overview Card ===== */
 
 .wo-card {

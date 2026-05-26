@@ -148,51 +148,95 @@
           <!-- Måltidsrader med kalorier per kategori -->
           <div class="meal-list">
             {% for cat in ['Breakfast', 'Lunch', 'Dinner', 'Snack'] %}
-              <div class="meal-row">
+              <div class="meal-row" 
+                  data-bs-toggle="modal" 
+                  data-bs-target="#detailModal-{{ cat }}"
+                  style="cursor:pointer;">
                 <div class="w-100">
                   <div class="d-flex justify-content-between align-items-center">
                     <div>
                       <div class="meal-name">{{ cat }}</div>
                       <div class="meal-kcal">{{ category_calories.get(cat, 0) }} kcal</div>
                     </div>
-                    <button type="button" class="add-btn" data-bs-toggle="modal" data-bs-target="#logModal-{{ cat }}">+</button>
+                    <div class="d-flex align-items-center gap-2">
+                      {% if logged_by_category.get(cat) %}
+                        <span class="meal-entry-count">
+                          {{ logged_by_category[cat]|length }}
+                        </span>
+                      {% endif %}
+                      <button type="button" class="add-btn"
+                              data-bs-toggle="modal"
+                              data-bs-target="#logModal-{{ cat }}"
+                              onclick="event.stopPropagation()">+</button>
+                    </div>
                   </div>
-
-                  <!-- Loggade måltider per kategori -->
-                  {% if logged_by_category.get(cat) %}
-                    {% for log_id, log_entry in logged_by_category[cat].items() %}
-                      <div class="log-entry">
-
-                        <!-- Måltidsrubrik med delete-knapp för hela måltiden -->
-                        <div class="log-entry-header">
-                          <span class="log-entry-name">{{ log_entry.meal_name.title() }}</span>
-                          <form method="POST" action="{{ url_for('dashboard.delete_log', log_id=log_id) }}"
-                                onsubmit="return confirm('Remove entire meal?')">
-                            <button type="submit" class="log-delete-btn">✕ Remove all</button>
-                          </form>
-                        </div>
-
-                        <!-- Enskilda ingredienser med redigering av mängd -->
-                        {% for item in log_entry.ingredients %}
-                          <div class="log-entry-item">
-                              <span>{{ item.food.title() }} — {{ item.amount }}g</span>
-                              <button type="button" onclick="toggleEdit('edit-{{ log_id }}-{{ item.food_id }}')">✎</button>
-
-                              <form id="edit-{{ log_id }}-{{ item.food_id }}" method="POST" 
-                                    action="{{ url_for('dashboard.edit_log_item', log_id=log_id, food_id=item.food_id) }}"
-                                    class="log-item-amount-form" style="display:none;">
-                                  <input type="number" name="amount" value="{{ item.amount }}" step="0.1" min="0.1" class="log-item-amount-input">
-                                  <button type="submit" class="log-item-save-btn">✓</button>
-                              </form>
-                            </div>
-                        {% endfor %}
-
-                      </div>
-                    {% endfor %}
-                  {% endif %}
-
                 </div>
               </div>
+              <!-- Detaljmodaler per kategori -->
+              {% for cat in ['Breakfast', 'Lunch', 'Dinner', 'Snack'] %}
+              <div class="modal fade" id="detailModal-{{ cat }}" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-scrollable">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <div>
+                        <h5 class="modal-title">{{ cat }}</h5>
+                        <div class="detail-modal-kcal">{{ category_calories.get(cat, 0) }} kcal logged</div>
+                      </div>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body detail-modal-body">
+                      <p class="text-muted small mb-3">Edit, delete or add to your logged food.</p>
+                        {% if logged_by_category.get(cat) %}
+                          {% for log_id, log_entry in logged_by_category[cat].items() %}
+                            <div class="detail-entry">
+                              <div class="detail-entry-header">
+                                <span class="detail-entry-name">{{ log_entry.meal_name.title() }}</span>
+                                <form method="POST" action="{{ url_for('dashboard.delete_log', log_id=log_id) }}"
+                                      onsubmit="return confirm('Remove entire meal?')">
+                                  <button type="submit" class="log-delete-btn">✕ Remove all</button>
+                                </form>
+                              </div>
+                              {% for item in log_entry.ingredients %}
+                                <div class="detail-entry-item">
+                                  <span class="detail-item-name">{{ item.food.title() }}</span>
+                                  <span class="detail-item-amount">{{ item.amount }}g</span>
+                                  <span class="detail-item-kcal">{{ item.kcal }} kcal</span>
+                                  <div class="detail-item-actions">
+                                    <button type="button" class="detail-edit-btn"
+                                            onclick="toggleEdit('edit-{{ log_id }}-{{ item.food_id }}')">✎</button>
+                                    <form method="POST" 
+                                          action="{{ url_for('dashboard.delete_log_item', log_id=log_id, food_id=item.food_id) }}">
+                                      <button type="submit" class="detail-delete-btn">✕</button>
+                                    </form>
+                                  </div>
+                                </div>
+                                <form id="edit-{{ log_id }}-{{ item.food_id }}" method="POST"
+                                      action="{{ url_for('dashboard.edit_log_item', log_id=log_id, food_id=item.food_id) }}"
+                                      class="detail-edit-form" style="display:none;">
+                                  <input type="number" name="amount" value="{{ item.amount }}"
+                                        step="0.1" min="0.1" class="form-control form-control-sm">
+                                  <button type="submit" class="btn btn-primary-blue btn-sm">Save</button>
+                                </form>
+                              {% endfor %}
+                            </div>
+                          {% endfor %}
+                        {% else %}
+                          <div class="detail-empty">
+                            <span>Nothing logged yet</span>
+                          </div>
+                        {% endif %}
+                    </div>
+                    <div class="modal-footer detail-modal-footer">
+                      <button type="button" 
+                              class="btn btn-primary-blue w-100"
+                              data-bs-dismiss="modal"
+                              data-bs-toggle="modal"
+                              data-bs-target="#logModal-{{ cat }}">+ Add to {{ cat }}</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              {% endfor%}
             {% endfor %}
           </div>
 
