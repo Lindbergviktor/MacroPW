@@ -101,9 +101,12 @@
                   data-calorie-goal="{{ macro_goals.calories }}"
                   aria-label="Calorie gauge for today's progress"></canvas>
                 <div class="gauge-center">
-                  <div class="gauge-kcal">{{ calories }} <span
-                      class="gauge-kcal-unit">Kcal</span></div>
-                  <div class="gauge-sub">Of {{ macro_goals.calories }} Kcal</div>
+                  <div style="display:flex; flex-direction:column; align-items:center;">
+                    {% set calories_left = macro_goals.calories - calories %}
+                    <div class="gauge-remaining">Remaining:</div>
+                    <div class="gauge-kcal">{{ calories_left }}<span class="gauge-kcal-unit">Kcal</span></div>
+                    <div class="gauge-sub">{{ calories }} / {{ macro_goals.calories }} Kcal</div>
+                  </div>
                   {% set burned = workouts_today | sum(attribute=2) | int %}
                   {% if burned > 0 %}
                   <div class="gauge-burned">+{{ burned }} from workouts included</div>

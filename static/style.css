@@ -383,6 +383,12 @@ textarea {
   transform: translateY(-18px);
 }
 
+.gauge-remaining {
+  font-size: 0.75rem;
+  opacity: 0.75;
+  margin-top: 6px;
+}
+
 .gauge-center {
   position: absolute;
   bottom: 10px;
@@ -409,6 +415,16 @@ textarea {
   font-size: 0.75rem;
   opacity: 0.75;
   margin-top: 6px;
+}
+
+.gauge-burned {
+  font-size: .72rem;
+  color: #0000008b;
+  font-weight: 400;
+  margin-top: .15rem;
+  letter-spacing: .01em;
+  font-family: "DM Sans";
+  align-self: flex-start;  /* ← lägg till denna */
 }
 
 /* ===== Macro cards ===== */
