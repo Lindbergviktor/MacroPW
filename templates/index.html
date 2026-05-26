@@ -281,8 +281,8 @@
               <!-- Ingrediens-dropdown -->
               <label class="form-label">Ingredients</label>
               <div id="ingredients-container-{{ cat }}">
-                <div class="row g-2 mb-2">
-                  <div class="col-7">
+                <div class="row g-2 mb-2 ingredient-row">
+                  <div class="col-6">
                     <select class="form-select food-select-live" name="food_id[]" data-cat="{{ cat }}">
                       <option value="" selected>Select Food</option>
                       {% for food in foods %}
@@ -294,10 +294,14 @@
                       {% endfor %}
                     </select>
                   </div>
-                  <div class="col-5">
+                  <div class="col-4">
                     <input type="number" class="form-control amount-input-live" name="amount[]" min="1" placeholder="Amount (g)" step="0.1" data-cat="{{ cat }}">
                   </div>
                 </div>
+              </div>
+              <div>
+                <button type="button" class="btn btn-outline-secondary btn-sm mb-2"
+                        onclick="addIngredientRow('{{ cat }}')">+ Add Ingredient</button>
               </div>
               <div id="calorie-preview-{{ cat }}" style="display:none; font-size:.85rem; color:#888; margin-bottom:.5rem;">
                 ≈ <span class="calorie-preview-value">0</span> kcal &nbsp;
@@ -421,36 +425,44 @@
 </script>
 <script>
   // Live-kalorier i måltidsmodaler
-function updateCaloriePreview(cat) {
-  const select = document.querySelector(`.food-select-live[data-cat="${cat}"]`);
-  const amountInput = document.querySelector(`.amount-input-live[data-cat="${cat}"]`);
-  const preview = document.getElementById(`calorie-preview-${cat}`);
-  if (!select || !amountInput || !preview) return;
+  function updateCaloriePreview(cat) {
+      const container = document.getElementById(`ingredients-container-${cat}`);
+      const preview   = document.getElementById(`calorie-preview-${cat}`);
+      if (!container || !preview) return;
 
-  const selectedOption = select.options[select.selectedIndex];
-  const cal = parseFloat(selectedOption?.dataset?.calories) || 0;
-  const prot = parseFloat(selectedOption?.dataset?.protein) || 0;
-  const fat = parseFloat(selectedOption?.dataset?.fat) || 0;
-  const carbs = parseFloat(selectedOption?.dataset?.carbs) || 0;
-  const amount = parseFloat(amountInput.value) || 0;
+      let totalCal = 0, totalProt = 0, totalFat = 0, totalCarbs = 0, hasData = false;
 
-  if (cal > 0 && amount > 0) {
-    preview.querySelector('.calorie-preview-value').textContent = Math.round(cal * amount / 100);
-    preview.querySelector('.protein-preview-value').textContent = (prot * amount / 100).toFixed(1);
-    preview.querySelector('.fat-preview-value').textContent = (fat * amount / 100).toFixed(1);
-    preview.querySelector('.carbs-preview-value').textContent = (carbs * amount / 100).toFixed(1);
-    preview.style.display = 'block';
-  } else {
-    preview.style.display = 'none';
-  }
-}
+      container.querySelectorAll('.ingredient-row').forEach(row => {
+        const select = row.querySelector('.food-select-live');
+        const amount = parseFloat(row.querySelector('input[name="amount[]"]')?.value) || 0;
+        if (!select) return;
+        const opt = select.options[select.selectedIndex];
+        if (opt && opt.value && amount > 0) {
+          totalCal   += parseFloat(opt.dataset.calories || 0) * amount / 100;
+          totalProt  += parseFloat(opt.dataset.protein  || 0) * amount / 100;
+          totalFat   += parseFloat(opt.dataset.fat      || 0) * amount / 100;
+          totalCarbs += parseFloat(opt.dataset.carbs    || 0) * amount / 100;
+          hasData = true;
+        }
+      });
 
-  ['Breakfast', 'Lunch', 'Dinner', 'Snack'].forEach(function(cat) {
-    const select = document.querySelector(`.food-select-live[data-cat="${cat}"]`);
-    const input = document.querySelector(`.amount-input-live[data-cat="${cat}"]`);
-    if (select) select.addEventListener('change', () => updateCaloriePreview(cat));
-    if (input)  input.addEventListener('input',  () => updateCaloriePreview(cat));
-  });
+      if (hasData) {
+        preview.querySelector('.calorie-preview-value').textContent = Math.round(totalCal);
+        preview.querySelector('.protein-preview-value').textContent = totalProt.toFixed(1);
+        preview.querySelector('.fat-preview-value').textContent     = totalFat.toFixed(1);
+        preview.querySelector('.carbs-preview-value').textContent   = totalCarbs.toFixed(1);
+        preview.style.display = 'block';
+      } else {
+        preview.style.display = 'none';
+      }
+    }
+
+    ['Breakfast', 'Lunch', 'Dinner', 'Snack'].forEach(cat => {
+      const container = document.getElementById(`ingredients-container-${cat}`);
+      if (!container) return;
+      container.addEventListener('change', e => { if (e.target.tagName === 'SELECT') updateCaloriePreview(cat); });
+      container.addEventListener('input',  e => { if (e.target.tagName === 'INPUT')  updateCaloriePreview(cat); });
+    });
 </script>
 
 <!--Funktion som togglar ett formulär för att redigera mängden på registrerade måltider.-->
@@ -459,6 +471,30 @@ function updateCaloriePreview(cat) {
   const form = document.getElementById(id);
   form.style.display = form.style.display === 'none' ? 'flex' : 'none';
 }
+</script>
+<script>
+  // Lägger till en ny tom ingrediensrad i modalen
+  function addIngredientRow(cat) {
+    const container = document.getElementById(`ingredients-container-${cat}`);
+    const firstRow  = container.querySelector('.ingredient-row');
+    const newRow    = document.createElement('div');
+    newRow.classList.add('row', 'g-2', 'mb-2', 'ingredient-row');
+    const cloned = firstRow.cloneNode(true);
+    cloned.querySelector('select').selectedIndex = 0;
+    cloned.querySelector('input').value = '';
+    newRow.innerHTML = cloned.innerHTML;
+
+    const removeCol = document.createElement('div');
+    removeCol.className = 'col-1 d-flex align-items-center';
+    removeCol.innerHTML = `<span class="remove-btn">✕</span>`;
+    removeCol.querySelector('span').addEventListener('click', () => {
+      newRow.remove();
+      updateCaloriePreview(cat);
+    });
+    newRow.appendChild(removeCol);
+
+    container.appendChild(newRow);
+  }
 </script>
 
 </body>

@@ -137,7 +137,6 @@
     </datalist>
 
     <!-- Modal för att skapa ny måltid -->
-    <!-- Modal för att skapa ny måltid -->
     <div class="modal fade" id="createMealModal" tabindex="-1" aria-labelledby="createMealModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -155,7 +154,7 @@
             <label class="form-label">Ingredients</label>
             <div id="ingredients-container">
                 <div class="row g-2 mb-2 ingredient-row">
-                <div class="col-7">
+                <div class="col-6">
                     <input type="text" class="form-control food-search-input"
                         list="food-options" placeholder="Search food..." required autocomplete="off">
                     <!-- Dold select med data-attribut för makroberäkning -->
@@ -170,7 +169,7 @@
                     {% endfor %}
                     </select>
                 </div>
-                <div class="col-5">
+                <div class="col-4">
                     <input type="number" class="form-control amount-input" name="amount[]" min="1" placeholder="Amount (g)" step="0.1" required>
                 </div>
                 </div>
@@ -268,10 +267,24 @@
     // Lägg till ny ingrediensrad
     document.getElementById('add-ingredient-btn').addEventListener('click', function() {
         const container = document.getElementById('ingredients-container');
-        const firstRow = container.querySelector('.ingredient-row');
-        const newRow = document.createElement('div');
+        const firstRow  = container.querySelector('.ingredient-row');
+        const newRow    = document.createElement('div');
         newRow.classList.add('row', 'g-2', 'mb-2', 'ingredient-row');
-        newRow.innerHTML = firstRow.innerHTML.replace(/value="[^"]*"/g, 'value=""');
+        const cloned = firstRow.cloneNode(true);
+        cloned.querySelector('.food-search-input').value  = '';
+        cloned.querySelector('.food-select-hidden').value = '';
+        cloned.querySelector('.amount-input').value       = '';
+        newRow.innerHTML = cloned.innerHTML;
+
+        const removeCol = document.createElement('div');
+        removeCol.className = 'col-1 d-flex align-items-center';
+        removeCol.innerHTML = `<span class="remove-btn">✕</span>`;
+        removeCol.querySelector('span').addEventListener('click', () => {
+            newRow.remove();
+            updateMacroSummary();
+        });
+        newRow.appendChild(removeCol);
+
         container.appendChild(newRow);
     });
 
