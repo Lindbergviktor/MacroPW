@@ -48,8 +48,8 @@ def calculate_calorie_goal(weight, height, age, gender, activity_level, weight_g
     return round(tdee + weight_goal_adjustment.get(weight_goal, 0))
 
 def calculate_protein_goal(weight):
-    """Proteinmål baserat på kroppsvikt. 1.8kg/kg"""
-    return round(1.8 * float(weight))
+    """Proteinmål baserat på kroppsvikt. 1.3kg/kg"""
+    return round(1.3 * float(weight))
 
 def calculate_fat_goal(calorie_goal):
     """Fettmål är 25% av de totala kalorierna. Fett = 9 kalorier/g"""
