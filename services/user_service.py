@@ -84,11 +84,6 @@ def update_user_profile(
         )
 
 
-def delete_user_account(user_id):
-    with get_db() as cur:
-        cur.execute("DELETE FROM users WHERE user_id=%s", (user_id,))
-
-
 def get_user_goal_data(user_id):
     with get_db() as cur:
         cur.execute(

@@ -9,7 +9,7 @@ from functools import wraps
 
 from flask import Blueprint, flash, redirect, render_template, request, session, url_for
 
-from services.user_service import create_user, delete_user_account, get_user_for_login, email_exists
+from services.user_service import create_user, get_user_for_login, email_exists
 
 import re
 
@@ -55,16 +55,6 @@ def login():
         flash("Wrong email or password.", "danger")
 
     return render_template("login.html")
-
-
-@auth_bp.route("/delete_account", methods=["POST"])
-def delete_account():
-    if "user_id" not in session:
-        return redirect(url_for("auth.login"))
-
-    delete_user_account(session["user_id"])
-    session.clear()
-    return redirect(url_for("auth.start_page"))
 
 
 @auth_bp.route("/register", methods=["GET", "POST"])
