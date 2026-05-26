@@ -1481,7 +1481,8 @@ footer {
     grid-template-columns: minmax(0, 1.14fr) minmax(320px, 0.86fr);
     grid-template-areas:
       "hero meals"
-      "hero water";
+      "hero water"
+      "workout workout";
     gap: 1.6rem;
     align-items: start;
   }
@@ -1519,6 +1520,7 @@ footer {
   }
 
   .wo-card {
+    grid-area: workout;
     margin-top: 0;
     flex-shrink: 0;   /* prevents workout card from being squished */
   }
