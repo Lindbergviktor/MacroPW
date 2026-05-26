@@ -382,7 +382,16 @@
   });
 
   const TOTAL = 8;
-  let filled = 0;
+  let filled = {{ water_today }};
+
+    function saveWater() {
+      const formData = new FormData();
+      formData.append('glasses', filled);
+      fetch("{{ url_for('dashboard.update_water') }}", {
+        method: 'POST',
+        body: formData
+      });
+    }
 
     function renderGlasses() {
       const wrap = document.getElementById('waterGlasses');
@@ -397,6 +406,7 @@
         g.addEventListener('click', () => {
           filled = (i < filled) ? i : i + 1;
           renderGlasses();
+          saveWater();
         });
         wrap.appendChild(g);
       }

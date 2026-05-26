@@ -99,3 +99,34 @@ def build_logged_by_category(logged_items):
             }
         )
     return logged_by_category
+
+
+def get_water_today(user_id):
+    """Hämtar antal glas vatten loggat för dagen."""
+    with get_db() as cur:
+        cur.execute("""
+            SELECT COALESCE(SUM(nr_of_glasses), 0)
+            FROM WATER_log
+            WHERE user_id = %s AND DATE(log_date) = CURRENT_DATE
+        """, (user_id,))
+        return int(cur.fetchone()[0])
+
+
+def set_water_today(user_id, glasses):
+    """Uppdaterar eller skapar en water log för dagen."""
+    with get_db() as cur:
+        cur.execute("""
+            SELECT log_id FROM water_log
+            WHERE user_id = %s AND DATE(log_date) = CURRENT_DATE
+        """, (user_id,))
+        existing = cur.fetchone()
+        if existing:
+            cur.execute("""
+                UPDATE water_log SET nr_of_glasses =%s
+                WHERE log_id = %s
+            """, (glasses, existing[0]))
+        else:
+            cur.execute("""
+                INSERT INTO water_log (user_id, nr_of_glasses)
+                VALUES (%s, %s)
+            """, (user_id, glasses))
