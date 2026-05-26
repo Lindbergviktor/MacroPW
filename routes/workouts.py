@@ -17,6 +17,7 @@ workouts_bp = Blueprint("workouts", __name__)
 @workouts_bp.route("/add_workout", methods=["GET", "POST"])
 @login_required
 def add_workout():
+    """Lägger till ett loggat träningspass för användaren"""
     if request.method == "POST":
         workout_id = request.form.get("workout_id")
         duration = request.form.get("duration")

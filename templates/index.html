@@ -209,7 +209,7 @@
         <div class="water-section">
           <div class="water-header">
             <span class="water-title">Water</span>
-            <span class="water-count" id="waterCount">0/8 glasses</span>
+            <span class="water-count" id="waterCount">0/8 250ml glasses</span>
           </div>
           <div class="water-glasses" id="waterGlasses"></div>
         </div>
@@ -414,7 +414,7 @@
         wrap.appendChild(g);
       }
 
-      document.getElementById('waterCount').textContent = `${filled} / ${TOTAL} glasses`;
+      document.getElementById('waterCount').innerHTML = `${filled} / ${TOTAL} <small style="font-size:.75em; opacity:.7;">250ml/glass</small>`;
     }
 
   renderGlasses();

@@ -9,6 +9,7 @@ from db import get_db
 
 
 def get_dashboard_data(user_id):
+    """Tar fram makrovärden för dagen åt användaren."""
     with get_db() as cur:
         cur.execute(
             """

@@ -17,6 +17,7 @@ statistics_bp = Blueprint("statistics", __name__)
 @statistics_bp.route("/statistics")
 @login_required
 def statistics():
+    """Statistik sida som visar en översikt för användaren."""
     user_id = session["user_id"]
 
     try:

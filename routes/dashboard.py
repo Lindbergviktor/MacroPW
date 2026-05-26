@@ -62,6 +62,7 @@ def index():
 @dashboard_bp.route("/log_meal_index", methods=["POST"])
 @login_required
 def log_meal_index():
+    """Loggar måltid ifrån startsidan"""
     category = request.form["meal_category"]
     meal_id = request.form.get("meal_id") or None
     food_ids = request.form.getlist("food_id[]")
@@ -167,6 +168,7 @@ def edit_log_item(log_id, food_id):
 @dashboard_bp.route("/water", methods=["POST"])
 @login_required
 def update_water():
+    """Uppdaterar vatten mängden för användaren"""
     glasses = request.form.get("glasses", type=int)
     if glasses is not None and glasses >= 0:
         set_water_today(session["user_id"], glasses)

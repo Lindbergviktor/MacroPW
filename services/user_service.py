@@ -97,6 +97,7 @@ def get_user_goal_data(user_id):
 
 
 def get_calorie_goal(user_id):
+    """Tar fram användarens kaloriemål."""
     row = get_user_goal_data(user_id)
     if not row:
         return None

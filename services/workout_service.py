@@ -19,6 +19,7 @@ def add_workout_log(duration, user_id, workout_id, log_date):
 
 
 def get_workouts_for_user(user_id):
+    """Visar användarens registrerade workouts."""
     with get_db() as cur:
         cur.execute(
             """

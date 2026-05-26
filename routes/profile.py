@@ -13,6 +13,7 @@ profile_bp = Blueprint("profile", __name__)
 
 @profile_bp.route("/profile", methods=["GET", "POST"])
 def profile():
+    """Profilsida för användaren med deras personliga information"""
     if "user_id" not in session:
         return redirect(url_for("auth.login"))
 

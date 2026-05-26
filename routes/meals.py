@@ -99,6 +99,7 @@ def log_meal(meal_id):
 @meals_bp.route("/delete_meal/<int:meal_id>", methods=["POST"])
 @login_required
 def delete_meal(meal_id):
+    """Tar bort en måltid"""
     try:
         meal = get_meal_owner(meal_id)
         if not meal or meal[0] != session["user_id"]:
