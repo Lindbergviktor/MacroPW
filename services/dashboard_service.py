@@ -127,6 +127,6 @@ def set_water_today(user_id, glasses):
             """, (glasses, existing[0]))
         else:
             cur.execute("""
-                INSERT INTO water_log (user_id, number_of_glasses)
+                INSERT INTO water_log (user_id, nr_of_glasses)
                 VALUES (%s, %s)
             """, (user_id, glasses))
