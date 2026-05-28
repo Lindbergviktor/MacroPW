@@ -1675,6 +1675,83 @@ footer {
     margin-top: 0.4rem;
   }
 
+  .meal-tabs-nav {
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    margin-bottom: 1.1rem;
+    padding-bottom: 0;
+    overflow: hidden;
+  }
+
+  .meal-tab-pill {
+    flex: 1 1 calc(50% - 0.35rem);
+    min-width: 0;
+    padding: 0.7rem 1rem;
+    border-radius: 14px 14px 0 0;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    box-shadow: none;
+    border-bottom: 2px solid transparent;
+    text-align: center;
+  }
+
+  .meal-tab-pill:hover,
+  .meal-tab-pill:focus-visible {
+    background: rgba(0, 164, 209, 0.06);
+    color: var(--blue-dark);
+  }
+
+  .meal-tab-pill.active {
+    background: rgba(0, 164, 209, 0.1);
+    color: var(--blue-dark);
+    box-shadow: none;
+    border-bottom-color: var(--blue-dark);
+  }
+
+  .meal-tab-content {
+    border-top: 1px solid rgba(0, 164, 209, 0.1);
+    padding-top: 1rem;
+  }
+
+  .meal-tab-pane {
+    padding-top: 0;
+  }
+
+  .meal-tabs-shell .meal-row {
+    min-height: 0;
+    padding: 1.2rem 1.2rem 1.1rem;
+    box-shadow: none;
+    border: 1px solid rgba(0, 164, 209, 0.08);
+  }
+
+  .meal-tabs-shell .meal-row:hover {
+    box-shadow: none;
+    transform: none;
+  }
+
+  .meal-row-top {
+    align-items: flex-start;
+  }
+
+  .meal-summary-toggle {
+    padding: 0.1rem 0;
+  }
+
+  .meal-tabs-shell .meal-name {
+    font-size: 1.18rem;
+  }
+
+  .meal-status {
+    margin-top: 0.35rem;
+    font-size: 0.76rem;
+  }
+
+  .meal-detail-panel {
+    background: rgba(255, 255, 255, 0.86);
+    padding: 0.35rem 1rem 0.9rem;
+  }
+
   .desktop-right .water-section {
     border: 1px solid rgba(0, 164, 209, 0.1);
     box-shadow: none;
@@ -1730,6 +1807,14 @@ footer {
 
   .desktop-right {
     grid-area: meals;
+  }
+
+  .meal-tabs-nav {
+    gap: 0.45rem;
+  }
+
+  .meal-tab-pill {
+    flex: 1 1 0;
   }
 
   .water-section {
