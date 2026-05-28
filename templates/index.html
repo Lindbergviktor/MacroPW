@@ -13,16 +13,6 @@
     rel="stylesheet">
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js" defer></script>
-  <style>
-    .gauge-burned {
-      font-size: .72rem;
-      color: #0000008b;
-      font-weight: 400;
-      margin-top: .15rem;
-      letter-spacing: .01em;
-      font-family: "DM Sans";
-    }
-  </style>
 </head>
 
 <body data-water-today="{{ water_today }}">
@@ -101,7 +91,7 @@
                   data-calorie-goal="{{ macro_goals.calories }}"
                   aria-label="Calorie gauge for today's progress"></canvas>
                 <div class="gauge-center">
-                  <div style="display:flex; flex-direction:column; align-items:center;">
+                  <div class="gauge-center-content">
                     {% set calories_left = macro_goals.calories - calories %}
                     <div class="gauge-remaining">Remaining:</div>
                     <div class="gauge-kcal">{{ calories_left }}<span class="gauge-kcal-unit">Kcal</span></div>
@@ -148,22 +138,31 @@
         <div class="desktop-right">
           <div class="section-title">Meals</div>
 
-          <div id="mealsCarousel" class="carousel slide meal-carousel" data-bs-interval="false">
-            <div class="carousel-indicators meal-carousel-indicators">
+          <div class="meal-tabs-shell">
+            <div class="nav meal-tabs-nav" id="mealsTab" role="tablist">
               {% for cat in ['Breakfast', 'Lunch', 'Dinner', 'Snack'] %}
                 <button
+                  class="meal-tab-pill {% if loop.first %}active{% endif %}"
                   type="button"
-                  data-bs-target="#mealsCarousel"
-                  data-bs-slide-to="{{ loop.index0 }}"
-                  class="{% if loop.first %}active{% endif %}"
+                  id="meal-tab-{{ loop.index0 }}"
+                  data-bs-toggle="tab"
+                  data-bs-target="#meal-pane-{{ loop.index0 }}"
+                  role="tab"
+                  aria-controls="meal-pane-{{ loop.index0 }}"
                   aria-current="{% if loop.first %}true{% endif %}"
+                  aria-selected="{% if loop.first %}true{% else %}false{% endif %}"
                   aria-label="Show {{ cat }}">{{ cat }}</button>
               {% endfor %}
             </div>
 
-            <div class="carousel-inner">
+            <div class="tab-content meal-tab-content">
               {% for cat in ['Breakfast', 'Lunch', 'Dinner', 'Snack'] %}
-                <div class="carousel-item meal-carousel-item {% if loop.first %}active{% endif %}">
+                <div
+                  class="tab-pane fade meal-tab-pane {% if loop.first %}show active{% endif %}"
+                  id="meal-pane-{{ loop.index0 }}"
+                  role="tabpanel"
+                  aria-labelledby="meal-tab-{{ loop.index0 }}"
+                  tabindex="0">
                   <div class="meal-row">
                     <div class="w-100">
                       <div class="meal-row-top">
@@ -210,7 +209,7 @@
 
                                       <form id="edit-{{ log_id }}-{{ item.food_id }}" method="POST" 
                                             action="{{ url_for('dashboard.edit_log_item', log_id=log_id, food_id=item.food_id) }}"
-                                            class="log-item-amount-form" style="display:none;">
+                                            class="log-item-amount-form ui-hidden">
                                           <input type="number" name="amount" value="{{ item.amount }}" step="0.1" min="0.1" class="log-item-amount-input">
                                           <button type="submit" class="log-item-save-btn">✓</button>
                                       </form>
@@ -228,15 +227,6 @@
                 </div>
               {% endfor %}
             </div>
-
-            <button class="carousel-control-prev meal-carousel-control" type="button" data-bs-target="#mealsCarousel" data-bs-slide="prev">
-              <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-              <span class="visually-hidden">Previous</span>
-            </button>
-            <button class="carousel-control-next meal-carousel-control" type="button" data-bs-target="#mealsCarousel" data-bs-slide="next">
-              <span class="carousel-control-next-icon" aria-hidden="true"></span>
-              <span class="visually-hidden">Next</span>
-            </button>
           </div>
 
           <!-- Snabbknappar -->
@@ -286,7 +276,7 @@
             {% endfor %}
           {% else %}
             <div class="wo-empty">
-              <svg width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" style="opacity:.35;margin-bottom:.5rem;">
+              <svg width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" class="wo-empty-icon">
                 <path d="M6.5 6.5h11M6.5 17.5h11M4 12h16M9 4v4M15 4v4M9 16v4M15 16v4"/>
               </svg>
               <span>No workouts logged today</span>
@@ -346,7 +336,7 @@
                 <button type="button" class="btn btn-outline-secondary btn-sm mb-2"
                         onclick="addIngredientRow('{{ cat }}')">+ Add Ingredient</button>
               </div>
-              <div id="calorie-preview-{{ cat }}" style="display:none; font-size:.85rem; color:#888; margin-bottom:.5rem;">
+              <div id="calorie-preview-{{ cat }}" class="calorie-preview ui-hidden">
                 ≈ <span class="calorie-preview-value">0</span> kcal &nbsp;
                 Protein: <span class="protein-preview-value">0</span>g &nbsp;
                 Fat: <span class="fat-preview-value">0</span>g &nbsp;

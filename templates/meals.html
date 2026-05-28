@@ -158,7 +158,7 @@
                     <input type="text" class="form-control food-search-input"
                         list="food-options" placeholder="Search food..." required autocomplete="off">
                     <!-- Dold select med data-attribut för makroberäkning -->
-                    <select class="food-select-hidden" name="food_name[]" style="display:none;">
+                    <select class="food-select-hidden ui-hidden" name="food_name[]">
                     <option value="">Select Food</option>
                     {% for food in foods %}
                     <option value="{{ food[1].title() }}"
@@ -180,7 +180,7 @@
             </button>
 
             <!-- Live makrosammanfattning -->
-            <div class="macro-summary mb-3" id="modal-macro-summary" style="display:none;">
+            <div class="macro-summary mb-3 ui-hidden" id="modal-macro-summary">
                 <div class="macro-summary-row">
                 <span>Calories</span>
                 <span class="mono" id="summary-calories">0 kcal</span>
@@ -251,7 +251,7 @@
         });
 
         const summary = document.getElementById('modal-macro-summary');
-        summary.style.display = hasData ? 'block' : 'none';
+        summary.classList.toggle('ui-hidden', !hasData);
         document.getElementById('summary-calories').textContent = Math.round(totalCalories) + ' kcal';
         document.getElementById('summary-protein').textContent  = totalProtein.toFixed(1) + ' g';
         document.getElementById('summary-fat').textContent      = totalFat.toFixed(1) + ' g';
@@ -290,7 +290,7 @@
 
     // Nollställ modal när den stängs
     document.getElementById('createMealModal').addEventListener('hidden.bs.modal', function() {
-        document.getElementById('modal-macro-summary').style.display = 'none';
+        document.getElementById('modal-macro-summary').classList.add('ui-hidden');
         const container = document.getElementById('ingredients-container');
         const rows = container.querySelectorAll('.ingredient-row');
         rows.forEach(function(row, index) { if (index > 0) row.remove(); });

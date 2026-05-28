@@ -137,9 +137,9 @@
       preview.querySelector(".protein-preview-value").textContent = totalProt.toFixed(1);
       preview.querySelector(".fat-preview-value").textContent = totalFat.toFixed(1);
       preview.querySelector(".carbs-preview-value").textContent = totalCarbs.toFixed(1);
-      preview.style.display = "block";
+      preview.classList.remove("ui-hidden");
     } else {
-      preview.style.display = "none";
+      preview.classList.add("ui-hidden");
     }
   }
 
@@ -165,7 +165,7 @@
   function toggleEdit(id) {
     const form = document.getElementById(id);
     if (!form) return;
-    form.style.display = form.style.display === "none" ? "flex" : "none";
+    form.classList.toggle("ui-hidden");
   }
 
   function addIngredientRow(category) {

@@ -10,7 +10,6 @@
     href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@500&display=swap"
     rel="stylesheet">
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-  <link rel="stylesheet" href="{{ url_for('static', filename='styling.css') }}">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js" defer></script>
   <script src="{{ url_for('static', filename='statistics.js') }}" defer></script>
 </head>
@@ -99,7 +98,7 @@
                 <strong>{{ calories_today }} / {{ calorie_goal }} kcal</strong>
               </div>
               <div class="stats-progress">
-                <div class="stats-progress-fill" style="width: {{ [today_calorie_pct, 100]|min }}%;"></div>
+                <div class="stats-progress-fill" data-progress="{{ [today_calorie_pct, 100]|min }}"></div>
               </div>
 
               <div class="stats-list-row">
@@ -127,7 +126,7 @@
                 <strong>{{ calories_week }} / {{ weekly_goal }} kcal</strong>
               </div>
               <div class="stats-progress">
-                <div class="stats-progress-fill" style="width: {{ [week_calorie_pct, 100]|min }}%;"></div>
+                <div class="stats-progress-fill" data-progress="{{ [week_calorie_pct, 100]|min }}"></div>
               </div>
 
               <div class="stats-list-row">

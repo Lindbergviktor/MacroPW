@@ -1,5 +1,10 @@
 const calorieLineChart = document.getElementById("calorieLineChart");
 
+document.querySelectorAll(".stats-progress-fill[data-progress]").forEach((bar) => {
+  const progress = Number.parseFloat(bar.dataset.progress || "0") || 0;
+  bar.style.width = `${Math.max(0, Math.min(progress, 100))}%`;
+});
+
 if (calorieLineChart && typeof Chart !== "undefined") {
   const chartStyles = getComputedStyle(calorieLineChart);
   const chartLabels = JSON.parse(calorieLineChart.dataset.labels || "[]");
