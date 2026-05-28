@@ -81,6 +81,7 @@ def get_dashboard_data(user_id):
 
 
 def build_logged_by_category(logged_items):
+    """Grupperar loggade maträtter per kategori och logg-id"""
     logged_by_category = {}
     for log_id, category, meal_name, food_id, food_name, amount, kcal in logged_items:
         if category not in logged_by_category:

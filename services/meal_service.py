@@ -55,6 +55,7 @@ def create_meal(name, user_id):
 
 
 def add_meal_ingredient(meal_id, food_id, amount):
+    """Skapar en måltidsmall med ingredienser i en transaktion. Returnerar meal_id."""
     with get_db() as cur:
         cur.execute(
             "INSERT INTO meal_ingredient (meal_id, food_id, amount) VALUES (%s, %s, %s)",
@@ -78,12 +79,14 @@ def create_meal_with_ingredients(name, user_id, ingredients):
 
 
 def get_meal_owner(meal_id):
+    """Returnerar user_id för ägaren till en måltidsmall. Används för behörighetskontroll."""
     with get_db() as cur:
         cur.execute("SELECT user_id FROM meal WHERE meal_id = %s", (meal_id,))
         return cur.fetchone()
 
 
 def get_meal_name(meal_id, user_id=None):
+    """Hämtar namnet på en måltidsmall. Om user_id anges kontrolleras även ägarskap."""
     with get_db() as cur:
         if user_id is None:
             cur.execute("SELECT name FROM meal WHERE meal_id = %s", (meal_id,))
@@ -96,6 +99,8 @@ def get_meal_name(meal_id, user_id=None):
 
 
 def get_meal_ingredients(meal_id):
+    """Hämtar ingredienser med livsmedelsnamn som lista av (food_id, namn, amount)."""
+    """Hämtar ingredienser för en måltidsmall som lista av (food_id, amount)."""
     with get_db() as cur:
         cur.execute("SELECT food_id, amount FROM meal_ingredient WHERE meal_id = %s", (meal_id,))
         return cur.fetchall()
@@ -116,6 +121,11 @@ def get_meal_ingredients_detailed(meal_id):
 
 
 def delete_meal_with_dependencies(meal_id):
+    """Tar bort en måltidsmall med alla beroenden.
+
+    Sätter meal_id till NULL i meal_log, tar sedan bort ingredienser
+    och slutligen mallen själv.
+    """
     with get_db() as cur:
         cur.execute("UPDATE meal_log SET meal_id = NULL WHERE meal_id = %s", (meal_id,))
         cur.execute("DELETE FROM meal_ingredient WHERE meal_id = %s", (meal_id,))
@@ -123,6 +133,11 @@ def delete_meal_with_dependencies(meal_id):
 
 
 def update_meal_name_and_ingredients(meal_id, name, ingredients):
+    """Uppdaterar namn och ingredienser för en måltidsmall.
+
+    Ersätter alla ingredienser med DELETE följt av INSERT för att
+    slippa jämföra skillnader rad för rad.
+    """
     with get_db() as cur:
         cur.execute("UPDATE meal SET name = %s WHERE meal_id = %s", (name, meal_id))
         cur.execute("DELETE FROM meal_ingredient WHERE meal_id = %s", (meal_id,))
@@ -134,6 +149,7 @@ def update_meal_name_and_ingredients(meal_id, name, ingredients):
 
 
 def create_logged_meal(category, meal_id, user_id):
+    """Skapar en måltidslogg utan maträtter. Returnerar log_id."""
     with get_db() as cur:
         cur.execute(
             "INSERT INTO meal_log (name, meal_id, user_id) VALUES (%s, %s, %s) RETURNING log_id",
@@ -143,6 +159,7 @@ def create_logged_meal(category, meal_id, user_id):
 
 
 def create_logged_meal_with_items(category, meal_id, user_id, items):
+    """Skapar en måltidslogg med maträtter i en transaktion. Returnerar log_id."""
     with get_db() as cur:
         cur.execute(
             "INSERT INTO meal_log (name, meal_id, user_id) VALUES (%s, %s, %s) RETURNING log_id",
@@ -167,6 +184,11 @@ def add_logged_meal_items(log_id, items):
 
 
 def log_meal_with_optional_items(category, meal_id, user_id, items):
+    """Loggar en måltid och lägger till maträtter från två källor.
+
+    Om meal_id anges kopieras ingredienser från mallen. Därefter läggs
+    eventuella extra items till. Returnerar log_id.
+    """
     with get_db() as cur:
         cur.execute(
             "INSERT INTO meal_log (name, meal_id, user_id) VALUES (%s, %s, %s) RETURNING log_id",
@@ -192,6 +214,7 @@ def log_meal_with_optional_items(category, meal_id, user_id, items):
 
 
 def log_saved_meal(meal_id, meal_category, user_id):
+    """Loggar en sparad måltidsmall och kopierar alla ingredienser till loggen. Returnerar log_id."""
     with get_db() as cur:
         cur.execute("INSERT INTO meal_log (name, meal_id, user_id) VALUES (%s, %s, %s) RETURNING log_id",
                     (meal_category, meal_id, user_id))
@@ -210,6 +233,7 @@ def log_saved_meal(meal_id, meal_category, user_id):
 
 
 def copy_meal_ingredients_to_log(log_id, meal_id):
+    """Kopierar ingredienser från en måltidsmall till en befintlig måltidslogg."""
     with get_db() as cur:
         cur.execute("SELECT food_id, amount FROM meal_ingredient WHERE meal_id = %s", (meal_id,))
         for food_id, amount in cur.fetchall():
@@ -220,18 +244,21 @@ def copy_meal_ingredients_to_log(log_id, meal_id):
 
 
 def get_log_owner(log_id):
+    """Returnerar user_id för ägaren till en måltidslogg. Används för behörighetskontroll."""
     with get_db() as cur:
         cur.execute("SELECT user_id FROM meal_log WHERE log_id = %s", (log_id,))
         return cur.fetchone()
 
 
 def delete_log(log_id):
+    """Tar bort en måltidslogg och alla tillhörande maträtter."""
     with get_db() as cur:
         cur.execute("DELETE FROM meal_log_item WHERE log_id = %s", (log_id,))
         cur.execute("DELETE FROM meal_log WHERE log_id = %s", (log_id,))
 
 
 def delete_log_item(log_id, food_id):
+    """Tar bort ett livsmedel från en måltidslogg."""
     with get_db() as cur:
         cur.execute(
             "DELETE FROM meal_log_item WHERE log_id = %s AND food_id = %s",
@@ -240,6 +267,7 @@ def delete_log_item(log_id, food_id):
 
 
 def update_log_item_amount(log_id, food_id, amount):
+    """Uppdaterar mängden för ett livsmedel i en måltidslogg."""
     with get_db() as cur:
         cur.execute(
             "UPDATE meal_log_item SET amount = %s WHERE log_id = %s AND food_id = %s",

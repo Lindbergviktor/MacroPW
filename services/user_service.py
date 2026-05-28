@@ -10,6 +10,7 @@ import nutrition
 
 
 def get_user_for_login(email, password):
+    """Hämtar user_id och namn om e-post och lösenord stämmer. Returnerar None annars."""
     with get_db() as cur:
         cur.execute(
             "SELECT user_id, name FROM users WHERE email = %s AND password = %s",
@@ -19,12 +20,14 @@ def get_user_for_login(email, password):
 
 
 def get_user_by_email(email):
+    """Hämtar user_id för en användare baserat på e-postadress. Returnerar None om den inte finns."""
     with get_db() as cur:
         cur.execute("SELECT user_id FROM users WHERE email = %s", (email,))
         return cur.fetchone()
     
 
 def email_exists(email):
+    """Returnerar True om e-postadressen redan är registrerad."""
     with get_db() as cur:
         cur.execute("SELECT user_id FROM users WHERE email = %s", (email,))
         return cur.fetchone() is not None
@@ -41,6 +44,7 @@ def create_user(
     birthdate,
     weight_goal,
 ):
+    """Skapar en ny användare med alla profilfält. Returnerar inget värde."""
     with get_db() as cur:
         cur.execute(
             """INSERT INTO users
@@ -51,6 +55,11 @@ def create_user(
 
 
 def get_user_profile_row(user_id):
+    """Hämtar alla profilkolumner för en användare.
+
+    Returnerar (rad, kolumnnamn) där kolumnnamnen hämtas dynamiskt från
+    information_schema för att alltid matcha databasens aktuella schema.
+    """
     with get_db() as cur:
         cur.execute("SELECT * FROM users WHERE user_id=%s", (user_id,))
         row = cur.fetchone()
@@ -72,6 +81,7 @@ def update_user_profile(
     activity_level,
     birthdate,
 ):
+    """Uppdaterar alla profilfält för en användare utom lösenord."""
     with get_db() as cur:
         cur.execute(
             """
@@ -85,6 +95,7 @@ def update_user_profile(
 
 
 def get_user_goal_data(user_id):
+    """Hämtar rådata för målberäkningar: kön, längd, vikt, aktivitetsnivå, födelsedag och viktmål."""
     with get_db() as cur:
         cur.execute(
             """

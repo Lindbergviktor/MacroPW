@@ -8,6 +8,7 @@ from db import get_db
 
 
 def add_workout_log(duration, user_id, workout_id, log_date):
+    """Sparar ett träningspass med användarens aktuella vikt hämtad från users-tabellen."""
     with get_db() as cur:
         cur.execute(
             """
