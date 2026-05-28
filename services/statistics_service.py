@@ -112,6 +112,11 @@ def get_statistics_data(user_id):
 
 
 def build_calorie_chart_days(nutrition_last_7):
+    """Bygger en komplett lista med 7 dagar bakåt för kalorigrafen.
+
+    Dagar utan loggad data fylls med nollvärden så att grafen alltid
+    visar alla sju dagar i rätt ordning.
+    """
     nutrition_map = {
         row[0]: {
             "calories": round(row[1] or 0),
