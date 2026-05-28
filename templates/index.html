@@ -148,55 +148,95 @@
         <div class="desktop-right">
           <div class="section-title">Meals</div>
 
-          <!-- Måltidsrader med kalorier per kategori -->
-          <div class="meal-list">
-            {% for cat in ['Breakfast', 'Lunch', 'Dinner', 'Snack'] %}
-              <div class="meal-row">
-                <div class="w-100">
-                  <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                      <div class="meal-name">{{ cat }}</div>
-                      <div class="meal-kcal">{{ category_calories.get(cat, 0) }} kcal</div>
-                    </div>
-                    <button type="button" class="add-btn" data-bs-toggle="modal" data-bs-target="#logModal-{{ cat }}">+</button>
-                  </div>
+          <div id="mealsCarousel" class="carousel slide meal-carousel" data-bs-interval="false">
+            <div class="carousel-indicators meal-carousel-indicators">
+              {% for cat in ['Breakfast', 'Lunch', 'Dinner', 'Snack'] %}
+                <button
+                  type="button"
+                  data-bs-target="#mealsCarousel"
+                  data-bs-slide-to="{{ loop.index0 }}"
+                  class="{% if loop.first %}active{% endif %}"
+                  aria-current="{% if loop.first %}true{% endif %}"
+                  aria-label="Show {{ cat }}">{{ cat }}</button>
+              {% endfor %}
+            </div>
 
-                  <!-- Loggade måltider per kategori -->
-                  {% if logged_by_category.get(cat) %}
-                    {% for log_id, log_entry in logged_by_category[cat].items() %}
-                      <div class="log-entry">
-
-                        <!-- Måltidsrubrik med delete-knapp för hela måltiden -->
-                        <div class="log-entry-header">
-                          <span class="log-entry-name">{{ log_entry.meal_name.title() }}</span>
-                          <form method="POST" action="{{ url_for('dashboard.delete_log', log_id=log_id) }}"
-                                onsubmit="return confirm('Remove entire meal?')">
-                            <button type="submit" class="log-delete-btn">✕ Remove all</button>
-                          </form>
-                        </div>
-
-                        <!-- Enskilda ingredienser med redigering av mängd -->
-                        {% for item in log_entry.ingredients %}
-                          <div class="log-entry-item">
-                              <span>{{ item.food.title() }} — {{ item.amount }}g</span>
-                              <button type="button" onclick="toggleEdit('edit-{{ log_id }}-{{ item.food_id }}')">✎</button>
-
-                              <form id="edit-{{ log_id }}-{{ item.food_id }}" method="POST" 
-                                    action="{{ url_for('dashboard.edit_log_item', log_id=log_id, food_id=item.food_id) }}"
-                                    class="log-item-amount-form" style="display:none;">
-                                  <input type="number" name="amount" value="{{ item.amount }}" step="0.1" min="0.1" class="log-item-amount-input">
-                                  <button type="submit" class="log-item-save-btn">✓</button>
-                              </form>
-                            </div>
-                        {% endfor %}
-
+            <div class="carousel-inner">
+              {% for cat in ['Breakfast', 'Lunch', 'Dinner', 'Snack'] %}
+                <div class="carousel-item meal-carousel-item {% if loop.first %}active{% endif %}">
+                  <div class="meal-row">
+                    <div class="w-100">
+                      <div class="meal-row-top">
+                        <button
+                          class="meal-summary-toggle collapsed"
+                          type="button"
+                          data-bs-toggle="collapse"
+                          data-bs-target="#mealCollapse-{{ loop.index0 }}"
+                          aria-expanded="false"
+                          aria-controls="mealCollapse-{{ loop.index0 }}">
+                          <span class="meal-summary-copy">
+                            <span class="meal-name">{{ cat }}</span>
+                            <span class="meal-kcal">{{ category_calories.get(cat, 0) }} kcal</span>
+                            <span class="meal-status">
+                              {% set meal_count = logged_by_category.get(cat, {})|length %}
+                              {% if meal_count %}
+                                {{ meal_count }} meal{% if meal_count != 1 %}s{% endif %} logged
+                              {% else %}
+                                Tap to add or expand
+                              {% endif %}
+                            </span>
+                          </span>
+                        </button>
+                        <button type="button" class="add-btn" data-bs-toggle="modal" data-bs-target="#logModal-{{ cat }}">+</button>
                       </div>
-                    {% endfor %}
-                  {% endif %}
 
+                      <div id="mealCollapse-{{ loop.index0 }}" class="collapse meal-collapse">
+                        <div class="meal-detail-panel">
+                          {% if logged_by_category.get(cat) %}
+                            {% for log_id, log_entry in logged_by_category[cat].items() %}
+                              <div class="log-entry">
+                                <div class="log-entry-header">
+                                  <span class="log-entry-name">{{ log_entry.meal_name.title() }}</span>
+                                  <form method="POST" action="{{ url_for('dashboard.delete_log', log_id=log_id) }}"
+                                        onsubmit="return confirm('Remove entire meal?')">
+                                    <button type="submit" class="log-delete-btn">✕ Remove all</button>
+                                  </form>
+                                </div>
+
+                                {% for item in log_entry.ingredients %}
+                                  <div class="log-entry-item">
+                                      <span>{{ item.food.title() }} — {{ item.amount }}g</span>
+                                      <button type="button" onclick="toggleEdit('edit-{{ log_id }}-{{ item.food_id }}')">✎</button>
+
+                                      <form id="edit-{{ log_id }}-{{ item.food_id }}" method="POST" 
+                                            action="{{ url_for('dashboard.edit_log_item', log_id=log_id, food_id=item.food_id) }}"
+                                            class="log-item-amount-form" style="display:none;">
+                                          <input type="number" name="amount" value="{{ item.amount }}" step="0.1" min="0.1" class="log-item-amount-input">
+                                          <button type="submit" class="log-item-save-btn">✓</button>
+                                      </form>
+                                  </div>
+                                {% endfor %}
+                              </div>
+                            {% endfor %}
+                          {% else %}
+                            <div class="meal-empty-state">No meals logged yet for {{ cat.lower() }}.</div>
+                          {% endif %}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            {% endfor %}
+              {% endfor %}
+            </div>
+
+            <button class="carousel-control-prev meal-carousel-control" type="button" data-bs-target="#mealsCarousel" data-bs-slide="prev">
+              <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+              <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next meal-carousel-control" type="button" data-bs-target="#mealsCarousel" data-bs-slide="next">
+              <span class="carousel-control-next-icon" aria-hidden="true"></span>
+              <span class="visually-hidden">Next</span>
+            </button>
           </div>
 
           <!-- Snabbknappar -->
