@@ -134,114 +134,116 @@
           </div>
         </div>
 
-        <!-- Höger: Måltidslista och knappar -->
-        <div class="desktop-right">
-          <div class="section-title">Meals</div>
+        <div class="desktop-side">
+          <!-- Höger: Måltidslista och knappar -->
+          <div class="desktop-right">
+            <div class="section-title">Meals</div>
 
-          <div class="meal-tabs-shell">
-            <div class="nav meal-tabs-nav" id="mealsTab" role="tablist">
-              {% for cat in ['Breakfast', 'Lunch', 'Dinner', 'Snack'] %}
-                <button
-                  class="meal-tab-pill {% if loop.first %}active{% endif %}"
-                  type="button"
-                  id="meal-tab-{{ loop.index0 }}"
-                  data-bs-toggle="tab"
-                  data-bs-target="#meal-pane-{{ loop.index0 }}"
-                  role="tab"
-                  aria-controls="meal-pane-{{ loop.index0 }}"
-                  aria-current="{% if loop.first %}true{% endif %}"
-                  aria-selected="{% if loop.first %}true{% else %}false{% endif %}"
-                  aria-label="Show {{ cat }}">{{ cat }}</button>
-              {% endfor %}
-            </div>
+            <div class="meal-tabs-shell">
+              <div class="nav meal-tabs-nav" id="mealsTab" role="tablist">
+                {% for cat in ['Breakfast', 'Lunch', 'Dinner', 'Snack'] %}
+                  <button
+                    class="meal-tab-pill {% if loop.first %}active{% endif %}"
+                    type="button"
+                    id="meal-tab-{{ loop.index0 }}"
+                    data-bs-toggle="tab"
+                    data-bs-target="#meal-pane-{{ loop.index0 }}"
+                    role="tab"
+                    aria-controls="meal-pane-{{ loop.index0 }}"
+                    aria-current="{% if loop.first %}true{% endif %}"
+                    aria-selected="{% if loop.first %}true{% else %}false{% endif %}"
+                    aria-label="Show {{ cat }}">{{ cat }}</button>
+                {% endfor %}
+              </div>
 
-            <div class="tab-content meal-tab-content">
-              {% for cat in ['Breakfast', 'Lunch', 'Dinner', 'Snack'] %}
-                <div
-                  class="tab-pane fade meal-tab-pane {% if loop.first %}show active{% endif %}"
-                  id="meal-pane-{{ loop.index0 }}"
-                  role="tabpanel"
-                  aria-labelledby="meal-tab-{{ loop.index0 }}"
-                  tabindex="0">
-                  <div class="meal-row">
-                    <div class="w-100">
-                      <div class="meal-row-top">
-                        <button
-                          class="meal-summary-toggle collapsed"
-                          type="button"
-                          data-bs-toggle="collapse"
-                          data-bs-target="#mealCollapse-{{ loop.index0 }}"
-                          aria-expanded="false"
-                          aria-controls="mealCollapse-{{ loop.index0 }}">
-                          <span class="meal-summary-copy">
-                            <span class="meal-name">{{ cat }}</span>
-                            <span class="meal-kcal">{{ category_calories.get(cat, 0) }} kcal</span>
-                            <span class="meal-status">
-                              {% set meal_count = logged_by_category.get(cat, {})|length %}
-                              {% if meal_count %}
-                                {{ meal_count }} meal{% if meal_count != 1 %}s{% endif %} logged
-                              {% else %}
-                                Tap to add or expand
-                              {% endif %}
+              <div class="tab-content meal-tab-content">
+                {% for cat in ['Breakfast', 'Lunch', 'Dinner', 'Snack'] %}
+                  <div
+                    class="tab-pane fade meal-tab-pane {% if loop.first %}show active{% endif %}"
+                    id="meal-pane-{{ loop.index0 }}"
+                    role="tabpanel"
+                    aria-labelledby="meal-tab-{{ loop.index0 }}"
+                    tabindex="0">
+                    <div class="meal-row">
+                      <div class="w-100">
+                        <div class="meal-row-top">
+                          <button
+                            class="meal-summary-toggle collapsed"
+                            type="button"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#mealCollapse-{{ loop.index0 }}"
+                            aria-expanded="false"
+                            aria-controls="mealCollapse-{{ loop.index0 }}">
+                            <span class="meal-summary-copy">
+                              <span class="meal-name">{{ cat }}</span>
+                              <span class="meal-kcal">{{ category_calories.get(cat, 0) }} kcal</span>
+                              <span class="meal-status">
+                                {% set meal_count = logged_by_category.get(cat, {})|length %}
+                                {% if meal_count %}
+                                  {{ meal_count }} meal{% if meal_count != 1 %}s{% endif %} logged
+                                {% else %}
+                                  Tap to add or expand
+                                {% endif %}
+                              </span>
                             </span>
-                          </span>
-                        </button>
-                        <button type="button" class="add-btn" data-bs-toggle="modal" data-bs-target="#logModal-{{ cat }}">+</button>
-                      </div>
+                          </button>
+                          <button type="button" class="add-btn" data-bs-toggle="modal" data-bs-target="#logModal-{{ cat }}">+</button>
+                        </div>
 
-                      <div id="mealCollapse-{{ loop.index0 }}" class="collapse meal-collapse">
-                        <div class="meal-detail-panel">
-                          {% if logged_by_category.get(cat) %}
-                            {% for log_id, log_entry in logged_by_category[cat].items() %}
-                              <div class="log-entry">
-                                <div class="log-entry-header">
-                                  <span class="log-entry-name">{{ log_entry.meal_name.title() }}</span>
-                                  <form method="POST" action="{{ url_for('dashboard.delete_log', log_id=log_id) }}"
-                                        onsubmit="return confirm('Remove entire meal?')">
-                                    <button type="submit" class="log-delete-btn">✕ Remove all</button>
-                                  </form>
-                                </div>
-
-                                {% for item in log_entry.ingredients %}
-                                  <div class="log-entry-item">
-                                      <span>{{ item.food.title() }} — {{ item.amount }}g</span>
-                                      <button type="button" onclick="toggleEdit('edit-{{ log_id }}-{{ item.food_id }}')">✎</button>
-
-                                      <form id="edit-{{ log_id }}-{{ item.food_id }}" method="POST" 
-                                            action="{{ url_for('dashboard.edit_log_item', log_id=log_id, food_id=item.food_id) }}"
-                                            class="log-item-amount-form ui-hidden">
-                                          <input type="number" name="amount" value="{{ item.amount }}" step="0.1" min="0.1" class="log-item-amount-input">
-                                          <button type="submit" class="log-item-save-btn">✓</button>
-                                      </form>
+                        <div id="mealCollapse-{{ loop.index0 }}" class="collapse meal-collapse">
+                          <div class="meal-detail-panel">
+                            {% if logged_by_category.get(cat) %}
+                              {% for log_id, log_entry in logged_by_category[cat].items() %}
+                                <div class="log-entry">
+                                  <div class="log-entry-header">
+                                    <span class="log-entry-name">{{ log_entry.meal_name.title() }}</span>
+                                    <form method="POST" action="{{ url_for('dashboard.delete_log', log_id=log_id) }}"
+                                          onsubmit="return confirm('Remove entire meal?')">
+                                      <button type="submit" class="log-delete-btn">✕ Remove all</button>
+                                    </form>
                                   </div>
-                                {% endfor %}
-                              </div>
-                            {% endfor %}
-                          {% else %}
-                            <div class="meal-empty-state">No meals logged yet for {{ cat.lower() }}.</div>
-                          {% endif %}
+
+                                  {% for item in log_entry.ingredients %}
+                                    <div class="log-entry-item">
+                                        <span>{{ item.food.title() }} — {{ item.amount }}g</span>
+                                        <button type="button" onclick="toggleEdit('edit-{{ log_id }}-{{ item.food_id }}')">✎</button>
+
+                                        <form id="edit-{{ log_id }}-{{ item.food_id }}" method="POST" 
+                                              action="{{ url_for('dashboard.edit_log_item', log_id=log_id, food_id=item.food_id) }}"
+                                              class="log-item-amount-form ui-hidden">
+                                            <input type="number" name="amount" value="{{ item.amount }}" step="0.1" min="0.1" class="log-item-amount-input">
+                                            <button type="submit" class="log-item-save-btn">✓</button>
+                                        </form>
+                                    </div>
+                                  {% endfor %}
+                                </div>
+                              {% endfor %}
+                            {% else %}
+                              <div class="meal-empty-state">No meals logged yet for {{ cat.lower() }}.</div>
+                            {% endif %}
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              {% endfor %}
+                {% endfor %}
+              </div>
+            </div>
+
+            <!-- Snabbknappar -->
+            <div class="action-row">
+              <a href="{{ url_for('meals.meals') }}" class="btn btn-primary">Add Meal</a>
             </div>
           </div>
 
-          <!-- Snabbknappar -->
-          <div class="action-row">
-            <a href="{{ url_for('meals.meals') }}" class="btn btn-primary">Add Meal</a>
+          <!-- Vattentracker -->
+          <div class="water-section">
+            <div class="water-header">
+              <span class="water-title">Water</span>
+              <span class="water-count" id="waterCount">0/8 250ml glasses</span>
+            </div>
+            <div class="water-glasses" id="waterGlasses" data-update-url="{{ url_for('dashboard.update_water') }}"></div>
           </div>
-        </div>
-
-        <!-- Vattentracker -->
-        <div class="water-section">
-          <div class="water-header">
-            <span class="water-title">Water</span>
-            <span class="water-count" id="waterCount">0/8 250ml glasses</span>
-          </div>
-          <div class="water-glasses" id="waterGlasses" data-update-url="{{ url_for('dashboard.update_water') }}"></div>
         </div>
 
       </div>

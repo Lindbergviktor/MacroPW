@@ -1645,7 +1645,7 @@ footer {
   .page-wrapper {
     max-width: 1000px;
     margin: 0 auto;
-    padding: 0 2rem;
+    padding: 0 2rem 1rem;
   }
 
   .stats-panel-grid {
@@ -1663,47 +1663,54 @@ footer {
     align-items: start;
   }
 
+  .desktop-side {
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+  }
+
   .desktop-right {
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(241, 251, 254, 0.94));
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(245, 252, 255, 0.96));
     border-radius: var(--radius-lg);
-    padding: 1.2rem 1.4rem;
-    box-shadow: var(--shadow-soft);
-    border: 1px solid rgba(0, 164, 209, 0.1);
+    padding: 1.15rem 1.3rem 1.25rem;
+    box-shadow: 0 8px 24px rgba(34, 56, 62, 0.06);
+    border: 1px solid rgba(0, 164, 209, 0.08);
   }
 
   .desktop-right .section-title {
-    margin-top: 0.4rem;
+    margin: 0.15rem 0 0.8rem;
   }
 
   .meal-tabs-nav {
     flex-wrap: wrap;
-    gap: 0.35rem;
-    margin-bottom: 1.1rem;
+    gap: 0.25rem 0.45rem;
+    margin-bottom: 0.95rem;
     padding-bottom: 0;
     overflow: hidden;
+    align-items: end;
   }
 
   .meal-tab-pill {
     flex: 1 1 calc(50% - 0.35rem);
     min-width: 0;
-    padding: 0.7rem 1rem;
-    border-radius: 14px 14px 0 0;
+    padding: 0.6rem 0.85rem 0.7rem;
+    border-radius: 0;
     background: transparent;
     color: var(--text-muted);
-    font-size: 0.8rem;
+    font-size: 0.76rem;
     box-shadow: none;
-    border-bottom: 2px solid transparent;
+    border-bottom: 1.5px solid transparent;
     text-align: center;
   }
 
   .meal-tab-pill:hover,
   .meal-tab-pill:focus-visible {
-    background: rgba(0, 164, 209, 0.06);
+    background: transparent;
     color: var(--blue-dark);
   }
 
   .meal-tab-pill.active {
-    background: rgba(0, 164, 209, 0.1);
+    background: transparent;
     color: var(--blue-dark);
     box-shadow: none;
     border-bottom-color: var(--blue-dark);
@@ -1711,7 +1718,7 @@ footer {
 
   .meal-tab-content {
     border-top: 1px solid rgba(0, 164, 209, 0.1);
-    padding-top: 1rem;
+    padding-top: 0.95rem;
   }
 
   .meal-tab-pane {
@@ -1720,14 +1727,16 @@ footer {
 
   .meal-tabs-shell .meal-row {
     min-height: 0;
-    padding: 1.2rem 1.2rem 1.1rem;
+    padding: 1.1rem 0 0;
     box-shadow: none;
-    border: 1px solid rgba(0, 164, 209, 0.08);
+    border: 0;
+    background: transparent;
   }
 
   .meal-tabs-shell .meal-row:hover {
     box-shadow: none;
     transform: none;
+    background: transparent;
   }
 
   .meal-row-top {
@@ -1735,28 +1744,40 @@ footer {
   }
 
   .meal-summary-toggle {
-    padding: 0.1rem 0;
+    padding: 0;
   }
 
   .meal-tabs-shell .meal-name {
-    font-size: 1.18rem;
+    font-size: 1.22rem;
   }
 
   .meal-status {
-    margin-top: 0.35rem;
-    font-size: 0.76rem;
+    margin-top: 0.3rem;
+    font-size: 0.74rem;
   }
 
   .meal-detail-panel {
-    background: rgba(255, 255, 255, 0.86);
-    padding: 0.35rem 1rem 0.9rem;
+    background: rgba(255, 255, 255, 0.7);
+    border: 1px solid rgba(0, 164, 209, 0.08);
+    border-radius: var(--radius-sm);
+    padding: 0.45rem 1rem 0.95rem;
+    box-shadow: none;
   }
 
   .desktop-right .water-section {
-    border: 1px solid rgba(0, 164, 209, 0.1);
+    border: 1px solid rgba(0, 164, 209, 0.08);
     box-shadow: none;
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.88), rgba(225, 246, 251, 0.92));
-    padding: 1rem 1.2rem;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.88), rgba(239, 249, 252, 0.9));
+    padding: 0.95rem 1.05rem 1rem;
+    border-radius: var(--radius);
+  }
+
+  .desktop-right .action-row {
+    margin-top: 1rem;
+  }
+
+  .desktop-right .action-row .btn {
+    padding: 0.8rem 1rem;
   }
 
   .workout-action-row .btn-primary-blue {
@@ -1794,19 +1815,18 @@ footer {
   }
 
   .desktop-grid {
-    grid-template-columns: minmax(0, 1.14fr) minmax(320px, 0.86fr);
-    grid-template-areas:
-      "hero meals"
-      "hero water";
-    gap: 1.6rem;
+    grid-template-columns: minmax(0, 1.12fr) minmax(360px, 0.88fr);
+    grid-template-areas: "hero side";
+    gap: 1.8rem;
   }
 
   .desktop-left {
     grid-area: hero;
   }
 
-  .desktop-right {
-    grid-area: meals;
+  .desktop-side {
+    grid-area: side;
+    gap: 0.9rem;
   }
 
   .meal-tabs-nav {
@@ -1815,11 +1835,48 @@ footer {
 
   .meal-tab-pill {
     flex: 1 1 0;
+    font-size: 0.78rem;
   }
 
-  .water-section {
-    grid-area: water;
-    margin-top: 0;
+  .desktop-right {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(245, 252, 255, 0.96));
+    border-radius: var(--radius-lg);
+    padding: 1.15rem 1.3rem 1.25rem;
+    box-shadow: 0 8px 24px rgba(34, 56, 62, 0.06);
+    border: 1px solid rgba(0, 164, 209, 0.08);
+  }
+
+  .desktop-right .section-title {
+    margin: 0.15rem 0 0.8rem;
+  }
+
+  .meal-tab-content {
+    padding-top: 0.95rem;
+  }
+
+  .meal-tabs-shell .meal-name {
+    font-size: 1.22rem;
+  }
+
+  .meal-detail-panel {
+    background: rgba(255, 255, 255, 0.7);
+    border: 1px solid rgba(0, 164, 209, 0.08);
+    border-radius: var(--radius-sm);
+    padding: 0.45rem 1rem 0.95rem;
+    box-shadow: none;
+  }
+
+  .desktop-right .action-row {
+    margin-top: 1rem;
+  }
+
+  .desktop-side .water-section {
+    margin-top: 0.9rem;
+    border: 1px solid rgba(0, 164, 209, 0.08);
+  }
+
+  .desktop-side .water-header {
+    margin-bottom: 0.8rem;
   }
 
   .desktop-left .hero-card {
@@ -1827,12 +1884,44 @@ footer {
   }
 
   .wo-card {
-    margin-top: 1.6rem !important;
+    margin-top: 2.1rem !important;
+    border: 1px solid rgba(0, 164, 209, 0.08);
+    box-shadow: 0 6px 22px rgba(34, 56, 62, 0.06);
   }
 
   .stats-hero {
     grid-template-columns: 1fr;
     align-items: center;
+  }
+
+  .wo-header {
+    background: linear-gradient(180deg, rgba(245, 252, 255, 0.98), rgba(235, 248, 252, 0.96));
+    color: var(--text-dark);
+    border-bottom: 1px solid rgba(0, 164, 209, 0.08);
+    padding: 1.15rem 1.25rem;
+  }
+
+  .wo-stat-label {
+    color: var(--text-muted);
+    opacity: 1;
+  }
+
+  .wo-stat-value {
+    font-size: 1.85rem;
+  }
+
+  .wo-body {
+    padding: 1rem 1rem 1.05rem;
+    gap: 0.5rem;
+  }
+
+  .wo-row {
+    background: rgba(219, 236, 239, 0.72);
+    padding: 0.8rem 0.9rem;
+  }
+
+  .wo-row:hover {
+    transform: none;
   }
 }
 /* ===== Workout Overview Card ===== */
