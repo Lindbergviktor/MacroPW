@@ -25,7 +25,7 @@
   </style>
 </head>
 
-<body>
+<body data-water-today="{{ water_today }}">
 
   <!-- Navbar -->
   <nav class="navbar navbar-expand-lg" data-bs-theme="dark">
@@ -251,7 +251,7 @@
             <span class="water-title">Water</span>
             <span class="water-count" id="waterCount">0/8 250ml glasses</span>
           </div>
-          <div class="water-glasses" id="waterGlasses"></div>
+          <div class="water-glasses" id="waterGlasses" data-update-url="{{ url_for('dashboard.update_water') }}"></div>
         </div>
 
       </div>
@@ -379,176 +379,7 @@
 
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
-
-  <!-- Gauge- och vattentracker-logik -->
-<script>
-  document.addEventListener('DOMContentLoaded', function () {
-    const gaugeCanvas = document.getElementById('calorieGaugeChart');
-    if (!gaugeCanvas || typeof Chart === 'undefined') return;
-
-    const calories = Number(gaugeCanvas.dataset.calories || 0);
-    const calorieGoal = Number(gaugeCanvas.dataset.calorieGoal || 0);
-    const consumed = Math.max(0, Math.min(calories, calorieGoal || calories));
-    const remaining = Math.max((calorieGoal || 0) - consumed, 0);
-
-    new Chart(gaugeCanvas, {
-      type: 'doughnut',
-      data: {
-        datasets: [{
-          data: calorieGoal > 0 ? [consumed, remaining] : [1],
-          backgroundColor: calorieGoal > 0
-            ? ['#00a4d1', 'rgba(255, 255, 255, 0.92)']
-            : ['rgba(255, 255, 255, 0.92)'],
-          borderWidth: 0,
-          cutout: '78%',
-          circumference: 180,
-          rotation: 270,
-          borderRadius: 10,
-        }],
-      },
-      options: {
-        responsive: false,
-        animation: {
-          duration: 700,
-        },
-        plugins: {
-          legend: {
-            display: false,
-          },
-          tooltip: {
-            enabled: false,
-          },
-        },
-        events: [],
-      },
-    });
-  });
-
-  const TOTAL = 8;
-  let filled = {{ water_today }};
-
-    function saveWater() {
-      const formData = new FormData();
-      formData.append('glasses', filled);
-      fetch("{{ url_for('dashboard.update_water') }}", {
-        method: 'POST',
-        body: formData
-      });
-    }
-
-    function renderGlasses() {
-      const wrap = document.getElementById('waterGlasses');
-      if (!wrap) return;
-      wrap.innerHTML = '';
-
-      for (let i = 0; i < TOTAL; i++) {
-        const g = document.createElement('button');
-        g.className = 'glass' + (i < filled ? ' filled' : '');
-        g.innerHTML = `<i class="bi ${i < filled ? 'bi-cup-straw' : 'bi-cup'}"></i>`;
-        g.title = i < filled ? 'Click to remove' : 'Click to add';
-        g.addEventListener('click', () => {
-          filled = (i < filled) ? i : i + 1;
-          renderGlasses();
-          saveWater();
-        });
-        wrap.appendChild(g);
-      }
-
-      document.getElementById('waterCount').innerHTML = `${filled} / ${TOTAL} <small style="font-size:.75em; opacity:.7;">250ml/glass</small>`;
-    }
-
-  renderGlasses();
-</script>
-<script>
-  setTimeout(function () {
-    document.querySelectorAll('.alert').forEach(function (el) {
-      el.style.display = 'none';
-    });
-  }, 3000);
-</script>
-<script>
-  // Nollställer alla formulär i en modal om den stängs
-  document.querySelectorAll('.modal').forEach(function (modal) {
-    modal.addEventListener('hidden.bs.modal', function () {
-      modal.querySelectorAll('form').forEach(function (form) {
-        form.reset();
-      });
-    });
-  });
-</script>
-<script>
-  // Live-kalorier i måltidsmodaler
-  function updateCaloriePreview(cat) {
-      const container = document.getElementById(`ingredients-container-${cat}`);
-      const preview   = document.getElementById(`calorie-preview-${cat}`);
-      if (!container || !preview) return;
-
-      let totalCal = 0, totalProt = 0, totalFat = 0, totalCarbs = 0, hasData = false;
-
-      container.querySelectorAll('.ingredient-row').forEach(row => {
-        const select = row.querySelector('.food-select-live');
-        const amount = parseFloat(row.querySelector('input[name="amount[]"]')?.value) || 0;
-        if (!select) return;
-        const opt = select.options[select.selectedIndex];
-        if (opt && opt.value && amount > 0) {
-          totalCal   += parseFloat(opt.dataset.calories || 0) * amount / 100;
-          totalProt  += parseFloat(opt.dataset.protein  || 0) * amount / 100;
-          totalFat   += parseFloat(opt.dataset.fat      || 0) * amount / 100;
-          totalCarbs += parseFloat(opt.dataset.carbs    || 0) * amount / 100;
-          hasData = true;
-        }
-      });
-
-      if (hasData) {
-        preview.querySelector('.calorie-preview-value').textContent = Math.round(totalCal);
-        preview.querySelector('.protein-preview-value').textContent = totalProt.toFixed(1);
-        preview.querySelector('.fat-preview-value').textContent     = totalFat.toFixed(1);
-        preview.querySelector('.carbs-preview-value').textContent   = totalCarbs.toFixed(1);
-        preview.style.display = 'block';
-      } else {
-        preview.style.display = 'none';
-      }
-    }
-
-    ['Breakfast', 'Lunch', 'Dinner', 'Snack'].forEach(cat => {
-      const container = document.getElementById(`ingredients-container-${cat}`);
-      if (!container) return;
-      container.addEventListener('change', e => { if (e.target.tagName === 'SELECT') updateCaloriePreview(cat); });
-      container.addEventListener('input',  e => { if (e.target.tagName === 'INPUT')  updateCaloriePreview(cat); });
-    });
-</script>
-
-<!--Funktion som togglar ett formulär för att redigera mängden på registrerade måltider.-->
-<script>
-  function toggleEdit(id) {
-  const form = document.getElementById(id);
-  form.style.display = form.style.display === 'none' ? 'flex' : 'none';
-}
-</script>
-<script>
-  // Lägger till en ny tom ingrediensrad i modalen
-  function addIngredientRow(cat) {
-    const container = document.getElementById(`ingredients-container-${cat}`);
-    const firstRow  = container.querySelector('.ingredient-row');
-    const newRow    = document.createElement('div');
-    newRow.classList.add('row', 'g-2', 'mb-2', 'ingredient-row');
-    const cloned = firstRow.cloneNode(true);
-    cloned.querySelector('select').selectedIndex = 0;
-    cloned.querySelector('input').value = '';
-    newRow.innerHTML = cloned.innerHTML;
-
-    const removeCol = document.createElement('div');
-    removeCol.className = 'col-1 d-flex align-items-center';
-    removeCol.innerHTML = `<span class="remove-btn">✕</span>`;
-    removeCol.querySelector('span').addEventListener('click', () => {
-      newRow.remove();
-      updateCaloriePreview(cat);
-    });
-    newRow.appendChild(removeCol);
-
-    container.appendChild(newRow);
-  }
-</script>
+  <script src="{{ url_for('static', filename='dashboard.js') }}"></script>
 
 </body>
 
