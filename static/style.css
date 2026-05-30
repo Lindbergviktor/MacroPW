@@ -1829,15 +1829,6 @@ footer {
     gap: 0.9rem;
   }
 
-  .meal-tabs-nav {
-    gap: 0.45rem;
-  }
-
-  .meal-tab-pill {
-    flex: 1 1 0;
-    font-size: 0.78rem;
-  }
-
   .desktop-right {
     background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(245, 252, 255, 0.96));
     border-radius: var(--radius-lg);
@@ -1850,12 +1841,65 @@ footer {
     margin: 0.15rem 0 0.8rem;
   }
 
-  .meal-tab-content {
-    padding-top: 0.95rem;
+  .desktop-right .meal-tabs-nav {
+    display: none;
   }
 
-  .meal-tabs-shell .meal-name {
-    font-size: 1.22rem;
+  .meal-tab-content {
+    padding-top: 0;
+    border-top: 0;
+  }
+
+  .desktop-right .meal-tab-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+
+  .desktop-right .meal-tab-pane {
+    display: block !important;
+    opacity: 1 !important;
+    padding: 0;
+  }
+
+  .desktop-right .meal-tabs-shell .meal-row {
+    min-height: 0;
+    padding: 0.9rem 0.95rem 0.85rem;
+    border: 1px solid rgba(0, 164, 209, 0.08);
+    border-radius: var(--radius);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(239, 249, 252, 0.88));
+    box-shadow: none;
+  }
+
+  .desktop-right .meal-tabs-shell .meal-row:hover {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(235, 248, 252, 0.94));
+    box-shadow: none;
+    transform: none;
+  }
+
+  .desktop-right .meal-summary-toggle {
+    padding: 0;
+  }
+
+  .desktop-right .meal-summary-toggle::after {
+    display: none;
+  }
+
+  .desktop-right .meal-tabs-shell .meal-name {
+    font-size: 1.12rem;
+  }
+
+  .desktop-right .meal-kcal {
+    font-size: 0.76rem;
+  }
+
+  .desktop-right .meal-status {
+    margin-top: 0.25rem;
+    font-size: 0.71rem;
+  }
+
+  .desktop-right .meal-collapse {
+    margin-top: 0.55rem;
   }
 
   .meal-detail-panel {
