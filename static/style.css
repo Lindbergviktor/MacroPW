@@ -527,6 +527,8 @@ textarea {
   margin-top: 1px;
 }
 
+/* ===== Meals - Base ===== */
+
 .meal-tabs-shell {
   position: relative;
   min-width: 0;
@@ -588,6 +590,8 @@ textarea {
 .meal-tab-pane {
   padding: 0.1rem 0;
 }
+
+/* ===== Meals - Mobile ===== */
 
 @media (max-width: 767.98px) {
   .meal-tabs-nav {
@@ -1642,6 +1646,7 @@ footer {
 }
 
 @media (min-width: 768px) {
+  /* ===== Layout - Tablet And Up ===== */
   .page-wrapper {
     max-width: 1000px;
     margin: 0 auto;
@@ -1669,6 +1674,7 @@ footer {
     gap: 0.9rem;
   }
 
+  /* ===== Meals - Tablet And Up ===== */
   .desktop-right {
     background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(245, 252, 255, 0.96));
     border-radius: var(--radius-lg);
@@ -1764,6 +1770,7 @@ footer {
     box-shadow: none;
   }
 
+  /* ===== Water - Tablet And Up ===== */
   .desktop-right .water-section {
     border: 1px solid rgba(0, 164, 209, 0.08);
     box-shadow: none;
@@ -1780,12 +1787,14 @@ footer {
     padding: 0.8rem 1rem;
   }
 
+  /* ===== Workout - Tablet And Up ===== */
   .workout-action-row .btn-primary-blue {
     flex-basis: 100%;
   }
 }
 
 @media (min-width: 992px) {
+  /* ===== Layout - Desktop ===== */
   .page-wrapper {
     max-width: 1180px;
   }
@@ -1829,6 +1838,7 @@ footer {
     gap: 0.9rem;
   }
 
+  /* ===== Meals - Desktop ===== */
   .desktop-right {
     background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(245, 252, 255, 0.96));
     border-radius: var(--radius-lg);
@@ -1914,6 +1924,7 @@ footer {
     margin-top: 1rem;
   }
 
+  /* ===== Water - Desktop ===== */
   .desktop-side .water-section {
     margin-top: 0.9rem;
     border: 1px solid rgba(0, 164, 209, 0.08);
@@ -1927,6 +1938,7 @@ footer {
     min-height: 100%;
   }
 
+  /* ===== Workout - Desktop ===== */
   .wo-card {
     margin-top: 2.1rem !important;
     border: 1px solid rgba(0, 164, 209, 0.08);
