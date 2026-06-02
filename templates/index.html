@@ -99,7 +99,7 @@
                   </div>
                   {% set burned = workouts_today | sum(attribute=2) | int %}
                   {% if burned > 0 %}
-                  <div class="gauge-burned">+{{ burned }} from workouts included</div>
+                  <div class="gauge-burned">Burned: +{{ burned }} kcal added to total</div>
                   {% endif %}
                 </div>
               </div>
