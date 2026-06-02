@@ -51,7 +51,8 @@
     const wrap = document.getElementById("waterGlasses");
     const count = document.getElementById("waterCount");
     if (!wrap || !count) return;
-
+    
+    // Fyller i hur många glass vatten
     let filled = Number(document.body.dataset.waterToday || 0);
     const updateUrl = wrap.dataset.updateUrl;
 
@@ -106,6 +107,7 @@
     });
   }
 
+    // JS funktion för att ge en kalorie-förhandsgranskning.
   function updateCaloriePreview(category) {
     const container = document.getElementById(`ingredients-container-${category}`);
     const preview = document.getElementById(`calorie-preview-${category}`);
