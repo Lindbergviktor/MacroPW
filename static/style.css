@@ -101,6 +101,26 @@ textarea {
   min-width: 0;
 }
 
+/* ===== Dashboard layout ===== */
+
+.dashboard-grid {
+  margin-top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.dashboard-col-left {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.dashboard-col-left .wo-card,
+.dashboard-col-left .water-section {
+  margin-top: 0;
+}
+
 /* ===== Typography ===== */
 
 .page-title {
@@ -1572,6 +1592,10 @@ footer {
     flex-direction: column;
   }
 
+  .dashboard-grid .desktop-right {
+    order: -1;
+  }
+
   .workout-action-row {
     flex-direction: column;
   }
@@ -1586,7 +1610,7 @@ footer {
   }
 
   .wo-card {
-    margin: 1.5rem 1rem 0;
+    margin: 0;
   }
 
   .hero-card .date-nav {
@@ -1657,6 +1681,13 @@ footer {
   }
 
   .desktop-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    align-items: start;
+  }
+
+  .dashboard-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 1.5rem;
@@ -1820,6 +1851,11 @@ footer {
     gap: 1.8rem;
   }
 
+  .dashboard-grid {
+    grid-template-columns: minmax(0, 1.12fr) minmax(360px, 0.88fr);
+    gap: 1.8rem;
+  }
+
   .desktop-left {
     grid-area: hero;
   }
@@ -1928,7 +1964,7 @@ footer {
   }
 
   .wo-card {
-    margin-top: 2.1rem !important;
+    margin-top: 0;
     border: 1px solid rgba(0, 164, 209, 0.08);
     box-shadow: 0 6px 22px rgba(34, 56, 62, 0.06);
   }
