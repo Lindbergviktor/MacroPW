@@ -77,8 +77,7 @@ def register():
     weight_goal = form_data.get("weight_goal", "")
 
     def fail(message):
-        flash(message, "danger")
-        return render_template("register.html", form_data=form_data)
+        return render_template("register.html", form_data=form_data, error=message)
     
     # Textfält
     if not name:
