@@ -2645,6 +2645,7 @@ footer {
 .log-edit-btn {
   border: none;
   color: var(--blue-dark);
+  background: none;
 }
 
 .log-item-amount-form {
