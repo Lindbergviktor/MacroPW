@@ -2237,6 +2237,11 @@ footer {
   gap: 0.25rem;
 }
 
+.log-edit-btn {
+  border: none;
+  color: var(--blue-dark);
+}
+
 .log-item-amount-input {
   width: 70px;
   padding: 0.15rem 0.4rem;

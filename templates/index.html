@@ -260,7 +260,7 @@
                                 {% for item in log_entry.ingredients %}
                                   <div class="log-entry-item">
                                       <span>{{ item.food.title() }} — {{ item.amount }}g</span>
-                                      <button type="button" onclick="toggleEdit('edit-{{ log_id }}-{{ item.food_id }}')">✎</button>
+                                      <button type="button" class="log-edit-btn" onclick="toggleEdit('edit-{{ log_id }}-{{ item.food_id }}')">✎</button>
 
                                       <form id="edit-{{ log_id }}-{{ item.food_id }}" method="POST"
                                             action="{{ url_for('dashboard.edit_log_item', log_id=log_id, food_id=item.food_id) }}"
