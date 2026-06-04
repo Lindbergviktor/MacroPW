@@ -1,11 +1,13 @@
 const calorieLineChart = document.getElementById("calorieLineChart");
 
+// Apply progress widths from data attributes so HTML stays style-free.
 document.querySelectorAll(".stats-progress-fill[data-progress]").forEach((bar) => {
   const progress = Number.parseFloat(bar.dataset.progress || "0") || 0;
   bar.style.width = `${Math.max(0, Math.min(progress, 100))}%`;
 });
 
 if (calorieLineChart && typeof Chart !== "undefined") {
+  // Read styling and data from the DOM before building the weekly chart.
   const chartStyles = getComputedStyle(calorieLineChart);
   const chartLabels = JSON.parse(calorieLineChart.dataset.labels || "[]");
   const chartValues = JSON.parse(calorieLineChart.dataset.values || "[]");

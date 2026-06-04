@@ -41,7 +41,7 @@
 
   <!-- Huvudinnehåll -->
   <div class="page-wrapper">
-    <div class="container mt-3 px-0">
+    <div class="container mt-3 px-auto">
       {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
           {% for category, message in messages %}
@@ -252,7 +252,7 @@
                                 <div class="log-entry-header">
                                   <span class="log-entry-name">{{ log_entry.meal_name.title() }}</span>
                                   <form method="POST" action="{{ url_for('dashboard.delete_log', log_id=log_id) }}"
-                                        onsubmit="return confirm('Remove entire meal?')">
+                                        data-confirm="Remove entire meal?">
                                     <button type="submit" class="log-delete-btn">✕ Remove all</button>
                                   </form>
                                 </div>
@@ -260,7 +260,7 @@
                                 {% for item in log_entry.ingredients %}
                                   <div class="log-entry-item">
                                       <span>{{ item.food.title() }} — {{ item.amount }}g</span>
-                                      <button type="button" onclick="toggleEdit('edit-{{ log_id }}-{{ item.food_id }}')">✎</button>
+                                      <button type="button" class="log-edit-btn" data-toggle-edit-id="edit-{{ log_id }}-{{ item.food_id }}">✎</button>
 
                                       <form id="edit-{{ log_id }}-{{ item.food_id }}" method="POST"
                                             action="{{ url_for('dashboard.edit_log_item', log_id=log_id, food_id=item.food_id) }}"
@@ -339,7 +339,7 @@
               </div>
               <div>
                 <button type="button" class="btn btn-outline-secondary btn-sm mb-2"
-                        onclick="addIngredientRow('{{ cat }}')">+ Add Ingredient</button>
+                        data-add-ingredient-row="{{ cat }}">+ Add Ingredient</button>
               </div>
               <div id="calorie-preview-{{ cat }}" class="calorie-preview ui-hidden">
                 ≈ <span class="calorie-preview-value">0</span> kcal &nbsp;
@@ -374,6 +374,7 @@
 
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="{{ url_for('static', filename='common.js') }}"></script>
   <script src="{{ url_for('static', filename='dashboard.js') }}"></script>
 
 </body>

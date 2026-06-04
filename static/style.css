@@ -2640,6 +2640,12 @@ footer {
   padding: 0;
 }
 
+.log-edit-btn {
+  border: none;
+  color: var(--blue-dark);
+  background: none;
+}
+
 .log-item-amount-form {
   display: flex;
   align-items: center;
