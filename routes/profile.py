@@ -31,22 +31,20 @@ def profile():
 
         try:
             height_value = int(height)
+            if height_value <= 0 or height_value > 300:
+                flash("Height must be between 1 and 300 cm.", "danger")
+                return redirect(url_for("profile.profile"))
         except ValueError:
             flash("Height must be a whole number.", "danger")
             return redirect(url_for("profile.profile"))
 
-        if height_value <= 0:
-            flash("Height must be a positive number.", "danger")
-            return redirect(url_for("profile.profile"))
-
         try:
             weight_value = float(weight)
+            if weight_value <= 0 or weight_value > 999.9:
+                flash("Weight must be between 1 and 999.9 kg.", "danger")
+                return redirect(url_for("profile.profile"))
         except ValueError:
-            flash("Weight must be a number.", "danger")
-            return redirect(url_for("profile.profile"))
-
-        if weight_value <= 0:
-            flash("Weight must be a positive number.", "danger")
+            flash("Weight must be a valid number.", "danger")
             return redirect(url_for("profile.profile"))
 
         update_user_profile(
