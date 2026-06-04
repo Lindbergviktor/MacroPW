@@ -2,6 +2,7 @@
   const TOTAL_GLASSES = 8;
   const MEAL_CATEGORIES = ["Breakfast", "Lunch", "Dinner", "Snack"];
 
+  // Render the half-doughnut calorie gauge on the dashboard hero card.
   function initGauge() {
     const gaugeCanvas = document.getElementById("calorieGaugeChart");
     if (!gaugeCanvas || typeof Chart === "undefined") return;
@@ -47,12 +48,12 @@
     });
   }
 
+  // Build and persist the clickable water glasses tracker.
   function initWaterTracker() {
     const wrap = document.getElementById("waterGlasses");
     const count = document.getElementById("waterCount");
     if (!wrap || !count) return;
     
-    // Fyller i hur många glass vatten
     let filled = Number(document.body.dataset.waterToday || 0);
     const updateUrl = wrap.dataset.updateUrl;
 
@@ -89,14 +90,7 @@
     renderGlasses();
   }
 
-  function initAlerts() {
-    window.setTimeout(function () {
-      document.querySelectorAll(".alert").forEach(function (el) {
-        el.style.display = "none";
-      });
-    }, 3000);
-  }
-
+  // Reset modal forms so repeated openings start from a clean state.
   function initModalResets() {
     document.querySelectorAll(".modal").forEach(function (modal) {
       modal.addEventListener("hidden.bs.modal", function () {
@@ -107,7 +101,7 @@
     });
   }
 
-    // JS funktion för att ge en kalorie-förhandsgranskning.
+  // Recalculate the live macro preview for one meal category modal.
   function updateCaloriePreview(category) {
     const container = document.getElementById(`ingredients-container-${category}`);
     const preview = document.getElementById(`calorie-preview-${category}`);
@@ -145,6 +139,7 @@
     }
   }
 
+  // Watch each meal modal for ingredient and amount changes.
   function initMealPreviewHandlers() {
     MEAL_CATEGORIES.forEach(function (category) {
       const container = document.getElementById(`ingredients-container-${category}`);
@@ -164,12 +159,14 @@
     });
   }
 
+  // Toggle the inline amount edit form for one logged ingredient.
   function toggleEdit(id) {
     const form = document.getElementById(id);
     if (!form) return;
     form.classList.toggle("ui-hidden");
   }
 
+  // Clone one ingredient row inside a meal modal.
   function addIngredientRow(category) {
     const container = document.getElementById(`ingredients-container-${category}`);
     if (!container) return;
@@ -197,14 +194,27 @@
     container.appendChild(newRow);
   }
 
-  window.toggleEdit = toggleEdit;
-  window.addIngredientRow = addIngredientRow;
+  // Route data-attribute driven buttons to their dashboard helpers.
+  function initMealActions() {
+    document.addEventListener("click", function (event) {
+      const editTrigger = event.target.closest("[data-toggle-edit-id]");
+      if (editTrigger) {
+        toggleEdit(editTrigger.dataset.toggleEditId);
+        return;
+      }
+
+      const addTrigger = event.target.closest("[data-add-ingredient-row]");
+      if (addTrigger) {
+        addIngredientRow(addTrigger.dataset.addIngredientRow);
+      }
+    });
+  }
 
   document.addEventListener("DOMContentLoaded", function () {
     initGauge();
     initWaterTracker();
-    initAlerts();
     initModalResets();
     initMealPreviewHandlers();
+    initMealActions();
   });
 })();
