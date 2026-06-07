@@ -10,8 +10,9 @@ En webbaserad applikation för kost- och träningsloggning, byggd med Flask, Boo
 - [Installation](#installation)
 - [Konfiguration](#konfiguration)
 - [Starta applikationen](#starta-applikationen)
-- [Projektstruktur](#projektstruktur)
 - [Testanvändare](#testanvändare)
+- [Projektstruktur](#projektstruktur)
+
 
 ## Funktioner
 
@@ -25,11 +26,11 @@ En webbaserad applikation för kost- och träningsloggning, byggd med Flask, Boo
 
 ## Teknikstack
 
-| Kategori       | Teknik                  |
-|----------------|-------------------------|
-| Backend        | Python 3, Flask         |
-| Databas        | PostgreSQL, psycopg2    |
-| Frontend       | Jinja2, Bootstrap, CSS  |
+| Kategori       | Teknik                              |
+|----------------|-------------------------------------|
+| Backend        | Python 3, Flask                     |
+| Databas        | PostgreSQL, psycopg2                |
+| Frontend       | Jinja2, Bootstrap, CSS, JavaScript  |
 
 ## Förutsättningar
 
@@ -51,9 +52,11 @@ En webbaserad applikation för kost- och träningsloggning, byggd med Flask, Boo
 
 ## Konfiguration
 
-Applikationen ansluter till databasen via filen `config.ini`. Denna fil tillhandahålls separat med korrekta värden redan ifyllda.
+Applikationen ansluter till databasen via filen `config.ini`. De korrekta värdena tillhandahålls separat.
 
-Placera `config.ini` i projektmappen (samma mapp som `app.py`) innan du startar applikationen.
+Fyll i rätt värden i `config.ini.example` i mappen (samma mapp som `app.py`).
+
+Ändra namnet till `config.ini` innan du startar applikationen.
 
 > **OBS:** `config.ini` är listad i `.gitignore` och ska aldrig checkas in i versionshanteringen eftersom den innehåller känsliga uppgifter.
 
@@ -71,27 +74,48 @@ För att testa applikationen utan att registrera ett nytt konto:
 
 | Fält     | Värde           |
 |----------|-----------------|
-| E-post   | anna@mail.com   |
-| Lösenord | lösenord123     |
+| E-post   | demo1@mail.com  |
+| Lösenord | Test1234        |
 
 ## Projektstruktur
 
 ```
-MacroPW/
-├── app.py               # Applikationens routes och logik
-├── db.py                # Databasanslutning
-├── nutrition.py         # Beräkningar för kalorimål och ålder
-├── config.ini           # Databasuppgifter (ingår ej i repo)
-├── config.ini.example   # Mall för konfiguration
+├── app.py                    # Applikationens entry point
+├── db.py                     # Databasanslutning
+├── nutrition.py              # Beräkningar för kalorimål och ålder
+├── config.ini                # Databasuppgifter (ingår ej i repo)
+├── config.ini.example        # Mall för konfiguration
+├── routes/                   # Flask Blueprints – en fil per funktionsområde
+│   ├── auth.py               # Inloggning och registrering
+│   ├── dashboard.py          # Dashboard/startsida för inloggad användare
+│   ├── foods.py              # Livsmedelshantering
+│   ├── meals.py              # Måltidsloggning
+│   ├── profile.py            # Användarprofil och inställningar
+│   ├── statistics.py         # Statistik och diagram
+│   └── workouts.py           # Träningsloggning
+├── services/                 # Affärslogik separerad från routes
+│   ├── dashboard_service.py
+│   ├── food_service.py
+│   ├── meal_service.py
+│   ├── statistics_service.py
+│   ├── user_service.py
+│   └── workout_service.py
 ├── static/
-│   ├── style.css        # Stilsättning
-│   └── images/          # Bilder
-└── templates/           # Jinja2-mallar (HTML)
-    ├── index.html
+│   ├── style.css             # Global stilsättning
+│   ├── common.js             # Delad JavaScript-logik
+│   ├── dashboard.js
+│   ├── meals.js
+│   ├── statistics.js
+│   └── images/               # Bilder (logga, bakgrund m.m.)
+└── templates/                # Jinja2-mallar (HTML)
+    ├── index.html            # Dashboard
+    ├── start_page.html       # Landningssida (ej inloggad)
     ├── login.html
     ├── register.html
+    ├── profile.html
     ├── meals.html
+    ├── edit_meal.html
     ├── foods.html
     ├── statistics.html
-    └── ...
+    └── add_workout.html
 ```
