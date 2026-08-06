@@ -142,3 +142,59 @@ def get_macro_goals(user_id, calories_burned=0):
         "fat": fat_goal,
         "carbs": carb_goal,
     }
+
+
+def verify_user_password(user_id, password):
+    """Kontrollerar om lösenordet stämmer för angiven användare."""
+    with get_db() as cur:
+        cur.execute(
+            "SELECT user_id FROM users WHERE user_id = %s AND password = %s",
+            (user_id, password),
+        )
+        return cur.fetchone() is not None
+
+
+def delete_user_account(user_id):
+    """Raderar användarkontot och all tillhörande data i en transaktion.
+
+    Returnerar rowcount från DELETE på users (0 eller 1).
+    """
+    with get_db() as cur:
+        cur.execute(
+            "DELETE FROM meal_log_item WHERE log_id IN "
+            "(SELECT log_id FROM meal_log WHERE user_id = %s)",
+            (user_id,),
+        )
+        cur.execute("DELETE FROM meal_log WHERE user_id = %s", (user_id,))
+        cur.execute(
+            "DELETE FROM meal_ingredient WHERE meal_id IN "
+            "(SELECT meal_id FROM meal WHERE user_id = %s)",
+            (user_id,),
+        )
+        cur.execute("DELETE FROM meal WHERE user_id = %s", (user_id,))
+        cur.execute("DELETE FROM workout_log WHERE user_id = %s", (user_id,))
+        cur.execute("DELETE FROM water_log WHERE user_id = %s", (user_id,))
+        cur.execute("DELETE FROM users WHERE user_id = %s", (user_id,))
+        return cur.rowcount
+
+
+def count_user_data(user_id):
+    """Räknar antalet rader per tabell kopplad till användaren.
+
+    Returnerar en dict med tabellnamn som nycklar och radantal som värden.
+    """
+    with get_db() as cur:
+        cur.execute("SELECT COUNT(*) FROM meal WHERE user_id = %s", (user_id,))
+        meals = cur.fetchone()[0]
+        cur.execute("SELECT COUNT(*) FROM meal_log WHERE user_id = %s", (user_id,))
+        meal_logs = cur.fetchone()[0]
+        cur.execute("SELECT COUNT(*) FROM workout_log WHERE user_id = %s", (user_id,))
+        workout_logs = cur.fetchone()[0]
+        cur.execute("SELECT COUNT(*) FROM water_log WHERE user_id = %s", (user_id,))
+        water_logs = cur.fetchone()[0]
+    return {
+        "meals": meals,
+        "meal_logs": meal_logs,
+        "workout_logs": workout_logs,
+        "water_logs": water_logs,
+    }

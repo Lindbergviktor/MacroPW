@@ -6,17 +6,22 @@ profiluppgifter, såsom namn, kroppsdata, aktivitetsnivå och mål.
 
 from flask import Blueprint, flash, redirect, render_template, request, session, url_for
 
-from services.user_service import get_user_profile_row, update_user_profile
+from routes.auth import login_required
+from services.user_service import (
+    count_user_data,
+    delete_user_account,
+    get_user_profile_row,
+    update_user_profile,
+    verify_user_password,
+)
 
 profile_bp = Blueprint("profile", __name__)
 
 
 @profile_bp.route("/profile", methods=["GET", "POST"])
+@login_required
 def profile():
     """Profilsida för användaren med deras personliga information"""
-    if "user_id" not in session:
-        return redirect(url_for("auth.login"))
-
     user_id = session["user_id"]
 
     if request.method == "POST":
@@ -64,4 +69,32 @@ def profile():
 
     row, cols = get_user_profile_row(user_id)
     user = dict(zip(cols, row))
-    return render_template("profile.html", user=user)
+    data_counts = count_user_data(user_id)
+    return render_template("profile.html", user=user, data_counts=data_counts)
+
+
+@profile_bp.route("/delete_account", methods=["POST"])
+@login_required
+def delete_account():
+    """Raderar användarens konto och all tillhörande data efter verifiering."""
+    user_id = session["user_id"]
+    password = request.form.get("password", "")
+    confirmation = request.form.get("confirmation", "")
+
+    if confirmation != "DELETE":
+        flash("You must type DELETE to confirm account deletion.", "danger")
+        return redirect(url_for("profile.profile"))
+
+    if not verify_user_password(user_id, password):
+        flash("Incorrect password. Account not deleted.", "danger")
+        return redirect(url_for("profile.profile"))
+
+    try:
+        delete_user_account(user_id)
+    except Exception:
+        flash("An error occurred. Account was not deleted.", "danger")
+        return redirect(url_for("profile.profile"))
+
+    session.clear()
+    flash("Your account and all associated data have been permanently deleted.", "success")
+    return redirect(url_for("auth.start_page"))
